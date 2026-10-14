@@ -2,137 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>YOYO TRADE PRO</title>
 
 <style>
 *{box-sizing:border-box}
-
-body{
-margin:0;
-background:#080c10;
-color:#fff;
-font-family:Arial,sans-serif;
-}
-
-header{
-text-align:center;
-padding:25px;
-background:#10161d;
-border-bottom:1px solid #293744;
-}
-
-.logo{
-font-size:30px;
-font-weight:900;
-}
-
+body{margin:0;background:#080c10;color:#fff;font-family:Arial,sans-serif}
+header{text-align:center;padding:24px 12px;background:#10161d;border-bottom:1px solid #293744}
+.logo{font-size:30px;font-weight:900}
 .logo span{color:#d5ff35}
-
-.sub{
-color:#91a2af;
-font-size:12px;
-margin-top:8px;
-}
-
-main{
-max-width:1100px;
-margin:auto;
-padding:15px;
-}
-
-.card{
-background:#111820;
-border:1px solid #293744;
-border-radius:15px;
-padding:17px;
-margin-bottom:16px;
-}
-
-h2{
-font-size:19px;
-margin-top:0;
-}
-
-label{
-display:block;
-color:#a7b5c2;
-font-size:13px;
-margin:12px 0 6px;
-}
-
-select,input{
-width:100%;
-padding:13px;
-border-radius:9px;
-border:1px solid #354451;
-background:#0a1016;
-color:#fff;
-font-size:15px;
-}
-
-button{
-background:#18232d;
-color:#fff;
-border:1px solid #354451;
-padding:12px;
-border-radius:9px;
-font-weight:bold;
-cursor:pointer;
-}
-
-button.active,.analyze{
-background:#d5ff35;
-color:#080c10;
-border-color:#d5ff35;
-}
-
-.row{
-display:flex;
-gap:7px;
-overflow-x:auto;
-margin:14px 0;
-}
-
-.row button{min-width:55px}
-
-#chart{
-height:580px;
-width:100%;
-}
-
-.note{
-color:#9aaab6;
-font-size:12px;
-line-height:1.6;
-}
-
-.analyze{
-width:100%;
-padding:17px;
-font-size:17px;
-margin-top:15px;
-}
-
-.result{
-margin-top:15px;
-background:#0b1218;
-padding:15px;
-border-radius:10px;
-line-height:1.8;
-}
-
-.badge{
-color:#d5ff35;
-font-size:12px;
-}
-
-footer{
-text-align:center;
-color:#758594;
-padding:25px;
-font-size:12px;
-}
+.sub{color:#91a2af;font-size:12px;margin-top:7px}
+main{max-width:1100px;margin:auto;padding:14px}
+.card{background:#111820;border:1px solid #293744;border-radius:15px;padding:16px;margin-bottom:15px}
+h2{font-size:19px;margin:0 0 16px}
+label{display:block;color:#a7b5c2;font-size:13px;margin:12px 0 6px}
+select,input{width:100%;padding:13px;border-radius:9px;border:1px solid #354451;background:#0a1016;color:#fff;font-size:15px}
+button{background:#18232d;color:#fff;border:1px solid #354451;padding:12px;border-radius:9px;font-weight:bold;cursor:pointer}
+button.active,.analyze{background:#d5ff35;color:#080c10;border-color:#d5ff35}
+.row{display:flex;gap:7px;overflow-x:auto;margin:14px 0}
+.row button{min-width:54px}
+#chart{height:590px;width:100%;position:relative}
+.note{color:#9aaab6;font-size:12px;line-height:1.6}
+.analyze{width:100%;padding:17px;font-size:17px;margin-top:14px}
+.result{margin-top:15px;background:#0b1218;padding:15px;border-radius:10px;line-height:1.7}
+.badge{color:#d5ff35;font-size:12px}
+.indicators{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.indicators div{background:#0b1218;padding:12px;border-radius:8px;font-size:13px}
+footer{text-align:center;color:#758594;padding:25px;font-size:12px}
 </style>
 </head>
 
@@ -146,12 +42,237 @@ font-size:12px;
 <main>
 
 <section class="card">
-
 <h2>Market Explorer</h2>
 
 <label>Market Category</label>
-
 <select id="category" onchange="changeCategory()">
 <option value="crypto">Crypto</option>
 <option value="stocks">Stocks</option>
 <option value="etfs">ETFs</option>
+<option value="forex">Forex</option>
+<option value="futures">Futures</option>
+<option value="commodities">Commodities</option>
+<option value="indices">Indices</option>
+</select>
+
+<label>Symbol</label>
+<select id="symbol" onchange="loadChart()"></select>
+
+<label>Custom TradingView Symbol</label>
+<input id="customSymbol" placeholder="Example: BINANCE:SOLUSDT">
+
+<button onclick="searchSymbol()" style="margin-top:10px">
+Search Symbol
+</button>
+</section>
+
+<section class="card">
+<h2 id="chartTitle">BINANCE:BTCUSDT</h2>
+
+<div class="row">
+<button onclick="setTimeframe('5',this)">5m</button>
+<button class="active" onclick="setTimeframe('15',this)">15m</button>
+<button onclick="setTimeframe('60',this)">1H</button>
+<button onclick="setTimeframe('240',this)">4H</button>
+<button onclick="setTimeframe('D',this)">1D</button>
+<button onclick="setTimeframe('W',this)">1W</button>
+</div>
+
+<div id="chart"></div>
+
+<p class="note">
+TradingView chart. Market prices may be delayed.
+Use the chart Indicators menu to verify or adjust EMA21.
+</p>
+</section>
+
+<section class="card">
+<h2>Market Analysis</h2>
+
+<p class="badge">Analysis Engine: Not Connected</p>
+
+<label>Analysis Mode</label>
+<select id="analysisMode">
+<option value="single">Single Timeframe</option>
+<option value="multi" selected>Multi Timeframe (15m + 1H)</option>
+</select>
+
+<h2 style="margin-top:20px">Technical Indicators</h2>
+
+<div class="indicators">
+<div>✓ EMA 21</div>
+<div>✓ RSI (14)</div>
+<div>✓ MACD (12,26,9)</div>
+<div>✓ Volume</div>
+<div>✓ Bollinger Bands (20,2)</div>
+</div>
+
+<button class="analyze" onclick="analyzeNow()">
+ANALYZE NOW
+</button>
+
+<div class="result" id="result">
+<strong>TRADE ANALYSIS</strong>
+<p>Status: WAITING</p>
+<p>Live analysis engine is not connected yet.</p>
+</div>
+</section>
+
+</main>
+
+<footer>
+YOYO TRADE PRO © 2026<br>
+Educational use only. Not financial advice.
+</footer>
+
+<script>
+const markets={
+crypto:[
+["Bitcoin","BINANCE:BTCUSDT"],
+["Ethereum","BINANCE:ETHUSDT"],
+["Solana","BINANCE:SOLUSDT"],
+["XRP","BINANCE:XRPUSDT"],
+["SUI","BINANCE:SUIUSDT"],
+["LINK","BINANCE:LINKUSDT"],
+["AVAX","BINANCE:AVAXUSDT"],
+["NEAR","BINANCE:NEARUSDT"]
+],
+stocks:[
+["Apple","NASDAQ:AAPL"],
+["NVIDIA","NASDAQ:NVDA"],
+["Tesla","NASDAQ:TSLA"],
+["Amazon","NASDAQ:AMZN"],
+["Microsoft","NASDAQ:MSFT"]
+],
+etfs:[
+["SPY","AMEX:SPY"],
+["QQQ","NASDAQ:QQQ"],
+["IWM","AMEX:IWM"]
+],
+forex:[
+["EUR/USD","FX:EURUSD"],
+["GBP/USD","FX:GBPUSD"],
+["USD/JPY","FX:USDJPY"]
+],
+futures:[
+["S&P 500 Futures","CME_MINI:ES1!"],
+["Nasdaq Futures","CME_MINI:NQ1!"],
+["Gold Futures","COMEX:GC1!"]
+],
+commodities:[
+["Gold","OANDA:XAUUSD"],
+["Silver","OANDA:XAGUSD"],
+["Oil","TVC:USOIL"]
+],
+indices:[
+["S&P 500","SP:SPX"],
+["Nasdaq 100","NASDAQ:NDX"],
+["Dow Jones","DJ:DJI"]
+]
+};
+
+let currentSymbol="BINANCE:BTCUSDT";
+let currentTimeframe="15";
+
+function changeCategory(){
+const category=document.getElementById("category").value;
+const select=document.getElementById("symbol");
+select.innerHTML="";
+markets[category].forEach(item=>{
+const option=document.createElement("option");
+option.textContent=item[0];
+option.value=item[1];
+select.appendChild(option);
+});
+loadChart();
+}
+
+function loadChart(){
+currentSymbol=document.getElementById("symbol").value;
+renderChart();
+}
+
+function searchSymbol(){
+const value=document.getElementById("customSymbol").value.trim().toUpperCase();
+if(!value){alert("Enter a symbol.");return;}
+currentSymbol=value;
+renderChart();
+}
+
+function setTimeframe(tf,button){
+currentTimeframe=tf;
+document.querySelectorAll(".row button").forEach(b=>b.classList.remove("active"));
+button.classList.add("active");
+renderChart();
+}
+
+function renderChart(){
+document.getElementById("chartTitle").textContent=currentSymbol;
+const chart=document.getElementById("chart");
+chart.innerHTML="";
+
+const widget=document.createElement("div");
+widget.className="tradingview-widget-container";
+widget.style.height="100%";
+widget.style.width="100%";
+
+const inner=document.createElement("div");
+inner.className="tradingview-widget-container__widget";
+inner.style.height="100%";
+inner.style.width="100%";
+widget.appendChild(inner);
+
+const script=document.createElement("script");
+script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+script.async=true;
+script.textContent=JSON.stringify({
+autosize:true,
+symbol:currentSymbol,
+interval:currentTimeframe,
+timezone:"Etc/UTC",
+theme:"dark",
+style:"1",
+locale:"en",
+backgroundColor:"#080c10",
+allow_symbol_change:true,
+hide_side_toolbar:false,
+save_image:true,
+support_host:"https://www.tradingview.com",
+studies:[
+"Volume@tv-basicstudies",
+"RSI@tv-basicstudies",
+"MACD@tv-basicstudies",
+"MAExp@tv-basicstudies"
+]
+});
+
+widget.appendChild(script);
+chart.appendChild(widget);
+}
+
+function analyzeNow(){
+const result=document.getElementById("result");
+result.replaceChildren();
+
+const title=document.createElement("strong");
+title.textContent=currentSymbol;
+result.appendChild(title);
+
+const messages=[
+"Status: ANALYSIS NOT CONNECTED",
+"EMA21 + RSI + MACD + Volume confirmation requires a market-data analysis engine.",
+"LONG / SHORT / Entry / SL / TP1–TP3 are not available yet."
+];
+
+messages.forEach(message=>{
+const p=document.createElement("p");
+p.textContent=message;
+result.appendChild(p);
+});
+}
+
+changeCategory();
+</script>
+
+</body>
+</html>
