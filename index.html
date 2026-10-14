@@ -2,276 +2,867 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YOYO TRADE PRO</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080c10;color:#fff;font-family:Arial,sans-serif}
-header{text-align:center;padding:24px 12px;background:#10161d;border-bottom:1px solid #293744}
-.logo{font-size:30px;font-weight:900}
+
+body{
+ margin:0;
+ background:#080c10;
+ color:#fff;
+ font-family:Arial,sans-serif;
+}
+
+header{
+ background:#050709;
+ padding:17px;
+ border-bottom:1px solid #293744;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+
+.logo{
+ font-size:23px;
+ font-weight:900;
+}
+
 .logo span{color:#d5ff35}
-.sub{color:#91a2af;font-size:12px;margin-top:7px}
-main{max-width:1100px;margin:auto;padding:14px}
-.card{background:#111820;border:1px solid #293744;border-radius:15px;padding:16px;margin-bottom:15px}
-h2{font-size:19px;margin:0 0 16px}
-label{display:block;color:#a7b5c2;font-size:13px;margin:12px 0 6px}
-select,input{width:100%;padding:13px;border-radius:9px;border:1px solid #354451;background:#0a1016;color:#fff;font-size:15px}
-button{background:#18232d;color:#fff;border:1px solid #354451;padding:12px;border-radius:9px;font-weight:bold;cursor:pointer}
-button.active,.analyze{background:#d5ff35;color:#080c10;border-color:#d5ff35}
-.row{display:flex;gap:7px;overflow-x:auto;margin:14px 0}
-.row button{min-width:54px}
-#chart{height:590px;width:100%;position:relative}
-.note{color:#9aaab6;font-size:12px;line-height:1.6}
-.analyze{width:100%;padding:17px;font-size:17px;margin-top:14px}
-.result{margin-top:15px;background:#0b1218;padding:15px;border-radius:10px;line-height:1.7}
-.badge{color:#d5ff35;font-size:12px}
-.indicators{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.indicators div{background:#0b1218;padding:12px;border-radius:8px;font-size:13px}
-footer{text-align:center;color:#758594;padding:25px;font-size:12px}
+
+.pro{
+ color:#d5ff35;
+ font-size:10px;
+ border:1px solid #526522;
+ border-radius:20px;
+ padding:7px;
+}
+
+main{
+ max-width:900px;
+ margin:auto;
+}
+
+section{
+ padding:15px;
+ border-bottom:1px solid #293744;
+ background:#10171c;
+}
+
+h2{
+ font-size:19px;
+ margin:0 0 12px;
+}
+
+label{
+ display:block;
+ color:#aab7c2;
+ font-size:12px;
+ margin:12px 0 6px;
+}
+
+select,input,button{
+ background:#0a1015;
+ color:white;
+ border:1px solid #344450;
+ border-radius:8px;
+ padding:12px;
+ font-size:14px;
+}
+
+select,input{width:100%}
+
+button{
+ cursor:pointer;
+ font-weight:bold;
+}
+
+button.active,.analyze{
+ background:#d5ff35;
+ color:#080c10;
+ border-color:#d5ff35;
+}
+
+.row{
+ display:flex;
+ gap:6px;
+ overflow-x:auto;
+ margin:12px 0;
+ scrollbar-width:none;
+}
+
+.row button{
+ flex:0 0 auto;
+ min-width:56px;
+}
+
+#chart{
+ height:390px;
+ background:#080c10;
+ overflow:hidden;
+}
+
+.small{
+ color:#9aaab6;
+ font-size:12px;
+ line-height:1.5;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+
+.indicators{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ margin:15px 0;
+}
+
+.indicators span{
+ padding:9px;
+ background:#0a1015;
+ border:1px solid #344450;
+ border-radius:7px;
+ font-size:12px;
+}
+
+.analyze{
+ width:100%;
+ padding:16px;
+ font-size:16px;
+ margin-top:10px;
+}
+
+.result{
+ background:#080d11;
+ border:1px solid #344450;
+ border-radius:10px;
+ padding:16px;
+ margin-top:15px;
+ line-height:1.8;
+ font-size:14px;
+ white-space:pre-line;
+ overflow-wrap:anywhere;
+}
+
+.green{color:#d5ff35}
+.red{color:#ff7777}
+
+footer{
+ text-align:center;
+ color:#8795a0;
+ padding:20px;
+ font-size:11px;
+}
+
+details summary{
+ color:#d5ff35;
+ font-weight:bold;
+ cursor:pointer;
+}
+
+@media(max-width:500px){
+ #chart{height:350px}
+ .logo{font-size:20px}
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="logo">YOYO <span>TRADE</span></div>
-<div class="sub">PROFESSIONAL MARKET ANALYSIS</div>
+ <div class="logo">YOYO <span>TRADE</span></div>
+ <div class="pro">PRO ANALYSIS</div>
 </header>
 
 <main>
 
-<section class="card">
-<h2>Market Explorer</h2>
+<section>
+ <h2 id="chartTitle">SOLUSDT</h2>
+ <div class="small">TradingView Market Chart</div>
 
-<label>Market Category</label>
-<select id="category" onchange="changeCategory()">
-<option value="crypto">Crypto</option>
-<option value="stocks">Stocks</option>
-<option value="etfs">ETFs</option>
-<option value="forex">Forex</option>
-<option value="futures">Futures</option>
-<option value="commodities">Commodities</option>
-<option value="indices">Indices</option>
-</select>
+ <div class="row" id="chartFrames">
+  <button data-tf="1">1m</button>
+  <button data-tf="5">5m</button>
+  <button data-tf="15" class="active">15m</button>
+  <button data-tf="30">30m</button>
+  <button data-tf="60">1H</button>
+  <button data-tf="120">2H</button>
+  <button data-tf="180">3H</button>
+  <button data-tf="240">4H</button>
+  <button data-tf="360">6H</button>
+  <button data-tf="720">12H</button>
+  <button data-tf="D">1D</button>
+  <button data-tf="W">1W</button>
+ </div>
 
-<label>Symbol</label>
-<select id="symbol" onchange="loadChart()"></select>
+ <div id="chart">Loading chart...</div>
 
-<label>Custom TradingView Symbol</label>
-<input id="customSymbol" placeholder="Example: BINANCE:SOLUSDT">
-
-<button onclick="searchSymbol()" style="margin-top:10px">
-Search Symbol
-</button>
+ <p class="small">
+ Chart data may be delayed. Indicators can be
+ adjusted inside TradingView.
+ </p>
 </section>
 
-<section class="card">
-<h2 id="chartTitle">BINANCE:BTCUSDT</h2>
+<section>
+ <details id="finder">
+  <summary>MARKET SEARCH · Crypto / Stocks</summary>
 
-<div class="row">
-<button onclick="setTimeframe('5',this)">5m</button>
-<button class="active" onclick="setTimeframe('15',this)">15m</button>
-<button onclick="setTimeframe('60',this)">1H</button>
-<button onclick="setTimeframe('240',this)">4H</button>
-<button onclick="setTimeframe('D',this)">1D</button>
-<button onclick="setTimeframe('W',this)">1W</button>
-</div>
+  <label>Market</label>
+  <select id="category">
+   <option value="crypto">Crypto · Hyperliquid Perps</option>
+   <option value="stocks">Stocks / ETFs · Chart Only</option>
+  </select>
 
-<div id="chart"></div>
+  <label>Search Symbol</label>
+  <input id="search"
+   placeholder="SOL, XRP, HYPE, NVDA..."
+   autocomplete="off">
 
-<p class="note">
-TradingView chart. Market prices may be delayed.
-Use the chart Indicators menu to verify or adjust EMA21.
-</p>
+  <label>Symbol</label>
+  <select id="symbol"></select>
+
+  <p id="marketStatus" class="small">
+   Loading markets...
+  </p>
+
+  <label>Custom TradingView Symbol</label>
+  <input id="custom"
+   placeholder="NASDAQ:AAPL">
+
+  <button id="showCustom" style="margin-top:9px">
+   SHOW CHART
+  </button>
+ </details>
+
+ <p class="small">
+ Select a symbol to change the chart.
+ Live analysis supports Hyperliquid crypto perps.
+ </p>
 </section>
 
-<section class="card">
-<h2>Market Analysis</h2>
+<section>
+ <h2>AI Timeframe Analysis</h2>
+ <p class="small">
+ Rules-based technical analysis
+ </p>
 
-<p class="badge">Analysis Engine: Not Connected</p>
+ <p id="status" class="green">
+ Connecting market data...
+ </p>
 
-<label>Analysis Mode</label>
-<select id="analysisMode">
-<option value="single">Single Timeframe</option>
-<option value="multi" selected>Multi Timeframe (15m + 1H)</option>
-</select>
+ <label>Analysis Mode</label>
+ <select id="mode">
+  <option value="multi">Multi Timeframe</option>
+  <option value="single">Single Timeframe</option>
+ </select>
 
-<h2 style="margin-top:20px">Technical Indicators</h2>
+ <div class="grid">
 
-<div class="indicators">
-<div>✓ EMA 21</div>
-<div>✓ RSI (14)</div>
-<div>✓ MACD (12,26,9)</div>
-<div>✓ Volume</div>
-<div>✓ Bollinger Bands (20,2)</div>
-</div>
+  <div>
+   <label>Entry Timeframe</label>
+   <select id="entryTf"></select>
+  </div>
 
-<button class="analyze" onclick="analyzeNow()">
-ANALYZE NOW
-</button>
+  <div id="confirmBox">
+   <label>Confirmation Timeframe</label>
+   <select id="confirmTf"></select>
+  </div>
 
-<div class="result" id="result">
-<strong>TRADE ANALYSIS</strong>
-<p>Status: WAITING</p>
-<p>Live analysis engine is not connected yet.</p>
-</div>
+ </div>
+
+ <p id="pair" class="green">
+  15m + 1H
+ </p>
+
+ <div class="indicators">
+  <span>✓ EMA 21</span>
+  <span>✓ RSI 14</span>
+  <span>✓ MACD 12/26/9</span>
+  <span>✓ Volume</span>
+  <span>BB 20/2 · Chart</span>
+ </div>
+
+ <button id="analyzeBtn" class="analyze">
+  ANALYZE NOW →
+ </button>
+
+ <div id="result" class="result">
+  Select a crypto market and press ANALYZE NOW.
+ </div>
+
 </section>
 
 </main>
 
 <footer>
-YOYO TRADE PRO © 2026<br>
-Educational use only. Not financial advice.
+ YOYO TRADE PRO © 2026<br>
+ Educational use only · Not financial advice
 </footer>
 
 <script>
-const markets={
-crypto:[
-["Bitcoin","BINANCE:BTCUSDT"],
-["Ethereum","BINANCE:ETHUSDT"],
-["Solana","BINANCE:SOLUSDT"],
-["XRP","BINANCE:XRPUSDT"],
-["SUI","BINANCE:SUIUSDT"],
-["LINK","BINANCE:LINKUSDT"],
-["AVAX","BINANCE:AVAXUSDT"],
-["NEAR","BINANCE:NEARUSDT"]
-],
-stocks:[
-["Apple","NASDAQ:AAPL"],
-["NVIDIA","NASDAQ:NVDA"],
-["Tesla","NASDAQ:TSLA"],
-["Amazon","NASDAQ:AMZN"],
-["Microsoft","NASDAQ:MSFT"]
-],
-etfs:[
-["SPY","AMEX:SPY"],
-["QQQ","NASDAQ:QQQ"],
-["IWM","AMEX:IWM"]
-],
-forex:[
-["EUR/USD","FX:EURUSD"],
-["GBP/USD","FX:GBPUSD"],
-["USD/JPY","FX:USDJPY"]
-],
-futures:[
-["S&P 500 Futures","CME_MINI:ES1!"],
-["Nasdaq Futures","CME_MINI:NQ1!"],
-["Gold Futures","COMEX:GC1!"]
-],
-commodities:[
-["Gold","OANDA:XAUUSD"],
-["Silver","OANDA:XAGUSD"],
-["Oil","TVC:USOIL"]
-],
-indices:[
-["S&P 500","SP:SPX"],
-["Nasdaq 100","NASDAQ:NDX"],
-["Dow Jones","DJ:DJI"]
-]
-};
+"use strict";
 
-let currentSymbol="BINANCE:BTCUSDT";
-let currentTimeframe="15";
+const $ = id => document.getElementById(id);
 
-function changeCategory(){
-const category=document.getElementById("category").value;
-const select=document.getElementById("symbol");
-select.innerHTML="";
-markets[category].forEach(item=>{
-const option=document.createElement("option");
-option.textContent=item[0];
-option.value=item[1];
-select.appendChild(option);
+const API = "https://api.hyperliquid.xyz/info";
+
+const frames = [
+ ["1m","1m"],["5m","5m"],["15m","15m"],
+ ["30m","30m"],["1H","1h"],["2H","2h"],
+ ["3H","3h"],["4H","4h"],["6H","6h"],
+ ["12H","12h"],["1D","1d"],["1W","1w"]
+];
+
+const stocks = [
+ "NASDAQ:AAPL","NASDAQ:NVDA","NASDAQ:TSLA",
+ "NASDAQ:AMZN","NASDAQ:MSFT","NASDAQ:AMD",
+ "NASDAQ:META","NASDAQ:GOOGL","NASDAQ:AVGO",
+ "NASDAQ:PLTR","NASDAQ:COIN","NASDAQ:HOOD",
+ "NYSE:TSM","NYSE:UBER","NYSE:CRM",
+ "AMEX:SPY","NASDAQ:QQQ","AMEX:IWM"
+];
+
+let markets = [];
+let coin = "SOL";
+let symbol = "BINANCE:SOLUSDT";
+let chartTf = "15";
+let chartOnly = false;
+let connected = false;
+
+const fmt = n => Number(n).toLocaleString(
+ "en-US",{
+  maximumFractionDigits:
+   Math.abs(n)<1 ? 6 : Math.abs(n)<100 ? 4 : 2
+ }
+);
+
+function frameName(v){
+ return frames.find(x=>x[1]===v)?.[0] || v;
+}
+
+for(const id of ["entryTf","confirmTf"]){
+ frames.forEach(([name,value])=>{
+  const o = document.createElement("option");
+  o.value=value;
+  o.textContent=name;
+  $(id).appendChild(o);
+ });
+}
+
+$("entryTf").value="15m";
+$("confirmTf").value="1h";
+
+function syncMode(){
+ const single=$("mode").value==="single";
+
+ $("confirmBox").style.display=
+  single ? "none" : "";
+
+ $("pair").textContent=
+  frameName($("entryTf").value)+
+  (single ? "" :
+   " + "+frameName($("confirmTf").value));
+}
+
+["mode","entryTf","confirmTf"].forEach(id=>{
+ $(id).addEventListener("change",syncMode);
 });
-loadChart();
-}
 
-function loadChart(){
-currentSymbol=document.getElementById("symbol").value;
-renderChart();
-}
+syncMode();
 
-function searchSymbol(){
-const value=document.getElementById("customSymbol").value.trim().toUpperCase();
-if(!value){alert("Enter a symbol.");return;}
-currentSymbol=value;
-renderChart();
-}
+async function api(body){
+ const controller=new AbortController();
+ const timer=setTimeout(
+  ()=>controller.abort(),15000
+ );
 
-function setTimeframe(tf,button){
-currentTimeframe=tf;
-document.querySelectorAll(".row button").forEach(b=>b.classList.remove("active"));
-button.classList.add("active");
-renderChart();
+ try{
+  const r=await fetch(API,{
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json"
+   },
+   body:JSON.stringify(body),
+   signal:controller.signal
+  });
+
+  if(!r.ok)throw Error("HTTP "+r.status);
+
+  return await r.json();
+ }finally{
+  clearTimeout(timer);
+ }
 }
 
 function renderChart(){
-document.getElementById("chartTitle").textContent=currentSymbol;
-const chart=document.getElementById("chart");
-chart.innerHTML="";
+ $("chartTitle").textContent=symbol;
 
-const widget=document.createElement("div");
-widget.className="tradingview-widget-container";
-widget.style.height="100%";
-widget.style.width="100%";
+ const host=$("chart");
+ host.replaceChildren();
 
-const inner=document.createElement("div");
-inner.className="tradingview-widget-container__widget";
-inner.style.height="100%";
-inner.style.width="100%";
-widget.appendChild(inner);
+ const outer=document.createElement("div");
+ outer.className="tradingview-widget-container";
+ outer.style.width="100%";
+ outer.style.height="100%";
 
-const script=document.createElement("script");
-script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-script.async=true;
-script.textContent=JSON.stringify({
-autosize:true,
-symbol:currentSymbol,
-interval:currentTimeframe,
-timezone:"Etc/UTC",
-theme:"dark",
-style:"1",
-locale:"en",
-backgroundColor:"#080c10",
-allow_symbol_change:true,
-hide_side_toolbar:false,
-save_image:true,
-support_host:"https://www.tradingview.com",
-studies:[
-"Volume@tv-basicstudies",
-"RSI@tv-basicstudies",
-"MACD@tv-basicstudies",
-"MAExp@tv-basicstudies"
-]
-});
+ const inner=document.createElement("div");
+ inner.className=
+  "tradingview-widget-container__widget";
+ inner.style.width="100%";
+ inner.style.height="100%";
 
-widget.appendChild(script);
-chart.appendChild(widget);
+ outer.appendChild(inner);
+
+ const script=document.createElement("script");
+ script.async=true;
+
+ script.src=
+ "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+
+ script.textContent=JSON.stringify({
+  autosize:true,
+  symbol:symbol,
+  interval:chartTf,
+  timezone:"Etc/UTC",
+  theme:"dark",
+  style:"1",
+  locale:"en",
+  backgroundColor:"#080c10",
+  hide_side_toolbar:true,
+  allow_symbol_change:true,
+  studies:[
+   "Volume@tv-basicstudies",
+   "RSI@tv-basicstudies",
+   "MACD@tv-basicstudies",
+   "MAExp@tv-basicstudies"
+  ]
+ });
+
+ outer.appendChild(script);
+ host.appendChild(outer);
 }
 
-function analyzeNow(){
-const result=document.getElementById("result");
-result.replaceChildren();
+function selectMarket(){
+ const value=$("symbol").value;
+ if(!value)return;
 
-const title=document.createElement("strong");
-title.textContent=currentSymbol;
-result.appendChild(title);
+ chartOnly=$("category").value==="stocks";
 
-const messages=[
-"Status: ANALYSIS NOT CONNECTED",
-"EMA21 + RSI + MACD + Volume confirmation requires a market-data analysis engine.",
-"LONG / SHORT / Entry / SL / TP1–TP3 are not available yet."
-];
+ if(chartOnly){
+  coin="";
+  symbol=value;
+ }else{
+  coin=value;
+  symbol="BINANCE:"+coin+"USDT";
+ }
 
-messages.forEach(message=>{
-const p=document.createElement("p");
-p.textContent=message;
-result.appendChild(p);
-});
+ renderChart();
+
+ $("result").textContent=chartOnly
+  ? "Stocks / ETFs: chart only. Analysis data is not connected."
+  : coin+" selected. Press ANALYZE NOW.";
 }
 
-changeCategory();
+function populate(){
+ const category=$("category").value;
+ const q=$("search").value.trim().toUpperCase();
+
+ const list=category==="crypto"
+  ? markets
+  : stocks.map(x=>({
+     name:x.split(":")[1],
+     value:x
+    }));
+
+ const filtered=list.filter(x=>
+  x.name.includes(q) ||
+  x.value.includes(q)
+ );
+
+ const select=$("symbol");
+ const previous=select.value;
+
+ select.replaceChildren();
+
+ filtered.forEach(x=>{
+  const o=document.createElement("option");
+  o.value=x.value;
+  o.textContent=x.name;
+  select.appendChild(o);
+ });
+
+ if(filtered.some(x=>x.value===previous)){
+  select.value=previous;
+ }else if(
+  category==="crypto" &&
+  filtered.some(x=>x.value==="SOL")
+ ){
+  select.value="SOL";
+ }
+
+ if(filtered.length){
+  selectMarket();
+ }else{
+  $("marketStatus").textContent=
+   "No matching symbols.";
+ }
+}
+
+async function loadMarkets(){
+ try{
+  const data=await api({type:"meta"});
+
+  markets=(data.universe||[])
+   .filter(x=>!x.isDelisted)
+   .map(x=>({
+    name:x.name,
+    value:x.name
+   }));
+
+  if(!markets.length){
+   throw Error("No markets returned");
+  }
+
+  connected=true;
+
+  $("status").textContent=
+   "● Hyperliquid connected";
+
+  $("marketStatus").textContent=
+   markets.length+" markets loaded";
+
+ }catch(e){
+  connected=false;
+
+  $("status").textContent=
+   "● Market API unavailable";
+
+  $("marketStatus").textContent=
+   "Could not load live markets: "+e.message;
+
+  markets=[
+   "SOL","ETH","XRP","SUI","HYPE",
+   "LINK","AVAX","NEAR","DOGE",
+   "SEI","ATOM","DOT","LTC",
+   "XLM","AAVE","UNI"
+  ].map(x=>({name:x,value:x}));
+ }
+
+ populate();
+}
+
+function ema(values,n){
+ const k=2/(n+1);
+ let e=values[0];
+ const out=[];
+
+ values.forEach(v=>{
+  e=v*k+e*(1-k);
+  out.push(e);
+ });
+
+ return out;
+}
+
+function rsi(values,n=14){
+ if(values.length<n+2)return NaN;
+
+ let gain=0,loss=0;
+
+ for(let i=1;i<=n;i++){
+  const d=values[i]-values[i-1];
+  gain+=Math.max(d,0)/n;
+  loss+=Math.max(-d,0)/n;
+ }
+
+ for(let i=n+1;i<values.length;i++){
+  const d=values[i]-values[i-1];
+
+  gain=(gain*(n-1)+Math.max(d,0))/n;
+  loss=(loss*(n-1)+Math.max(-d,0))/n;
+ }
+
+ if(loss===0)return gain===0?50:100;
+
+ return 100-100/(1+gain/loss);
+}
+
+function indicators(c){
+ const close=c.map(x=>x.c);
+ const volume=c.map(x=>x.v);
+
+ const e21=ema(close,21);
+ const e12=ema(close,12);
+ const e26=ema(close,26);
+
+ const macd=e12.map((x,i)=>x-e26[i]);
+ const signal=ema(macd,9);
+
+ const avgVol=volume.slice(-21,-1)
+  .reduce((a,b)=>a+b,0)/20;
+
+ const tr=[];
+
+ for(let i=1;i<c.length;i++){
+  tr.push(Math.max(
+   c[i].h-c[i].l,
+   Math.abs(c[i].h-c[i-1].c),
+   Math.abs(c[i].l-c[i-1].c)
+  ));
+ }
+
+ const atr=tr.slice(-14)
+  .reduce((a,b)=>a+b,0)/14;
+
+ return {
+  price:close.at(-1),
+  ema:e21.at(-1),
+  prevEma:e21.at(-2),
+  rsi:rsi(close),
+  macd:macd.at(-1),
+  signal:signal.at(-1),
+  volume:avgVol
+   ? volume.at(-1)/avgVol
+   : 0,
+  atr:atr
+ };
+}
+
+async function getCandles(market,interval){
+ const duration={
+  "1m":1,"5m":5,"15m":15,
+  "30m":30,"1h":60,"2h":120,
+  "3h":180,"4h":240,"6h":360,
+  "12h":720,"1d":1440,"1w":10080
+ };
+
+ const minutes=duration[interval];
+
+ if(!minutes){
+  throw Error("Unsupported timeframe");
+ }
+
+ const end=Date.now();
+ const start=end-150*minutes*60000;
+
+ const data=await api({
+  type:"candleSnapshot",
+  req:{
+   coin:market,
+   interval:interval,
+   startTime:start,
+   endTime:end
+  }
+ });
+
+ if(!Array.isArray(data)){
+  throw Error("Invalid candle data");
+ }
+
+ return data
+  .filter(x=>Number(x.T)<=Date.now())
+  .map(x=>({
+   c:+x.c,
+   h:+x.h,
+   l:+x.l,
+   v:+x.v
+  }));
+}
+
+async function analyze(){
+ const box=$("result");
+ const button=$("analyzeBtn");
+
+ if(chartOnly || !coin){
+  box.textContent=
+   "Select a Hyperliquid crypto market.";
+  return;
+ }
+
+ if(!connected){
+  box.textContent=
+   "Market API is not connected. Refresh and try again.";
+  return;
+ }
+
+ button.disabled=true;
+ box.textContent="Loading completed candles...";
+
+ try{
+  const entry=$("entryTf").value;
+  const multi=$("mode").value==="multi";
+  const confirm=$("confirmTf").value;
+
+  const [c1,c2]=await Promise.all([
+   getCandles(coin,entry),
+   multi
+    ? getCandles(coin,confirm)
+    : Promise.resolve(null)
+  ]);
+
+  if(c1.length<50 || (c2 && c2.length<50)){
+   throw Error("Not enough closed candles");
+  }
+
+  const a=indicators(c1);
+  const b=c2?indicators(c2):null;
+
+  const bullish=
+   a.price>a.ema &&
+   a.ema>a.prevEma &&
+   a.rsi>=50 &&
+   a.macd>a.signal;
+
+  const bearish=
+   a.price<a.ema &&
+   a.ema<a.prevEma &&
+   a.rsi<=50 &&
+   a.macd<a.signal;
+
+  const confirmLong=
+   !b || (
+    b.price>b.ema &&
+    b.ema>b.prevEma
+   );
+
+  const confirmShort=
+   !b || (
+    b.price<b.ema &&
+    b.ema<b.prevEma
+   );
+
+  const volumeOK=a.volume>=1.2;
+
+  let side="WAIT";
+
+  if(bullish && confirmLong && volumeOK){
+   side="LONG";
+  }else if(
+   bearish && confirmShort && volumeOK
+  ){
+   side="SHORT";
+  }
+
+  const lines=[
+   "YOYO TRADE PRO",
+   "",
+   coin+" | "+side,
+   "",
+   "Timeframe: "+frameName(entry)+
+    (multi?" + "+frameName(confirm):""),
+   "",
+   "Price: "+fmt(a.price),
+   "EMA21: "+fmt(a.ema),
+   "RSI14: "+a.rsi.toFixed(1),
+   "Volume: "+a.volume.toFixed(2)+"×"
+  ];
+
+  if(side==="WAIT"){
+   lines.push(
+    "",
+    "No confirmed trade setup.",
+    "Wait for confirmation."
+   );
+  }else{
+   const risk=Math.max(
+    a.atr*1.5,
+    a.price*0.002
+   );
+
+   const direction=side==="LONG"?1:-1;
+
+   lines.push(
+    "",
+    "ENTRY: "+fmt(a.price),
+    "SL: "+fmt(a.price-direction*risk),
+    "TP1: "+fmt(a.price+direction*2*risk),
+    "TP2: "+fmt(a.price+direction*3*risk),
+    "TP3: "+fmt(a.price+direction*4*risk),
+    "",
+    "Experimental technical signal.",
+    "Verify price before trading."
+   );
+  }
+
+  lines.push(
+   "",
+   "Updated: "+new Date().toLocaleString()
+  );
+
+  box.textContent=lines.join("\n");
+
+ }catch(e){
+  box.textContent=
+   "Analysis unavailable: "+e.message+
+   "\nNo trade signal generated.";
+ }finally{
+  button.disabled=false;
+ }
+}
+
+$("category").addEventListener(
+ "change",populate
+);
+
+$("search").addEventListener(
+ "input",populate
+);
+
+$("symbol").addEventListener(
+ "change",selectMarket
+);
+
+$("showCustom").addEventListener("click",()=>{
+ const value=$("custom").value
+  .trim().toUpperCase();
+
+ if(!/^[A-Z0-9_!.-]+:[A-Z0-9_!.-]+$/.test(value)){
+  alert("Example: NASDAQ:AAPL");
+  return;
+ }
+
+ symbol=value;
+ coin="";
+ chartOnly=true;
+
+ renderChart();
+
+ $("result").textContent=
+  "Custom symbol: chart only.";
+});
+
+$("chartFrames").addEventListener("click",e=>{
+ const button=e.target.closest(
+  "button[data-tf]"
+ );
+
+ if(!button)return;
+
+ chartTf=button.dataset.tf;
+
+ document.querySelectorAll(
+  "#chartFrames button"
+ ).forEach(b=>{
+  b.classList.toggle(
+   "active",b===button
+  );
+ });
+
+ renderChart();
+});
+
+$("analyzeBtn").addEventListener(
+ "click",analyze
+);
+
+renderChart();
+loadMarkets();
+
 </script>
 
 </body>
