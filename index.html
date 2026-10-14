@@ -1,37 +1,1289 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>YOYO TRADE PRO · Hyperliquid</title><style>
-:root{--bg:#080d11;--panel:#10191f;--line:#273a43;--text:#eef4f6;--muted:#8fa2ac;--lime:#d5ff35;--green:#22c6a2;--red:#f46b83}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}header{position:sticky;top:0;z-index:9;background:#05090c;border-bottom:1px solid var(--line);padding:16px;display:flex;align-items:center;justify-content:space-between}.logo{font-size:22px;font-weight:900;letter-spacing:-.7px}.logo b{color:var(--lime)}.badge{font-size:10px;letter-spacing:1px;border:1px solid #536c24;color:var(--lime);padding:8px;border-radius:25px}main{max-width:1000px;margin:auto}section{padding:15px;border-bottom:1px solid var(--line)}.top{display:flex;justify-content:space-between;align-items:center;gap:8px}.top h1{font-size:23px;margin:0}.muted{color:var(--muted)}.tiny{font-size:12px}.status{margin:8px 0;font-size:12px}.good{color:var(--green)}.bad{color:var(--red)}.lime{color:var(--lime)}button,select,input{font:inherit;border-radius:9px;border:1px solid #38505a;background:#0b1318;color:var(--text);padding:11px}button{cursor:pointer;font-weight:700}button:disabled{opacity:.6}button.active,.primary{background:var(--lime);border-color:var(--lime);color:#071013}.tfrow{display:flex;gap:7px;overflow:auto;scrollbar-width:none;padding:12px 0}.tfrow button{flex:0 0 auto;min-width:54px}.chartbox{height:310px;position:relative;background:#070e13;border:1px solid var(--line);border-radius:14px;overflow:hidden}.chartbox canvas{display:block;width:100%;height:100%;touch-action:none}.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;background:#070e13ee;color:var(--muted);z-index:2}.hide{display:none!important}.chartlegend{display:flex;gap:14px;flex-wrap:wrap;margin:9px 0 0;font-size:12px}.pill{display:inline-flex;align-items:center;gap:5px}.dot{width:7px;height:7px;border-radius:50%;display:inline-block}.controls{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.controls button{font-size:12px;padding:8px 10px}.chart-tools{display:flex;gap:7px;align-items:center;justify-content:space-between;margin-top:10px}.chart-tools button{padding:7px 11px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}details summary{color:var(--lime);font-weight:800;cursor:pointer;padding:4px 0}label{display:block;color:var(--muted);font-size:12px;margin:12px 0 6px}select,input{width:100%;min-width:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}h2{font-size:19px;margin:0 0 6px}.primary{width:100%;padding:15px;font-size:16px;margin-top:16px}.result{border:1px solid var(--line);background:#080e12;border-radius:12px;padding:16px;margin-top:13px}.result-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.signal{font-size:20px;font-weight:900}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}.metric{padding:10px;background:#121d23;border-radius:8px}.metric small{display:block;color:var(--muted);margin-bottom:5px}.metric strong{font-size:16px}.risk{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.error{white-space:pre-wrap;overflow-wrap:anywhere}.footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}.indicator-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.indicator-row label{display:flex;align-items:center;gap:5px;margin:0;padding:8px;border:1px solid var(--line);border-radius:8px;color:var(--text)}input[type=checkbox]{width:auto;accent-color:var(--lime)}.pane{height:100px;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:8px;background:#070e13;position:relative}.pane canvas{width:100%;height:100%;display:block;touch-action:none}.pane-title{position:absolute;left:9px;top:7px;color:var(--muted);font-size:11px;pointer-events:none}#rsiPane{height:94px}#macdPane{height:100px}@media(min-width:650px){.chartbox{height:420px}.pane{height:120px}}@media(max-width:370px){.logo{font-size:19px}.badge{font-size:9px}.top h1{font-size:20px}}
-</style></head><body><header><div class="logo">YOYO <b>TRADE</b></div><div class="badge">PRO · HYPERLIQUID</div></header><main><section><div class="top"><div><h1 id="title">SOL · Hyperliquid</h1><div class="muted tiny">Perpetual markets · Live updates</div></div><button id="findBtn">⌕ Symbol</button></div><div class="status" id="status">Connecting to Hyperliquid…</div><div class="tfrow" id="chartFrames"></div><div class="chartbox"><canvas id="priceChart"></canvas><div id="overlay" class="overlay">Loading candles…</div></div><div class="chartlegend"><span class="pill"><i class="dot" style="background:#d5ff35"></i> EMA 9</span><span class="pill"><i class="dot" style="background:#5b9cff"></i> EMA 21</span><span class="pill"><i class="dot" style="background:#f1a85b"></i> EMA 89</span><span id="priceText" class="muted">—</span></div><div class="chart-tools"><span class="muted tiny">Drag to pan · Pinch to zoom</span><div><button id="zoomOut">−</button> <button id="resetZoom">Reset</button> <button id="zoomIn">+</button></div></div><div class="controls" id="toggles"><button data-ind="ema9" class="active">EMA9</button><button data-ind="ema21" class="active">EMA21</button><button data-ind="ema89" class="active">EMA89</button><button data-ind="bb">BB 20/2</button><button data-ind="volume" class="active">Volume</button><button data-ind="rsi" class="active">RSI</button><button data-ind="macd" class="active">MACD</button></div><div class="pane" id="rsiPane"><div class="pane-title">RSI 14</div><canvas id="rsiChart"></canvas></div><div class="pane" id="macdPane"><div class="pane-title">MACD 12 / 26 / 9</div><canvas id="macdChart"></canvas></div><p class="muted tiny" id="chartNote">Completed candles · UTC · Data may be delayed</p></section><section><details id="finder"><summary>MARKET SEARCH · Hyperliquid Perps</summary><label>Market group</label><select id="group"><option value="all">All Hyperliquid Perps</option><option value="crypto">Crypto</option><option value="stocks">Stocks / Equity perps</option></select><label>Search symbol</label><input id="search" placeholder="SOL, XRP, HYPE, NVDA…" autocomplete="off" spellcheck="false"><label>Choose market</label><select id="market"></select><p class="muted tiny" id="marketInfo">Loading markets…</p></details></section><section><div class="row"><h2>Timeframe Analysis</h2><span class="muted tiny">Rules-based</span></div><p class="muted tiny">Uses completed Hyperliquid candles. No automatic orders.</p><label>Analysis mode</label><select id="mode"><option value="multi">Multi Timeframe</option><option value="single">Single Timeframe</option></select><div class="grid"><div><label>Entry timeframe</label><select id="entry"></select></div><div id="confirmWrap"><label>Confirm timeframe</label><select id="confirm"></select></div></div><p class="lime" id="pair">15m + 1H</p><div class="indicator-row"><label><input type="checkbox" id="useRsi" checked>RSI 14</label><label><input type="checkbox" id="useMacd" checked>MACD</label><label><input type="checkbox" id="useVol" checked>Volume ≥1.2×</label><label><input type="checkbox" id="useEma" checked>EMA 9/89</label></div><button class="primary" id="analyze">ANALYZE NOW →</button><div class="result" id="result"><span class="muted">Choose a market and tap ANALYZE NOW.</span></div></section></main><div class="footer">YOYO TRADE PRO © 2026 · Educational use only · Not financial advice</div><script>
-'use strict';
-const $=id=>document.getElementById(id), API='https://api.hyperliquid.xyz/info';
-const TF=[['1m','1m'],['5m','5m'],['15m','15m'],['30m','30m'],['1H','1h'],['2H','2h'],['3H','3h'],['4H','4h'],['6H','6h'],['12H','12h'],['1D','1d'],['1W','1w']];
-const MS={'1m':60000,'5m':300000,'15m':900000,'30m':1800000,'1h':3600000,'2h':7200000,'3h':10800000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000};
-const state={markets:[],market:'SOL',tf:'15m',candles:[],connected:false,request:0,offset:0,visible:65,ind:{ema9:true,ema21:true,ema89:true,bb:false,volume:true,rsi:true,macd:true},loading:false};
-const nameTf=v=>TF.find(x=>x[1]===v)?.[0]||v;
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmt(n){if(!Number.isFinite(n))return '—';return Number(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<1?6:Math.abs(n)<100?4:2});}
-function setStatus(s,ok){$('status').textContent=s;$('status').className='status '+(ok===true?'good':ok===false?'bad':'muted');}
-async function api(body){const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),12000);try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal,cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return await r.json();}finally{clearTimeout(timer);}}
-function classify(m){const s=m.name.toUpperCase();return /(^|:)(NVDA|TSLA|AAPL|AMZN|MSFT|META|GOOGL|AMD|COIN|HOOD|SPY|QQQ|PLTR|MSTR|TSM|NFLX|AVGO|INTC|GME|HOOD|MU|ORCL|CRM|UBER|BABA|PFE|DIS|WMT|COST|JPM|BAC|GS|XAU|GOLD|SILVER)(-|$)/.test(s)||/^(NVDA|TSLA|AAPL|AMZN|MSFT|META|GOOGL|AMD|COIN|HOOD|SPY|QQQ|PLTR|MSTR|TSM|NFLX|AVGO|INTC|GME|MU|ORCL|CRM|UBER|BABA|PFE|DIS|WMT|COST|JPM|BAC|GS|XAU|GOLD|SILVER)$/.test(s)?'stocks':'crypto';}
-function marketList(){const q=$('search').value.trim().toUpperCase(),g=$('group').value;const list=state.markets.filter(m=>(g==='all'||classify(m)===g)&&m.name.toUpperCase().includes(q));const sel=$('market'),old=sel.value;sel.replaceChildren();for(const m of list){const o=document.createElement('option');o.value=m.name;o.textContent=m.name;sel.appendChild(o);}if(list.some(m=>m.name===old))sel.value=old;else if(list.some(m=>m.name===state.market))sel.value=state.market;else if(list.length)sel.value=list[0].name;$('marketInfo').textContent=list.length+' matching markets · '+state.markets.length+' loaded';}
-async function loadMarkets(){try{const d=await api({type:'meta'});if(!Array.isArray(d.universe))throw Error('Invalid market list');const base=d.universe.filter(m=>!m.isDelisted).map(m=>({name:m.name}));let extra=[];try{const ds=await api({type:'perpDexs'});if(Array.isArray(ds)){const names=ds.map(x=>typeof x==='string'?x:(Array.isArray(x)?x[0]:x?.name)).filter(x=>typeof x==='string'&&x);const batches=await Promise.allSettled(names.slice(0,12).map(dex=>api({type:'meta',dex})));batches.forEach((r,i)=>{if(r.status==='fulfilled'&&Array.isArray(r.value.universe)){extra.push(...r.value.universe.filter(m=>!m.isDelisted).map(m=>({name:m.name.includes(':')?m.name:names[i]+':'+m.name})));}});}}catch(e){/* default perp markets still work */}state.markets=[...new Map([...base,...extra].map(m=>[m.name,m])).values()].sort((a,b)=>a.name.localeCompare(b.name));state.connected=true;setStatus('● Hyperliquid connected · '+state.markets.length+' markets',true);marketList();if(!state.markets.some(m=>m.name===state.market))state.market=state.markets[0]?.name||'SOL';$('market').value=state.market;loadCandles();}catch(e){state.connected=false;setStatus('Market connection failed: '+e.message,false);$('marketInfo').textContent='Could not load markets. Check internet and reload.';$('overlay').textContent='Hyperliquid connection unavailable. Tap Reset / refresh to retry.';}}
-function initControls(){for(const [name,value] of TF){const b=document.createElement('button');b.textContent=name;b.dataset.tf=value;b.classList.toggle('active',value===state.tf);$('chartFrames').appendChild(b);for(const id of ['entry','confirm']){const o=document.createElement('option');o.value=value;o.textContent=name;$(id).appendChild(o);}}$('entry').value='15m';$('confirm').value='1h';}
-function syncPair(){$('confirmWrap').classList.toggle('hide',$('mode').value==='single');$('pair').textContent=nameTf($('entry').value)+($('mode').value==='multi'?' + '+nameTf($('confirm').value):'');}
-function chooseMarket(m){if(!m||!state.markets.some(x=>x.name===m))return;state.market=m;$('title').textContent=m+' · Hyperliquid';$('result').innerHTML='<span class="muted">'+escapeHtml(m)+' selected. Tap ANALYZE NOW.</span>';loadCandles();}
-function toCandles(raw){return raw.filter(x=>Number(x.T)<=Date.now()).map(x=>({t:+x.t,o:+x.o,h:+x.h,l:+x.l,c:+x.c,v:+x.v})).filter(x=>[x.t,x.o,x.h,x.l,x.c,x.v].every(Number.isFinite)).sort((a,b)=>a.t-b.t);}
-async function getCandles(m,tf,count=200){const now=Date.now(),d=await api({type:'candleSnapshot',req:{coin:m,interval:tf,startTime:now-(count+5)*MS[tf],endTime:now}});if(!Array.isArray(d))throw Error('No candles returned');return toCandles(d);}
-async function loadCandles(){if(!state.connected)return;const seq=++state.request;state.loading=true;$('overlay').classList.remove('hide');$('overlay').textContent='Loading '+state.market+' · '+nameTf(state.tf)+'…';try{const c=await getCandles(state.market,state.tf,200);if(seq!==state.request)return;if(c.length<25)throw Error('Not enough completed candles for this market');state.candles=c;state.offset=0;state.visible=65;$('overlay').classList.add('hide');$('priceText').textContent='Last '+fmt(c.at(-1).c);$('chartNote').textContent='Hyperliquid · '+c.length+' completed '+nameTf(state.tf)+' candles · UTC · Updated '+new Date().toLocaleTimeString();draw();}catch(e){if(seq!==state.request)return;state.candles=[];$('overlay').textContent='Chart unavailable: '+e.message+' · Try another timeframe or symbol.';draw();}finally{if(seq===state.request)state.loading=false;}}
-function EMA(a,n){const k=2/(n+1);let v=a[0];return a.map(x=>(v=x*k+v*(1-k)));}
-function RSI(a,n=14){const r=new Array(a.length).fill(NaN);if(a.length<=n)return r;let up=0,dn=0;for(let i=1;i<=n;i++){const d=a[i]-a[i-1];up+=Math.max(d,0);dn+=Math.max(-d,0);}up/=n;dn/=n;for(let i=n;i<a.length;i++){if(i>n){const d=a[i]-a[i-1];up=(up*(n-1)+Math.max(0,d))/n;dn=(dn*(n-1)+Math.max(0,-d))/n;}r[i]=dn===0?(up===0?50:100):100-100/(1+up/dn);}return r;}
-function stats(c){const close=c.map(x=>x.c),vol=c.map(x=>x.v),e9=EMA(close,9),e21=EMA(close,21),e89=EMA(close,89),e12=EMA(close,12),e26=EMA(close,26),macd=e12.map((v,i)=>v-e26[i]),sig=EMA(macd,9),rsi=RSI(close),bbTop=[],bbBot=[];for(let i=0;i<close.length;i++){if(i<19){bbTop.push(NaN);bbBot.push(NaN);continue;}const arr=close.slice(i-19,i+1),avg=arr.reduce((a,b)=>a+b,0)/20,sd=Math.sqrt(arr.reduce((a,b)=>a+(b-avg)**2,0)/20);bbTop.push(avg+2*sd);bbBot.push(avg-2*sd);}let trs=[];for(let i=1;i<c.length;i++)trs.push(Math.max(c[i].h-c[i].l,Math.abs(c[i].h-c[i-1].c),Math.abs(c[i].l-c[i-1].c)));const atr=trs.slice(-14).reduce((a,b)=>a+b,0)/Math.max(1,Math.min(14,trs.length));const avgVol=vol.slice(-21,-1).reduce((a,b)=>a+b,0)/20;return {close,e9,e21,e89,macd,sig,rsi,bbTop,bbBot,atr,volume:avgVol?vol.at(-1)/avgVol:0};}
-function canvasCtx(id){const el=$(id),rect=el.getBoundingClientRect();if(!rect.width||!rect.height)return null;const dpr=Math.min(devicePixelRatio||1,2);el.width=Math.round(rect.width*dpr);el.height=Math.round(rect.height*dpr);const ctx=el.getContext('2d');ctx.scale(dpr,dpr);return {ctx,w:rect.width,h:rect.height};}
-function line(ctx,arr,from,to,x,scale,color,width=1.5){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();let started=false;for(let i=from;i<to;i++){const y=scale(arr[i]);if(!Number.isFinite(y))continue;if(!started){ctx.moveTo(x(i),y);started=true;}else ctx.lineTo(x(i),y);}ctx.stroke();}
-function draw(){const c=state.candles;if(!c.length)return;const st=stats(c),len=c.length,visible=Math.min(len,Math.round(state.visible)),end=Math.max(visible,len-state.offset),start=end-visible,sub=c.slice(start,end),box=canvasCtx('priceChart');if(!box)return;const {ctx,w,h}=box,padL=10,padR=66,padT=18,volH=state.ind.volume?48:0,padB=volH+12,plotH=h-padT-padB,plotW=w-padL-padR,step=plotW/visible,x=i=>padL+(i-start+.5)*step;let values=sub.flatMap(a=>[a.h,a.l]);for(const [key,show] of [['e9',state.ind.ema9],['e21',state.ind.ema21],['e89',state.ind.ema89],['bbTop',state.ind.bb],['bbBot',state.ind.bb]])if(show)values.push(...st[key].slice(start,end).filter(Number.isFinite));let low=Math.min(...values),high=Math.max(...values);const margin=(high-low||high*.01||1)*.08;low-=margin;high+=margin;const sy=v=>padT+(high-v)/(high-low)*plotH;ctx.fillStyle='#070e13';ctx.fillRect(0,0,w,h);ctx.font='11px Arial';ctx.textAlign='left';for(let i=0;i<5;i++){const yy=padT+plotH*i/4;ctx.strokeStyle='#20313b';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(w-padR+5,yy);ctx.stroke();ctx.fillStyle='#91a4ad';ctx.fillText(fmt(high-(high-low)*i/4),w-padR+10,yy+4);}for(let i=start;i<end;i++){const a=c[i],xx=x(i),up=a.c>=a.o,col=up?'#22c6a2':'#f46b83';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=Math.max(1,Math.min(2,step*.14));ctx.beginPath();ctx.moveTo(xx,sy(a.h));ctx.lineTo(xx,sy(a.l));ctx.stroke();const top=sy(Math.max(a.o,a.c)),bottom=sy(Math.min(a.o,a.c));ctx.fillRect(xx-Math.max(1,step*.32),top,Math.max(2,step*.64),Math.max(1,bottom-top));}if(state.ind.bb){line(ctx,st.bbTop,start,end,x,sy,'#548b8d');line(ctx,st.bbBot,start,end,x,sy,'#548b8d');}if(state.ind.ema89)line(ctx,st.e89,start,end,x,sy,'#f1a85b',1.6);if(state.ind.ema21)line(ctx,st.e21,start,end,x,sy,'#5b9cff',1.5);if(state.ind.ema9)line(ctx,st.e9,start,end,x,sy,'#d5ff35',1.7);if(state.ind.volume){const max=Math.max(...sub.map(v=>v.v),1);for(let i=start;i<end;i++){const a=c[i],bh=(a.v/max)*(volH-8);ctx.fillStyle=a.c>=a.o?'#147b69':'#9b4358';ctx.fillRect(x(i)-Math.max(1,step*.32),h-8-bh,Math.max(2,step*.64),bh);}}drawRsi(st,start,end,visible);drawMacd(st,start,end,visible);}
-function drawRsi(st,start,end,visible){$('rsiPane').classList.toggle('hide',!state.ind.rsi);if(!state.ind.rsi)return;const box=canvasCtx('rsiChart');if(!box)return;const {ctx,w,h}=box,pad=12,right=42,x=i=>pad+(i-start+.5)*(w-pad-right)/visible,y=v=>12+(100-v)/100*(h-22);ctx.fillStyle='#0b1019';ctx.fillRect(0,0,w,h);ctx.fillStyle='#25162e';ctx.fillRect(pad,y(70),w-pad-right,y(30)-y(70));ctx.strokeStyle='#37414c';for(const n of [30,50,70]){ctx.beginPath();ctx.moveTo(pad,y(n));ctx.lineTo(w-right,y(n));ctx.stroke();ctx.fillStyle='#9ba6b4';ctx.font='10px Arial';ctx.fillText(n,w-right+8,y(n)+3);}line(ctx,st.rsi,start,end,x,y,'#c95be2',1.5);}
-function drawMacd(st,start,end,visible){$('macdPane').classList.toggle('hide',!state.ind.macd);if(!state.ind.macd)return;const box=canvasCtx('macdChart');if(!box)return;const {ctx,w,h}=box,pad=12,right=42,x=i=>pad+(i-start+.5)*(w-pad-right)/visible,vals=[...st.macd.slice(start,end),...st.sig.slice(start,end)],max=Math.max(...vals.map(Math.abs),1e-9)*1.2,y=v=>h/2-v/max*(h*.42);ctx.fillStyle='#0b1019';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#36424b';ctx.beginPath();ctx.moveTo(pad,h/2);ctx.lineTo(w-right,h/2);ctx.stroke();const step=(w-pad-right)/visible;for(let i=start;i<end;i++){const hist=st.macd[i]-st.sig[i];ctx.fillStyle=hist>=0?'#208b7b':'#bd486d';ctx.fillRect(x(i)-Math.max(1,step*.3),Math.min(y(hist),h/2),Math.max(2,step*.6),Math.max(1,Math.abs(y(hist)-h/2)));}line(ctx,st.macd,start,end,x,y,'#4f9fff');line(ctx,st.sig,start,end,x,y,'#ff9c51');}
-function changeZoom(factor){state.visible=Math.max(15,Math.min(state.candles.length,Math.round(state.visible*factor)));state.offset=Math.min(state.offset,Math.max(0,state.candles.length-state.visible));draw();}
-let touchX=null,touchDistance=null;const priceEl=$('priceChart');priceEl.addEventListener('touchstart',e=>{if(e.touches.length===2){touchDistance=Math.abs(e.touches[0].clientX-e.touches[1].clientX);touchX=null;}else if(e.touches.length===1)touchX=e.touches[0].clientX;},{passive:true});priceEl.addEventListener('touchmove',e=>{if(e.touches.length===2&&touchDistance){const d=Math.abs(e.touches[0].clientX-e.touches[1].clientX);if(Math.abs(d-touchDistance)>18){changeZoom(d>touchDistance?.85:1.18);touchDistance=d;}}else if(e.touches.length===1&&touchX!==null){const diff=e.touches[0].clientX-touchX,step=priceEl.clientWidth/Math.max(1,state.visible);if(Math.abs(diff)>step*2){state.offset=Math.max(0,Math.min(state.candles.length-state.visible,state.offset+Math.round(diff/step)));touchX=e.touches[0].clientX;draw();}}},{passive:true});priceEl.addEventListener('touchend',()=>{touchX=null;touchDistance=null;});let mouseX=null;priceEl.addEventListener('mousedown',e=>mouseX=e.clientX);window.addEventListener('mouseup',()=>mouseX=null);priceEl.addEventListener('mousemove',e=>{if(mouseX===null)return;const step=priceEl.clientWidth/Math.max(1,state.visible),diff=e.clientX-mouseX;if(Math.abs(diff)>step*2){state.offset=Math.max(0,Math.min(state.candles.length-state.visible,state.offset+Math.round(diff/step)));mouseX=e.clientX;draw();}});priceEl.addEventListener('wheel',e=>{e.preventDefault();changeZoom(e.deltaY>0?1.15:.87);},{passive:false});
-function analyzeStats(c){if(c.length<100)throw Error('Not enough completed candles (need 100)');const s=stats(c),last=c.at(-1),prev=c.at(-2);return {last,prev,s,price:last.c,ema9:s.e9.at(-1),ema89:s.e89.at(-1),rsi:s.rsi.at(-1),macd:s.macd.at(-1),signal:s.sig.at(-1),vol:s.volume,atr:s.atr};}
-function renderResult(side,a,entry,confirm,b){const color=side==='LONG'?'good':side==='SHORT'?'bad':'muted';let html='<div class="result-head"><b>YOYO TRADE PRO</b><span class="signal '+color+'">'+side+'</span></div><p class="muted tiny">'+escapeHtml(state.market)+' · '+nameTf(entry)+(b?' + '+nameTf(confirm):'')+' · '+new Date().toLocaleString()+'</p><div class="metric-grid">';for(const [k,v] of [['Price',fmt(a.price)],['EMA9',fmt(a.ema9)],['EMA89',fmt(a.ema89)],['RSI14',a.rsi.toFixed(1)],['MACD',fmt(a.macd)],['Volume',a.vol.toFixed(2)+'×']])html+='<div class="metric"><small>'+k+'</small><strong>'+v+'</strong></div>';html+='</div>';if(side!=='WAIT'){const risk=Math.max(a.atr*1.5,a.price*.002),dir=side==='LONG'?1:-1;html+='<div class="risk"><div class="metric-grid">';for(const [k,v] of [['ENTRY',a.price],['STOP LOSS',a.price-dir*risk],['TP1 · 2R',a.price+dir*2*risk],['TP2 · 3R',a.price+dir*3*risk],['TP3 · 4R',a.price+dir*4*risk]])html+='<div class="metric"><small>'+k+'</small><strong>'+fmt(v)+'</strong></div>';html+='</div><p class="muted tiny">Experimental signal · verify live price and liquidity before trading.</p></div>';}else html+='<p class="muted">No confirmed trade setup. Wait for confirmation.</p>';return html;}
-async function analyze(){if(!state.connected){$('result').textContent='Hyperliquid is not connected.';return;}const btn=$('analyze'),market=state.market,entry=$('entry').value,confirm=$('confirm').value,multi=$('mode').value==='multi';btn.disabled=true;$('result').innerHTML='<span class="muted">Analyzing completed candles…</span>';try{const [c,d]=await Promise.all([getCandles(market,entry,180),multi?getCandles(market,confirm,180):Promise.resolve(null)]),a=analyzeStats(c),b=d?analyzeStats(d):null;const long=a.price>a.ema9&&a.ema9>a.ema89&&a.last.c>a.last.o,short=a.price<a.ema9&&a.ema9<a.ema89&&a.last.c<a.last.o;const higherLong=!b||(b.price>b.ema89&&b.ema9>b.ema89),higherShort=!b||(b.price<b.ema89&&b.ema9<b.ema89);const rsiLong=!$('useRsi').checked||a.rsi>=50,rsiShort=!$('useRsi').checked||a.rsi<=50,macdLong=!$('useMacd').checked||a.macd>a.signal,macdShort=!$('useMacd').checked||a.macd<a.signal,volOK=!$('useVol').checked||a.vol>=1.2,emaLong=!$('useEma').checked||long,emaShort=!$('useEma').checked||short;let side='WAIT';if(emaLong&&higherLong&&rsiLong&&macdLong&&volOK&&a.price>a.prev.c)side='LONG';else if(emaShort&&higherShort&&rsiShort&&macdShort&&volOK&&a.price<a.prev.c)side='SHORT';$('result').innerHTML=renderResult(side,a,entry,confirm,b);}catch(e){$('result').innerHTML='<span class="bad error">Analysis unavailable: '+escapeHtml(e.message)+'<br>No signal generated.</span>';}finally{btn.disabled=false;}}
-initControls();syncPair();$('chartFrames').addEventListener('click',e=>{const b=e.target.closest('button[data-tf]');if(!b)return;state.tf=b.dataset.tf;document.querySelectorAll('#chartFrames button').forEach(x=>x.classList.toggle('active',x===b));loadCandles();});$('findBtn').addEventListener('click',()=>{$('finder').open=true;$('finder').scrollIntoView({behavior:'smooth',block:'start'});$('search').focus();});$('search').addEventListener('input',marketList);$('group').addEventListener('change',marketList);$('market').addEventListener('change',e=>chooseMarket(e.target.value));for(const id of ['mode','entry','confirm'])$(id).addEventListener('change',syncPair);$('toggles').addEventListener('click',e=>{const b=e.target.closest('button[data-ind]');if(!b)return;const k=b.dataset.ind;state.ind[k]=!state.ind[k];b.classList.toggle('active',state.ind[k]);draw();});$('zoomIn').onclick=()=>changeZoom(.8);$('zoomOut').onclick=()=>changeZoom(1.25);$('resetZoom').onclick=()=>{state.offset=0;state.visible=65;draw();};$('analyze').onclick=analyze;window.addEventListener('resize',()=>draw());document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.connected)loadCandles();});setInterval(()=>{if(!document.hidden&&state.connected&&!state.loading)loadCandles();},15000);loadMarkets();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070d12">
+<title>YOYO TRADE PRO | Weekly Range</title>
+
+<style>
+:root{
+ --bg:#070d12;
+ --panel:#101a22;
+ --card:#14232c;
+ --border:#28404c;
+ --text:#f0f5f7;
+ --muted:#91a6b1;
+ --lime:#d5ff35;
+ --green:#25c9a4;
+ --red:#ff6881;
+ --blue:#62a8ff;
+ --orange:#f6ae60;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+header{
+ position:sticky;
+ top:0;
+ z-index:10;
+ background:#05090d;
+ padding:17px 15px;
+ border-bottom:1px solid var(--border);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+}
+.logo{
+ font-size:22px;
+ font-weight:900;
+ letter-spacing:-1px;
+}
+.logo span{color:var(--lime)}
+.badge{
+ color:var(--lime);
+ border:1px solid #5f7828;
+ padding:8px 10px;
+ border-radius:25px;
+ font-size:10px;
+ font-weight:800;
+}
+main{
+ max-width:1050px;
+ margin:auto;
+ padding:14px;
+}
+.panel{
+ padding:17px;
+ margin-bottom:14px;
+ background:var(--panel);
+ border:1px solid var(--border);
+ border-radius:16px;
+}
+h1{font-size:24px;margin:0 0 8px}
+h2{font-size:19px;margin:0 0 12px}
+p{line-height:1.55}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.lime{color:var(--lime)}
+.blue{color:var(--blue)}
+.orange{color:var(--orange)}
+label{
+ display:block;
+ margin:13px 0 7px;
+ color:var(--muted);
+ font-size:12px;
+ font-weight:700;
+}
+select,input,button{
+ font:inherit;
+ border-radius:10px;
+}
+select,input{
+ width:100%;
+ min-width:0;
+ background:#09131a;
+ color:var(--text);
+ border:1px solid #38515f;
+ padding:13px;
+}
+button{
+ background:#172932;
+ color:var(--text);
+ border:1px solid #38515f;
+ padding:12px;
+ cursor:pointer;
+ font-weight:800;
+}
+button:disabled{opacity:.55}
+.primary{
+ width:100%;
+ margin-top:15px;
+ padding:16px;
+ background:var(--lime);
+ color:#07110b;
+ border:0;
+ font-size:16px;
+ font-weight:900;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+}
+.metric{
+ background:var(--card);
+ padding:13px;
+ border-radius:11px;
+ border:1px solid #213640;
+ min-width:0;
+}
+.metric small{
+ display:block;
+ color:var(--muted);
+ margin-bottom:7px;
+ font-size:11px;
+}
+.metric strong{
+ display:block;
+ font-size:19px;
+ overflow-wrap:anywhere;
+}
+.status{
+ margin:12px 0;
+ font-size:12px;
+ overflow-wrap:anywhere;
+}
+.chartbox{
+ height:390px;
+ position:relative;
+ background:#070e13;
+ border:1px solid var(--border);
+ border-radius:14px;
+ overflow:hidden;
+}
+canvas{
+ display:block;
+ width:100%;
+ height:100%;
+ touch-action:pan-y;
+}
+.overlay{
+ position:absolute;
+ inset:0;
+ background:#070e13;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:20px;
+ color:var(--muted);
+}
+.hidden{display:none!important}
+.legend{
+ display:flex;
+ flex-wrap:wrap;
+ gap:12px;
+ padding:13px 0;
+ font-size:11px;
+}
+.dot{
+ display:inline-block;
+ width:8px;
+ height:8px;
+ border-radius:50%;
+ margin-right:4px;
+}
+.result{
+ border:1px solid var(--border);
+ background:#09141b;
+ border-radius:13px;
+ padding:16px;
+ margin-top:12px;
+}
+.signal{
+ display:inline-block;
+ padding:10px 16px;
+ border-radius:9px;
+ font-weight:900;
+ font-size:21px;
+ margin-bottom:10px;
+}
+.long{
+ background:var(--green);
+ color:#06140e;
+}
+.wait{
+ background:#28301a;
+ color:var(--lime);
+ border:1px solid #637a33;
+}
+.closed{
+ background:#26313a;
+ color:#d5e0e5;
+}
+.info{
+ border-radius:10px;
+ background:#152630;
+ color:#bfd0d9;
+ padding:13px;
+ margin-top:12px;
+ line-height:1.65;
+}
+.rule{
+ border-bottom:1px solid var(--border);
+ padding:10px 0;
+ line-height:1.5;
+}
+.rule:last-child{border:0}
+.row{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+}
+.pill{
+ color:var(--lime);
+ background:#233019;
+ padding:7px 10px;
+ border-radius:20px;
+ font-size:11px;
+ font-weight:800;
+}
+.toolbar{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ margin:10px 0;
+}
+.toolbar button{
+ padding:9px 12px;
+ font-size:12px;
+}
+footer{
+ text-align:center;
+ color:var(--muted);
+ padding:25px;
+ font-size:11px;
+}
+@media(min-width:650px){
+ .chartbox{height:500px}
+ .metric strong{font-size:23px}
+}
+@media(max-width:370px){
+ .logo{font-size:19px}
+ .badge{font-size:9px}
+ .metric strong{font-size:16px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">YOYO <span>TRADE</span></div>
+ <div class="badge">PRO · WEEKLY RANGE</div>
+</header>
+
+<main>
+
+<section class="panel">
+ <h1>Weekly Range Strategy</h1>
+ <p class="muted">
+ Monday Low Sweep → 15m Acceptance →
+ 1H EMA50 → 4H EMA50
+ </p>
+ <div class="info">
+ <span class="lime"><b>LONG ONLY · RESEARCH MODE</b></span><br>
+ Hyperliquid perpetual markets.<br>
+ No automatic orders. No mock signals.
+ </div>
+</section>
+
+<section class="panel">
+
+<h2>Hyperliquid Market Scanner</h2>
+
+<label>Search Market</label>
+<input id="search"
+ placeholder="Search SOL, XRP, HYPE, NVDA..."
+ autocomplete="off">
+
+<div class="grid">
+ <div>
+  <label>Perpetual Market</label>
+  <select id="market">
+   <option value="SOL">SOL</option>
+  </select>
+ </div>
+ <div>
+  <label>Trading Week · UTC</label>
+  <select id="week">
+   <option value="0">Current Week</option>
+   <option value="1">Previous Week</option>
+   <option value="2">2 Weeks Ago</option>
+   <option value="3">3 Weeks Ago</option>
+  </select>
+ </div>
+</div>
+
+<div id="status" class="status muted">
+ Connecting to Hyperliquid...
+</div>
+
+<div class="info">
+ <b>Volume Filter:</b>
+ <span class="lime">≥ 1.0×</span><br>
+ Entry timeframe: 15m<br>
+ Monday range: 00:00–24:00 UTC
+</div>
+
+<button id="analyze" class="primary">
+ RUN WEEKLY RANGE ANALYSIS →
+</button>
+
+</section>
+
+<section class="panel">
+<h2>Monday Trading Range</h2>
+
+<div class="grid">
+ <div class="metric">
+  <small>MONDAY HIGH</small>
+  <strong id="mondayHigh" class="blue">—</strong>
+ </div>
+ <div class="metric">
+  <small>MONDAY LOW</small>
+  <strong id="mondayLow" class="lime">—</strong>
+ </div>
+ <div class="metric">
+  <small>SWEEP LOW</small>
+  <strong id="sweepLow" class="red">—</strong>
+ </div>
+ <div class="metric">
+  <small>LAST CLOSE</small>
+  <strong id="lastClose">—</strong>
+ </div>
+</div>
+
+<p id="weekInfo" class="muted small">
+ Waiting for analysis...
+</p>
+</section>
+
+<section class="panel">
+
+<div class="row">
+ <h2>15m Price Chart</h2>
+ <span class="pill">WEEKLY RANGE</span>
+</div>
+
+<div class="chartbox">
+ <canvas id="chart"></canvas>
+ <div class="overlay" id="overlay">
+  Choose a market and run analysis.
+ </div>
+</div>
+
+<div class="toolbar">
+ <button id="zoomIn">Zoom +</button>
+ <button id="zoomOut">Zoom −</button>
+ <button id="resetZoom">Reset</button>
+</div>
+
+<div class="legend">
+ <span><i class="dot" style="background:#62a8ff"></i>Monday High</span>
+ <span><i class="dot" style="background:#d5ff35"></i>Monday Low</span>
+ <span><i class="dot" style="background:#25c9a4"></i>1H EMA50</span>
+ <span><i class="dot" style="background:#f6ae60"></i>4H EMA50</span>
+ <span><i class="dot" style="background:#ff6881"></i>SL</span>
+</div>
+
+<p class="muted small">
+ Completed 15m candles only. Historical signals
+ are labeled separately from fresh signals.
+</p>
+</section>
+
+<section class="panel">
+<h2>EMA50 Targets</h2>
+<div class="grid">
+ <div class="metric">
+  <small>TP1 · 1H EMA50</small>
+  <strong class="green" id="ema1h">—</strong>
+ </div>
+ <div class="metric">
+  <small>TP2 · 4H EMA50</small>
+  <strong class="orange" id="ema4h">—</strong>
+ </div>
+</div>
+<p class="muted small" id="emaNote">
+ Targets will be calculated from available candles.
+</p>
+</section>
+
+<section class="panel">
+<h2>Trading Signal</h2>
+
+<div id="result" class="result">
+ <span class="muted">
+  No analysis yet.
+ </span>
+</div>
+
+</section>
+
+<section class="panel">
+<h2>Strategy Rules</h2>
+
+<div class="rule">01 · Let Monday High and Low form.</div>
+<div class="rule">02 · Wait for a sweep below Monday Low.</div>
+<div class="rule">03 · Require two 15m closes above Monday Low.</div>
+<div class="rule">04 · Entry confirmation volume ≥ 1.0×.</div>
+<div class="rule">05 · Stop Loss below Sweep Low.</div>
+<div class="rule">06 · TP1 at 1H EMA50.</div>
+<div class="rule">07 · Exit on confirmed 1H EMA50 rejection.</div>
+<div class="rule">08 · After acceptance above TP1, target 4H EMA50.</div>
+</section>
+
+</main>
+
+<footer>
+YOYO TRADE PRO © 2026<br>
+Weekly Range Research · Educational Use Only
+</footer>
+
+<script>
+"use strict";
+
+const API = "https://api.hyperliquid.xyz/info";
+const $ = id => document.getElementById(id);
+
+const MIN_VOLUME = 1.0;
+const MIN_RR = 2.0;
+
+const MINUTE = 60000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const WEEK = 7 * DAY;
+
+let allMarkets = ["SOL"];
+let chartCache = null;
+let chartCount = 90;
+let currentRun = 0;
+
+function fmt(n) {
+ if (!Number.isFinite(n)) return "—";
+ return Number(n).toLocaleString("en-US", {
+  maximumFractionDigits:
+   Math.abs(n) < 1 ? 6 :
+   Math.abs(n) < 100 ? 4 : 2
+ });
+}
+
+function html(s) {
+ return String(s).replace(/[&<>"']/g, c => ({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ }[c]));
+}
+
+function status(message, type="muted") {
+ $("status").textContent = message;
+ $("status").className = "status " + type;
+}
+
+async function request(body) {
+ const controller = new AbortController();
+ const timer = setTimeout(() => controller.abort(), 15000);
+
+ try {
+  const response = await fetch(API, {
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(body),
+   signal:controller.signal,
+   cache:"no-store"
+  });
+
+  if (!response.ok) {
+   throw Error("HTTP " + response.status);
+  }
+
+  return await response.json();
+ } finally {
+  clearTimeout(timer);
+ }
+}
+
+function sleep(ms) {
+ return new Promise(resolve => setTimeout(resolve,ms));
+}
+
+// ALL AVAILABLE PERPETUAL MARKET DISCOVERY
+
+async function loadMarkets() {
+ try {
+  const base = await request({type:"meta"});
+  if (!Array.isArray(base.universe)) {
+   throw Error("Invalid market metadata");
+  }
+
+  const symbols = new Set();
+
+  for (const m of base.universe) {
+   if (!m.isDelisted) symbols.add(m.name);
+  }
+
+  let failed = 0;
+
+  try {
+   const dexData = await request({type:"perpDexs"});
+
+   if (Array.isArray(dexData)) {
+    const dexNames = [...new Set(dexData.map(x => {
+     if (typeof x === "string") return x;
+     if (Array.isArray(x)) return x[0];
+     return x?.name;
+    }).filter(x => typeof x === "string" && x))];
+
+    for (let i=0;i<dexNames.length;i+=3) {
+     const batch = dexNames.slice(i,i+3);
+
+     const results = await Promise.allSettled(
+      batch.map(dex => request({type:"meta",dex}))
+     );
+
+     results.forEach((result,j) => {
+      if (
+       result.status !== "fulfilled" ||
+       !Array.isArray(result.value?.universe)
+      ) {
+       failed++;
+       return;
+      }
+
+      for (const m of result.value.universe) {
+       if (m.isDelisted) continue;
+
+       const name = m.name.includes(":")
+        ? m.name
+        : batch[j] + ":" + m.name;
+
+       symbols.add(name);
+      }
+     });
+
+     status(
+      "Loading markets · " + symbols.size + " found...",
+      "muted"
+     );
+
+     if (i+3<dexNames.length) await sleep(120);
+    }
+   }
+  } catch(e) {
+   failed++;
+   console.warn("Additional DEX discovery:",e);
+  }
+
+  allMarkets = [...symbols].sort((a,b) =>
+   a.localeCompare(b)
+  );
+
+  updateMarkets();
+
+  status(
+   "● Hyperliquid connected · " +
+   allMarkets.length +
+   " markets loaded" +
+   (failed ? " · " + failed + " DEX fetches failed" : ""),
+   failed ? "orange" : "green"
+  );
+
+ } catch(e) {
+  status("Market connection failed: " + e.message,"red");
+ }
+}
+
+function updateMarkets() {
+ const q = $("search").value.trim().toUpperCase();
+ const select = $("market");
+ const previous = select.value;
+
+ const matches = allMarkets.filter(name =>
+  name.toUpperCase().includes(q)
+ );
+
+ select.replaceChildren();
+
+ for (const name of matches) {
+  const option = document.createElement("option");
+  option.value = name;
+  option.textContent = name;
+  select.appendChild(option);
+ }
+
+ if (matches.includes(previous)) {
+  select.value = previous;
+ } else if (matches.includes("SOL")) {
+  select.value = "SOL";
+ } else if (matches.length) {
+  select.value = matches[0];
+ }
+}
+
+function mondayUTC(offset) {
+ const now = new Date();
+ const weekday = (now.getUTCDay()+6)%7;
+
+ const start = Date.UTC(
+  now.getUTCFullYear(),
+  now.getUTCMonth(),
+  now.getUTCDate()-weekday
+ );
+
+ return start-offset*WEEK;
+}
+
+function completedCandles(raw, cutoff) {
+ if (!Array.isArray(raw)) throw Error("Invalid candle response");
+
+ return raw.map(x => ({
+  t:Number(x.t),
+  T:Number(x.T),
+  o:Number(x.o),
+  h:Number(x.h),
+  l:Number(x.l),
+  c:Number(x.c),
+  v:Number(x.v)
+ })).filter(x =>
+  [x.t,x.T,x.o,x.h,x.l,x.c,x.v]
+   .every(Number.isFinite) &&
+  x.T <= cutoff
+ ).sort((a,b) => a.t-b.t);
+}
+
+async function getCandles(coin,tf,start,end) {
+ const raw = await request({
+  type:"candleSnapshot",
+  req:{
+   coin:coin,
+   interval:tf,
+   startTime:start,
+   endTime:end
+  }
+ });
+
+ return completedCandles(raw,Math.min(end,Date.now()));
+}
+
+// EMA50 USING ONLY AVAILABLE HISTORICAL CANDLES
+
+function EMA(values,length=50) {
+ const output = new Array(values.length).fill(NaN);
+ if (values.length<length) return output;
+
+ let previous = values.slice(0,length)
+  .reduce((a,b)=>a+b,0)/length;
+
+ output[length-1]=previous;
+
+ const k = 2/(length+1);
+
+ for (let i=length;i<values.length;i++) {
+  previous=values[i]*k+previous*(1-k);
+  output[i]=previous;
+ }
+
+ return output;
+}
+
+function emaAt(candles,time) {
+ const available=candles.filter(c => c.T<=time);
+ if (available.length<50) return NaN;
+
+ const series=EMA(available.map(c=>c.c),50);
+ return series.at(-1);
+}
+
+// 15M VOLUME RATIO VS PREVIOUS 20 CANDLES
+
+function volumeRatio(data,index) {
+ if (index<20) return NaN;
+
+ const previous=data.slice(index-20,index);
+
+ const avg=previous.reduce(
+  (sum,c)=>sum+c.v,0
+ )/20;
+
+ if (!(avg>0)) return NaN;
+
+ return data[index].v/avg;
+}
+
+// SWEEP + TWO CONFIRMED 15M CLOSES + VOLUME 1.0X
+
+function findSetup(candles,mondayLow,mondayEnd,testEnd) {
+ let sweep=null;
+ let count=0;
+ let setup=null;
+ let lastSweep=null;
+
+ for (let i=0;i<candles.length;i++) {
+  const c=candles[i];
+
+  if (c.t<mondayEnd || c.T>testEnd) continue;
+
+  if (!sweep) {
+   if (c.l<mondayLow) {
+    sweep={low:c.l,time:c.t};
+    lastSweep={...sweep};
+    count=c.c>mondayLow ? 1 : 0;
+   }
+   continue;
+  }
+
+  // New lower low invalidates the previous
+  // acceptance sequence.
+  if (c.l<sweep.low) {
+   sweep.low=c.l;
+   sweep.time=c.t;
+   count=0;
+  }
+
+  lastSweep={...sweep};
+
+  if (c.c>mondayLow) {
+   count++;
+  } else {
+   count=0;
+  }
+
+  if (count>=2) {
+   const ratio=volumeRatio(candles,i);
+
+   // Volume must pass on the second
+   // confirmation candle.
+   if (!(ratio>=MIN_VOLUME)) {
+    continue;
+   }
+
+   const stop=sweep.low*0.999;
+
+   if (!(stop<c.c)) continue;
+
+   setup={
+    entry:c.c,
+    entryTime:c.T,
+    entryIndex:i,
+    sweepLow:sweep.low,
+    stop,
+    volume:ratio,
+    candle:c
+   };
+
+   break;
+  }
+ }
+
+ return {setup,sweep:lastSweep};
+}
+
+// EVALUATE TRADE FROM ENTRY TO SELECTED WEEK END
+
+function evaluateTrade(data,entry,tp1,tp2) {
+ let state="OPEN";
+ let exitPrice=null;
+ let exitTime=null;
+ let reachedTP1=false;
+ let acceptedTP1=false;
+
+ // TP1 is an EMA zone, not necessarily a
+ // guaranteed executable limit order.
+ for (const c of data) {
+  if (c.t<entry.entryTime) continue;
+
+  // Conservative same-candle assumption:
+  // SL takes priority over targets.
+  if (c.l<=entry.stop) {
+   state="STOPPED";
+   exitPrice=entry.stop;
+   exitTime=c.T;
+   break;
+  }
+
+  if (!reachedTP1 && c.h>=tp1) {
+   reachedTP1=true;
+  }
+
+  if (reachedTP1 && c.c>tp1) {
+   acceptedTP1=true;
+  }
+
+  // Simplified rejection rule:
+  // Price touches TP1 but closes back below
+  // the original TP1 reference before acceptance.
+  if (reachedTP1 && !acceptedTP1 && c.c<tp1) {
+   state="TP1_REJECTION";
+   exitPrice=c.c;
+   exitTime=c.T;
+   break;
+  }
+
+  if (acceptedTP1 && c.h>=tp2) {
+   state="TP2_REACHED";
+   exitPrice=tp2;
+   exitTime=c.T;
+   break;
+  }
+ }
+
+ return {
+  state,
+  exitPrice,
+  exitTime,
+  reachedTP1,
+  acceptedTP1
+ };
+}
+
+function metric(label,value,cls="") {
+ return `<div class="metric">
+  <small>${html(label)}</small>
+  <strong class="${cls}">${html(String(value))}</strong>
+ </div>`;
+}
+
+function showSignal(title,message,setup,targets,assessment,isFresh) {
+ let cls=isFresh ? "long" : "closed";
+
+ if (!setup) cls="wait";
+
+ let output=`
+  <div class="signal ${cls}">${html(title)}</div>
+  <p class="muted">${html(message)}</p>
+ `;
+
+ if (setup && targets) {
+  const risk=setup.entry-setup.stop;
+  const rr1=risk>0?(targets.tp1-setup.entry)/risk:NaN;
+  const rr2=risk>0?(targets.tp2-setup.entry)/risk:NaN;
+
+  output+=`
+   <div class="grid">
+    ${metric("ENTRY",fmt(setup.entry),"green")}
+    ${metric("STOP LOSS",fmt(setup.stop),"red")}
+    ${metric("TP1 · 1H EMA50",fmt(targets.tp1),"green")}
+    ${metric("TP2 · 4H EMA50",fmt(targets.tp2),"orange")}
+    ${metric("TP1 R:R",Number.isFinite(rr1)?rr1.toFixed(2)+"R":"—")}
+    ${metric("TP2 R:R",Number.isFinite(rr2)?rr2.toFixed(2)+"R":"—")}
+    ${metric("ENTRY VOLUME",setup.volume.toFixed(2)+"×","lime")}
+    ${metric("SWEEP LOW",fmt(setup.sweepLow),"red")}
+   </div>
+
+   <div class="info">
+    <b>Confirmation:</b>
+    ${new Date(setup.entryTime).toUTCString()}<br>
+    <b>Volume:</b> ${setup.volume.toFixed(2)}×
+    (minimum ${MIN_VOLUME.toFixed(1)}×)<br>
+    <b>Management:</b> Monitor 1H EMA50 rejection.
+    Continue toward 4H EMA50 only after acceptance.
+   </div>
+  `;
+
+  if (assessment) {
+   output+=`
+    <div class="info">
+     <b>Trade monitoring:</b>
+     ${html(assessment.state)}<br>
+     TP1 touched: ${assessment.reachedTP1?"YES":"NO"}<br>
+     TP1 accepted: ${assessment.acceptedTP1?"YES":"NO"}
+     ${Number.isFinite(assessment.exitPrice)
+      ? "<br>Exit reference: "+fmt(assessment.exitPrice)
+      : ""}
+    </div>
+   `;
+  }
+ }
+
+ $("result").innerHTML=output;
+}
+
+// CANDLESTICK CHART
+
+function drawChart() {
+ if (!chartCache) return;
+
+ const {candles,levels}=chartCache;
+ const canvas=$("chart");
+ const rect=canvas.getBoundingClientRect();
+
+ if (!rect.width || !rect.height || !candles.length) return;
+
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+
+ canvas.width=Math.round(rect.width*dpr);
+ canvas.height=Math.round(rect.height*dpr);
+
+ const ctx=canvas.getContext("2d");
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+
+ const w=rect.width;
+ const h=rect.height;
+
+ ctx.fillStyle="#070e13";
+ ctx.fillRect(0,0,w,h);
+
+ const visible=candles.slice(-chartCount);
+
+ const left=10,right=70,top=15,bottom=44;
+ const pw=w-left-right;
+ const ph=h-top-bottom;
+
+ const prices=visible.flatMap(c=>[c.h,c.l]);
+
+ for (const n of Object.values(levels)) {
+  if (Number.isFinite(n)) prices.push(n);
+ }
+
+ let lo=Math.min(...prices);
+ let hi=Math.max(...prices);
+
+ const margin=(hi-lo||Math.abs(hi)*.01||1)*.1;
+ lo-=margin;
+ hi+=margin;
+
+ const y=p=>top+(hi-p)/(hi-lo)*ph;
+ const step=pw/visible.length;
+ const x=i=>left+(i+.5)*step;
+
+ ctx.font="11px Arial";
+
+ for (let i=0;i<5;i++) {
+  const price=hi-(hi-lo)*i/4;
+  const yy=y(price);
+
+  ctx.strokeStyle="#233640";
+  ctx.beginPath();
+  ctx.moveTo(left,yy);
+  ctx.lineTo(w-right,yy);
+  ctx.stroke();
+
+  ctx.fillStyle="#93a7b0";
+  ctx.fillText(fmt(price),w-right+8,yy+4);
+ }
+
+ // Price candles
+
+ visible.forEach((c,i)=>{
+  const xx=x(i);
+  const col=c.c>=c.o?"#25c9a4":"#ff6881";
+
+  ctx.strokeStyle=col;
+  ctx.fillStyle=col;
+  ctx.lineWidth=1.2;
+
+  ctx.beginPath();
+  ctx.moveTo(xx,y(c.h));
+  ctx.lineTo(xx,y(c.l));
+  ctx.stroke();
+
+  const upper=y(Math.max(c.o,c.c));
+  const lower=y(Math.min(c.o,c.c));
+  const bw=Math.max(2,step*.65);
+
+  ctx.fillRect(
+   xx-bw/2,
+   upper,
+   bw,
+   Math.max(1,lower-upper)
+  );
+ });
+
+ const lines=[
+  ["MON HIGH",levels.high,"#62a8ff"],
+  ["MON LOW",levels.low,"#d5ff35"],
+  ["1H EMA50",levels.tp1,"#25c9a4"],
+  ["4H EMA50",levels.tp2,"#f6ae60"],
+  ["SL",levels.stop,"#ff6881"]
+ ];
+
+ // Draw horizontal price levels
+
+ for (const [name,price,color] of lines) {
+  if (!Number.isFinite(price)) continue;
+
+  const yy=y(price);
+  if (yy<top || yy>h-bottom) continue;
+
+  ctx.strokeStyle=color;
+  ctx.lineWidth=1.3;
+  ctx.setLineDash([5,4]);
+
+  ctx.beginPath();
+  ctx.moveTo(left,yy);
+  ctx.lineTo(w-right,yy);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+
+  ctx.fillStyle=color;
+  ctx.font="10px Arial";
+  ctx.fillText(name,left+5,Math.max(12,yy-5));
+ }
+
+ // Time axis
+
+ ctx.fillStyle="#889ca7";
+ ctx.font="10px Arial";
+
+ for (let i=0;i<visible.length;i+=Math.max(12,Math.floor(visible.length/4))) {
+  const date=new Date(visible[i].t);
+
+  ctx.fillText(
+   (date.getUTCMonth()+1)+"/"+
+   date.getUTCDate()+" "+
+   String(date.getUTCHours()).padStart(2,"0")+":"+
+   String(date.getUTCMinutes()).padStart(2,"0"),
+   x(i),
+   h-14
+  );
+ }
+
+ $("overlay").classList.add("hidden");
+}
+
+// FULL WEEKLY RANGE ANALYSIS
+
+async function analyze() {
+ const run=++currentRun;
+ const coin=$("market").value;
+ const offset=Number($("week").value);
+ const button=$("analyze");
+
+ if (!coin) {
+  status("Select a market first.","red");
+  return;
+ }
+
+ button.disabled=true;
+ button.textContent="ANALYZING...";
+
+ $("overlay").classList.remove("hidden");
+ $("overlay").textContent="Loading Hyperliquid candles...";
+ $("result").innerHTML='<span class="muted">Analyzing...</span>';
+
+ chartCache=null;
+
+ for (const id of [
+  "mondayHigh","mondayLow","sweepLow",
+  "lastClose","ema1h","ema4h"
+ ]) {
+  $(id).textContent="—";
+ }
+
+ try {
+  const monday=mondayUTC(offset);
+  const mondayEnd=monday+DAY;
+  const end=Math.min(Date.now(),monday+WEEK);
+
+  if (end<mondayEnd) {
+   throw Error("Monday range is not completed yet.");
+  }
+
+  status("Downloading "+coin+" market data...");
+
+  // 15m warmup gives enough candles for
+  // Monday entry volume calculations.
+  const [m15,h1,h4]=await Promise.all([
+   getCandles(coin,"15m",monday-6*HOUR,end),
+   getCandles(coin,"1h",monday-120*HOUR,end),
+   getCandles(coin,"4h",monday-480*HOUR,end)
+  ]);
+
+  if (run!==currentRun) return;
+
+  const mondayBars=m15.filter(c=>
+   c.t>=monday &&
+   c.T<=mondayEnd
+  );
+
+  if (mondayBars.length<90) {
+   throw Error("Insufficient Monday candles.");
+  }
+
+  if (h1.length<50 || h4.length<50) {
+   throw Error("Insufficient EMA50 candle history.");
+  }
+
+  const mondayHigh=Math.max(...mondayBars.map(c=>c.h));
+  const mondayLow=Math.min(...mondayBars.map(c=>c.l));
+
+  const last=m15.at(-1);
+
+  $("mondayHigh").textContent=fmt(mondayHigh);
+  $("mondayLow").textContent=fmt(mondayLow);
+  $("lastClose").textContent=fmt(last.c);
+
+  $("weekInfo").textContent=
+   "Monday "+new Date(monday).toUTCString()+
+   " · UTC range completed.";
+
+  const scan=findSetup(m15,mondayLow,mondayEnd,end);
+
+  if (scan.sweep) {
+   $("sweepLow").textContent=fmt(scan.sweep.low);
+  }
+
+  // Display market-context EMA from the latest
+  // completed candle at or before test end.
+  const context1=emaAt(h1,end);
+  const context4=emaAt(h4,end);
+
+  let tp1=context1;
+  let tp2=context4;
+  let stop=NaN;
+
+  if (!scan.sweep) {
+   showSignal(
+    "WAIT",
+    "No Monday Low sweep confirmed.",
+    null,null,null,false
+   );
+
+  } else if (!scan.setup) {
+   showSignal(
+    "WAIT",
+    "Sweep found, but two accepted 15m closes " +
+    "with volume ≥1.0× were not confirmed.",
+    null,null,null,false
+   );
+
+  } else {
+   const entry=scan.setup;
+
+   // Freeze both targets at entry time.
+   // Future prices do not affect historical targets.
+   tp1=emaAt(h1,entry.entryTime);
+   tp2=emaAt(h4,entry.entryTime);
+   stop=entry.stop;
+
+   const risk=entry.entry-stop;
+   const rr=(tp1-entry.entry)/risk;
+
+   const valid=
+    Number.isFinite(tp1) &&
+    Number.isFinite(tp2) &&
+    risk>0 &&
+    tp1>entry.entry &&
+    tp2>tp1 &&
+    rr>=MIN_RR;
+
+   if (!valid) {
+    showSignal(
+     "WAIT",
+     "Sweep and volume confirmed, but EMA50 targets " +
+     "or minimum TP1 risk/reward 2R did not qualify.",
+     null,null,null,false
+    );
+   } else {
+    const later=m15.filter(c=>c.t>=entry.entryTime);
+
+    const assessment=evaluateTrade(
+     later,entry,tp1,tp2
+    );
+
+    const fresh=
+     offset===0 &&
+     Date.now()-entry.entryTime<=30*MINUTE &&
+     assessment.state==="OPEN";
+
+    const stateLabel=fresh
+     ? "LONG"
+     : assessment.state==="OPEN"
+      ? "HISTORICAL SETUP"
+      : assessment.state;
+
+    showSignal(
+     stateLabel,
+     fresh
+      ? "Fresh Weekly Range LONG setup confirmed."
+      : "Historical setup detected. This is not a new entry.",
+     entry,
+     {tp1,tp2},
+     assessment,
+     fresh
+    );
+   }
+  }
+
+  $("ema1h").textContent=fmt(tp1);
+  $("ema4h").textContent=fmt(tp2);
+
+  $("emaNote").textContent=scan.setup
+   ? "EMA targets frozen at historical entry time."
+   : "Latest completed EMA50 values for context.";
+
+  // Chart only displays prices from the selected week.
+  chartCache={
+   candles:m15.filter(c=>c.t>=monday),
+   levels:{
+    high:mondayHigh,
+    low:mondayLow,
+    tp1,
+    tp2,
+    stop
+   }
+  };
+
+  chartCount=90;
+  drawChart();
+
+  status(
+   "● Analysis completed · "+coin+
+   " · Volume threshold 1.0×",
+   "green"
+  );
+
+ } catch(e) {
+  if (run!==currentRun) return;
+
+  status("Analysis error: "+e.message,"red");
+
+  $("result").innerHTML=
+   '<span class="red">No signal generated: '+
+   html(e.message)+"</span>";
+
+  $("overlay").textContent=
+   "Chart unavailable: "+e.message;
+
+ } finally {
+  if (run===currentRun) {
+   button.disabled=false;
+   button.textContent="RUN WEEKLY RANGE ANALYSIS →";
+  }
+ }
+}
+
+$("search").addEventListener("input",updateMarkets);
+
+$("analyze").addEventListener("click",analyze);
+
+$("zoomIn").onclick=()=>{
+ if (!chartCache) return;
+ chartCount=Math.max(20,Math.round(chartCount*.8));
+ drawChart();
+};
+
+$("zoomOut").onclick=()=>{
+ if (!chartCache) return;
+ chartCount=Math.min(
+  chartCache.candles.length,
+  Math.round(chartCount*1.25)
+ );
+ drawChart();
+};
+
+$("resetZoom").onclick=()=>{
+ chartCount=90;
+ drawChart();
+};
+
+window.addEventListener("resize",drawChart);
+
+loadMarkets();
+
+</script>
+</body>
+</html>
