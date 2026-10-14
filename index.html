@@ -3,70 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070d12">
+<meta name="theme-color" content="#080d12">
 <title>YOYO TRADE PRO | Weekly Range</title>
 
 <style>
 :root{
- --bg:#070d12;
- --panel:#101a22;
- --card:#14232c;
- --border:#28404c;
- --text:#f0f5f7;
- --muted:#91a6b1;
- --lime:#d5ff35;
- --green:#25c9a4;
- --red:#ff6881;
- --blue:#62a8ff;
- --orange:#f6ae60;
+  --bg:#080d12;
+  --panel:#111b23;
+  --card:#172630;
+  --border:#2a404c;
+  --text:#f0f5f7;
+  --muted:#91a6b1;
+  --lime:#d5ff35;
+  --green:#25c9a4;
+  --red:#ff6881;
+  --blue:#62a8ff;
+  --orange:#f6ae60;
 }
+
 *{box-sizing:border-box}
+
 body{
- margin:0;
- background:var(--bg);
- color:var(--text);
- font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:14px -apple-system,BlinkMacSystemFont,
+  "Segoe UI",Arial,sans-serif;
 }
+
 header{
- position:sticky;
- top:0;
- z-index:10;
- background:#05090d;
- padding:17px 15px;
- border-bottom:1px solid var(--border);
- display:flex;
- align-items:center;
- justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:#05090d;
+  border-bottom:1px solid var(--border);
+  padding:17px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
+
 .logo{
- font-size:22px;
- font-weight:900;
- letter-spacing:-1px;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-1px;
 }
+
 .logo span{color:var(--lime)}
+
 .badge{
- color:var(--lime);
- border:1px solid #5f7828;
- padding:8px 10px;
- border-radius:25px;
- font-size:10px;
- font-weight:800;
+  color:var(--lime);
+  border:1px solid #647a2b;
+  border-radius:25px;
+  padding:8px 10px;
+  font-size:10px;
+  font-weight:800;
 }
+
 main{
- max-width:1050px;
- margin:auto;
- padding:14px;
+  max-width:1100px;
+  margin:auto;
+  padding:14px;
 }
+
 .panel{
- padding:17px;
- margin-bottom:14px;
- background:var(--panel);
- border:1px solid var(--border);
- border-radius:16px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:17px;
+  margin-bottom:14px;
 }
+
 h1{font-size:24px;margin:0 0 8px}
 h2{font-size:19px;margin:0 0 12px}
+h3{font-size:15px;margin:0 0 10px}
+
 p{line-height:1.55}
+
 .muted{color:var(--muted)}
 .small{font-size:12px}
 .green{color:var(--green)}
@@ -74,192 +87,235 @@ p{line-height:1.55}
 .lime{color:var(--lime)}
 .blue{color:var(--blue)}
 .orange{color:var(--orange)}
+
 label{
- display:block;
- margin:13px 0 7px;
- color:var(--muted);
- font-size:12px;
- font-weight:700;
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  margin:13px 0 7px;
 }
-select,input,button{
- font:inherit;
- border-radius:10px;
+
+input,select,button{
+  font:inherit;
+  border-radius:10px;
 }
-select,input{
- width:100%;
- min-width:0;
- background:#09131a;
- color:var(--text);
- border:1px solid #38515f;
- padding:13px;
+
+input,select{
+  width:100%;
+  min-width:0;
+  background:#09131a;
+  color:var(--text);
+  border:1px solid #38515f;
+  padding:13px;
 }
+
 button{
- background:#172932;
- color:var(--text);
- border:1px solid #38515f;
- padding:12px;
- cursor:pointer;
- font-weight:800;
+  background:#172932;
+  border:1px solid #38515f;
+  color:var(--text);
+  padding:12px;
+  cursor:pointer;
+  font-weight:800;
 }
-button:disabled{opacity:.55}
+
+button:disabled{opacity:.5}
+
 .primary{
- width:100%;
- margin-top:15px;
- padding:16px;
- background:var(--lime);
- color:#07110b;
- border:0;
- font-size:16px;
- font-weight:900;
+  width:100%;
+  margin-top:15px;
+  padding:16px;
+  background:var(--lime);
+  color:#07110b;
+  border:0;
+  font-size:16px;
+  font-weight:900;
 }
+
 .grid{
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
- gap:10px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
 }
+
 .metric{
- background:var(--card);
- padding:13px;
- border-radius:11px;
- border:1px solid #213640;
- min-width:0;
+  background:var(--card);
+  border:1px solid #213640;
+  border-radius:11px;
+  padding:13px;
+  min-width:0;
 }
+
 .metric small{
- display:block;
- color:var(--muted);
- margin-bottom:7px;
- font-size:11px;
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:7px;
 }
+
 .metric strong{
- display:block;
- font-size:19px;
- overflow-wrap:anywhere;
+  display:block;
+  font-size:19px;
+  overflow-wrap:anywhere;
 }
+
 .status{
- margin:12px 0;
- font-size:12px;
- overflow-wrap:anywhere;
+  margin:12px 0;
+  font-size:12px;
+  overflow-wrap:anywhere;
 }
+
 .chartbox{
- height:390px;
- position:relative;
- background:#070e13;
- border:1px solid var(--border);
- border-radius:14px;
- overflow:hidden;
+  height:390px;
+  position:relative;
+  background:#070e13;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
 }
+
 canvas{
- display:block;
- width:100%;
- height:100%;
- touch-action:pan-y;
+  display:block;
+  width:100%;
+  height:100%;
 }
+
 .overlay{
- position:absolute;
- inset:0;
- background:#070e13;
- display:flex;
- align-items:center;
- justify-content:center;
- text-align:center;
- padding:20px;
- color:var(--muted);
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+  color:var(--muted);
+  background:#070e13;
 }
+
 .hidden{display:none!important}
+
 .legend{
- display:flex;
- flex-wrap:wrap;
- gap:12px;
- padding:13px 0;
- font-size:11px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  padding:13px 0;
+  font-size:11px;
 }
+
 .dot{
- display:inline-block;
- width:8px;
- height:8px;
- border-radius:50%;
- margin-right:4px;
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  margin-right:4px;
 }
+
 .result{
- border:1px solid var(--border);
- background:#09141b;
- border-radius:13px;
- padding:16px;
- margin-top:12px;
+  border:1px solid var(--border);
+  background:#09141b;
+  border-radius:13px;
+  padding:16px;
+  margin-top:12px;
 }
+
 .signal{
- display:inline-block;
- padding:10px 16px;
- border-radius:9px;
- font-weight:900;
- font-size:21px;
- margin-bottom:10px;
+  display:inline-block;
+  padding:10px 16px;
+  border-radius:9px;
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:10px;
 }
+
 .long{
- background:var(--green);
- color:#06140e;
+  background:var(--green);
+  color:#06140e;
 }
+
 .wait{
- background:#28301a;
- color:var(--lime);
- border:1px solid #637a33;
+  background:#28301a;
+  color:var(--lime);
+  border:1px solid #637a33;
 }
+
 .closed{
- background:#26313a;
- color:#d5e0e5;
+  background:#26313a;
+  color:#d5e0e5;
 }
+
 .info{
- border-radius:10px;
- background:#152630;
- color:#bfd0d9;
- padding:13px;
- margin-top:12px;
- line-height:1.65;
+  background:#152630;
+  border-radius:10px;
+  padding:13px;
+  margin-top:12px;
+  color:#bfd0d9;
+  line-height:1.65;
 }
-.rule{
- border-bottom:1px solid var(--border);
- padding:10px 0;
- line-height:1.5;
-}
-.rule:last-child{border:0}
+
 .row{
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
 }
+
 .pill{
- color:var(--lime);
- background:#233019;
- padding:7px 10px;
- border-radius:20px;
- font-size:11px;
- font-weight:800;
+  background:#233019;
+  color:var(--lime);
+  padding:7px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:800;
 }
+
 .toolbar{
- display:flex;
- gap:8px;
- flex-wrap:wrap;
- margin:10px 0;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:10px 0;
 }
+
 .toolbar button{
- padding:9px 12px;
- font-size:12px;
+  padding:9px 12px;
+  font-size:12px;
 }
+
+.scan-item{
+  background:#101e27;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:13px;
+  margin-top:9px;
+}
+
+.scan-item strong{
+  font-size:16px;
+}
+
+.rule{
+  border-bottom:1px solid var(--border);
+  padding:10px 0;
+  line-height:1.5;
+}
+
+.rule:last-child{border:0}
+
 footer{
- text-align:center;
- color:var(--muted);
- padding:25px;
- font-size:11px;
+  text-align:center;
+  color:var(--muted);
+  padding:25px;
+  font-size:11px;
 }
+
 @media(min-width:650px){
- .chartbox{height:500px}
- .metric strong{font-size:23px}
+  .chartbox{height:500px}
+  .metric strong{font-size:23px}
 }
+
 @media(max-width:370px){
- .logo{font-size:19px}
- .badge{font-size:9px}
- .metric strong{font-size:16px}
+  .logo{font-size:19px}
+  .badge{font-size:9px}
+  .metric strong{font-size:16px}
 }
 </style>
 </head>
@@ -267,176 +323,213 @@ footer{
 <body>
 
 <header>
- <div class="logo">YOYO <span>TRADE</span></div>
- <div class="badge">PRO · WEEKLY RANGE</div>
+  <div class="logo">YOYO <span>TRADE</span></div>
+  <div class="badge">PRO · WEEKLY RANGE</div>
 </header>
 
 <main>
 
 <section class="panel">
- <h1>Weekly Range Strategy</h1>
- <p class="muted">
- Monday Low Sweep → 15m Acceptance →
- 1H EMA50 → 4H EMA50
- </p>
- <div class="info">
- <span class="lime"><b>LONG ONLY · RESEARCH MODE</b></span><br>
- Hyperliquid perpetual markets.<br>
- No automatic orders. No mock signals.
- </div>
+  <h1>Weekly Range Strategy</h1>
+
+  <p class="muted">
+    Monday Low Sweep → 15m Acceptance →
+    1H EMA50 → 4H EMA50 → Monday High
+  </p>
+
+  <div class="info">
+    <b class="lime">LONG ONLY · RESEARCH MODE</b><br>
+    Hyperliquid perpetual markets.<br>
+    Volume ≥ 1.0× · 2 × 15m Confirmation.<br>
+    No automatic trading or mock signals.
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Hyperliquid Market</h2>
+
+  <label>Search Market</label>
+  <input id="search"
+    placeholder="SOL, XRP, HYPE, NVDA..."
+    autocomplete="off">
+
+  <div class="grid">
+    <div>
+      <label>Perpetual Market</label>
+      <select id="market">
+        <option value="SOL">SOL</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Trading Week · UTC</label>
+      <select id="week">
+        <option value="0">Current Week</option>
+        <option value="1">Previous Week</option>
+        <option value="2">2 Weeks Ago</option>
+        <option value="3">3 Weeks Ago</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="status" class="status muted">
+    Connecting to Hyperliquid...
+  </div>
+
+  <button id="analyze" class="primary">
+    RUN WEEKLY RANGE ANALYSIS →
+  </button>
+</section>
+
+<section class="panel">
+  <h2>Monday Trading Range</h2>
+
+  <div class="grid">
+    <div class="metric">
+      <small>MONDAY HIGH</small>
+      <strong id="mondayHigh" class="blue">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>MONDAY LOW</small>
+      <strong id="mondayLow" class="lime">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>SWEEP LOW</small>
+      <strong id="sweepLow" class="red">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>LAST CLOSE</small>
+      <strong id="lastClose">—</strong>
+    </div>
+  </div>
+
+  <p id="weekInfo" class="muted small">
+    Waiting for analysis...
+  </p>
 </section>
 
 <section class="panel">
 
-<h2>Hyperliquid Market Scanner</h2>
+  <div class="row">
+    <h2>15m Price Chart</h2>
+    <span class="pill">WEEKLY RANGE</span>
+  </div>
 
-<label>Search Market</label>
-<input id="search"
- placeholder="Search SOL, XRP, HYPE, NVDA..."
- autocomplete="off">
+  <div class="chartbox">
+    <canvas id="chart"></canvas>
+    <div class="overlay" id="overlay">
+      Choose a market and run analysis.
+    </div>
+  </div>
 
-<div class="grid">
- <div>
-  <label>Perpetual Market</label>
-  <select id="market">
-   <option value="SOL">SOL</option>
-  </select>
- </div>
- <div>
-  <label>Trading Week · UTC</label>
-  <select id="week">
-   <option value="0">Current Week</option>
-   <option value="1">Previous Week</option>
-   <option value="2">2 Weeks Ago</option>
-   <option value="3">3 Weeks Ago</option>
-  </select>
- </div>
-</div>
+  <div class="toolbar">
+    <button id="zoomIn">Zoom +</button>
+    <button id="zoomOut">Zoom −</button>
+    <button id="resetZoom">Reset</button>
+  </div>
 
-<div id="status" class="status muted">
- Connecting to Hyperliquid...
-</div>
+  <div class="legend">
+    <span><i class="dot" style="background:#62a8ff"></i>Monday High</span>
+    <span><i class="dot" style="background:#d5ff35"></i>Monday Low</span>
+    <span><i class="dot" style="background:#25c9a4"></i>TP1</span>
+    <span><i class="dot" style="background:#f6ae60"></i>TP2</span>
+    <span><i class="dot" style="background:#b68cff"></i>TP3</span>
+    <span><i class="dot" style="background:#ff6881"></i>SL</span>
+  </div>
 
-<div class="info">
- <b>Volume Filter:</b>
- <span class="lime">≥ 1.0×</span><br>
- Entry timeframe: 15m<br>
- Monday range: 00:00–24:00 UTC
-</div>
-
-<button id="analyze" class="primary">
- RUN WEEKLY RANGE ANALYSIS →
-</button>
-
+  <p class="muted small">
+    Completed 15m candles only. Historical setups
+    are not fresh trading signals.
+  </p>
 </section>
 
 <section class="panel">
-<h2>Monday Trading Range</h2>
+  <h2>Trading Signal</h2>
 
-<div class="grid">
- <div class="metric">
-  <small>MONDAY HIGH</small>
-  <strong id="mondayHigh" class="blue">—</strong>
- </div>
- <div class="metric">
-  <small>MONDAY LOW</small>
-  <strong id="mondayLow" class="lime">—</strong>
- </div>
- <div class="metric">
-  <small>SWEEP LOW</small>
-  <strong id="sweepLow" class="red">—</strong>
- </div>
- <div class="metric">
-  <small>LAST CLOSE</small>
-  <strong id="lastClose">—</strong>
- </div>
-</div>
-
-<p id="weekInfo" class="muted small">
- Waiting for analysis...
-</p>
+  <div id="result" class="result">
+    <span class="muted">No analysis yet.</span>
+  </div>
 </section>
 
 <section class="panel">
+  <h2>Multi-Market Scanner</h2>
 
-<div class="row">
- <h2>15m Price Chart</h2>
- <span class="pill">WEEKLY RANGE</span>
-</div>
+  <p class="muted small">
+    Scan selected Hyperliquid markets for the
+    Weekly Range setup. Scanning runs only while
+    this page is open.
+  </p>
 
-<div class="chartbox">
- <canvas id="chart"></canvas>
- <div class="overlay" id="overlay">
-  Choose a market and run analysis.
- </div>
-</div>
+  <div class="grid">
+    <div>
+      <label>Number of Markets</label>
+      <select id="scanCount">
+        <option value="5">5 Markets</option>
+        <option value="10" selected>10 Markets</option>
+        <option value="20">20 Markets</option>
+        <option value="30">30 Markets</option>
+      </select>
+    </div>
 
-<div class="toolbar">
- <button id="zoomIn">Zoom +</button>
- <button id="zoomOut">Zoom −</button>
- <button id="resetZoom">Reset</button>
-</div>
+    <div>
+      <label>Start From</label>
+      <select id="scanStart">
+        <option value="0">Beginning</option>
+        <option value="30">Market 31</option>
+        <option value="60">Market 61</option>
+        <option value="100">Market 101</option>
+        <option value="200">Market 201</option>
+      </select>
+    </div>
+  </div>
 
-<div class="legend">
- <span><i class="dot" style="background:#62a8ff"></i>Monday High</span>
- <span><i class="dot" style="background:#d5ff35"></i>Monday Low</span>
- <span><i class="dot" style="background:#25c9a4"></i>1H EMA50</span>
- <span><i class="dot" style="background:#f6ae60"></i>4H EMA50</span>
- <span><i class="dot" style="background:#ff6881"></i>SL</span>
-</div>
+  <button id="scanBtn" class="primary">
+    SCAN MARKETS →
+  </button>
 
-<p class="muted small">
- Completed 15m candles only. Historical signals
- are labeled separately from fresh signals.
-</p>
+  <div id="scanStatus" class="status muted">
+    Scanner ready.
+  </div>
+
+  <div id="scanResults"></div>
 </section>
 
 <section class="panel">
-<h2>EMA50 Targets</h2>
-<div class="grid">
- <div class="metric">
-  <small>TP1 · 1H EMA50</small>
-  <strong class="green" id="ema1h">—</strong>
- </div>
- <div class="metric">
-  <small>TP2 · 4H EMA50</small>
-  <strong class="orange" id="ema4h">—</strong>
- </div>
-</div>
-<p class="muted small" id="emaNote">
- Targets will be calculated from available candles.
-</p>
+  <div class="row">
+    <h2>Signal History</h2>
+    <button id="clearHistory">Clear</button>
+  </div>
+
+  <p class="muted small">
+    Saved on this device only. Not synchronized
+    with other members.
+  </p>
+
+  <div id="history"></div>
 </section>
 
 <section class="panel">
-<h2>Trading Signal</h2>
+  <h2>Strategy Rules</h2>
 
-<div id="result" class="result">
- <span class="muted">
-  No analysis yet.
- </span>
-</div>
-
-</section>
-
-<section class="panel">
-<h2>Strategy Rules</h2>
-
-<div class="rule">01 · Let Monday High and Low form.</div>
-<div class="rule">02 · Wait for a sweep below Monday Low.</div>
-<div class="rule">03 · Require two 15m closes above Monday Low.</div>
-<div class="rule">04 · Entry confirmation volume ≥ 1.0×.</div>
-<div class="rule">05 · Stop Loss below Sweep Low.</div>
-<div class="rule">06 · TP1 at 1H EMA50.</div>
-<div class="rule">07 · Exit on confirmed 1H EMA50 rejection.</div>
-<div class="rule">08 · After acceptance above TP1, target 4H EMA50.</div>
+  <div class="rule">01 · Let Monday High and Low form.</div>
+  <div class="rule">02 · Wait for a sweep below Monday Low.</div>
+  <div class="rule">03 · Two 15m closes above Monday Low.</div>
+  <div class="rule">04 · Confirmation volume ≥ 1.0×.</div>
+  <div class="rule">05 · Stop Loss below Sweep Low.</div>
+  <div class="rule">06 · TP1 at 1H EMA50.</div>
+  <div class="rule">07 · Exit on confirmed EMA50 rejection.</div>
+  <div class="rule">08 · TP2 at 4H EMA50 after TP1 acceptance.</div>
+  <div class="rule">09 · TP3 at Monday High if above TP2.</div>
 </section>
 
 </main>
 
 <footer>
-YOYO TRADE PRO © 2026<br>
-Weekly Range Research · Educational Use Only
+  YOYO TRADE PRO © 2026<br>
+  Weekly Range Research · Educational Use Only
 </footer>
 
 <script>
@@ -457,831 +550,1193 @@ let allMarkets = ["SOL"];
 let chartCache = null;
 let chartCount = 90;
 let currentRun = 0;
+let scanRunning = false;
+let marketsReady = false;
+
+// NUMBER FORMAT
 
 function fmt(n) {
- if (!Number.isFinite(n)) return "—";
- return Number(n).toLocaleString("en-US", {
-  maximumFractionDigits:
-   Math.abs(n) < 1 ? 6 :
-   Math.abs(n) < 100 ? 4 : 2
- });
-}
+  if (!Number.isFinite(n)) return "—";
 
-function html(s) {
- return String(s).replace(/[&<>"']/g, c => ({
-  "&":"&amp;",
-  "<":"&lt;",
-  ">":"&gt;",
-  '"':"&quot;",
-  "'":"&#39;"
- }[c]));
-}
-
-function status(message, type="muted") {
- $("status").textContent = message;
- $("status").className = "status " + type;
-}
-
-async function request(body) {
- const controller = new AbortController();
- const timer = setTimeout(() => controller.abort(), 15000);
-
- try {
-  const response = await fetch(API, {
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
-   body:JSON.stringify(body),
-   signal:controller.signal,
-   cache:"no-store"
+  return Number(n).toLocaleString("en-US", {
+    maximumFractionDigits:
+      Math.abs(n) < 1 ? 6 :
+      Math.abs(n) < 100 ? 4 : 2
   });
+}
 
-  if (!response.ok) {
-   throw Error("HTTP " + response.status);
-  }
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
 
-  return await response.json();
- } finally {
-  clearTimeout(timer);
- }
+function setStatus(message,type="muted") {
+  $("status").textContent = message;
+  $("status").className = "status " + type;
 }
 
 function sleep(ms) {
- return new Promise(resolve => setTimeout(resolve,ms));
+  return new Promise(resolve => setTimeout(resolve,ms));
 }
 
-// ALL AVAILABLE PERPETUAL MARKET DISCOVERY
+// HYPERLIQUID API
 
-async function loadMarkets() {
- try {
-  const base = await request({type:"meta"});
-  if (!Array.isArray(base.universe)) {
-   throw Error("Invalid market metadata");
-  }
+async function request(body) {
+  const controller = new AbortController();
 
-  const symbols = new Set();
-
-  for (const m of base.universe) {
-   if (!m.isDelisted) symbols.add(m.name);
-  }
-
-  let failed = 0;
+  const timer = setTimeout(
+    () => controller.abort(),
+    15000
+  );
 
   try {
-   const dexData = await request({type:"perpDexs"});
+    const response = await fetch(API, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body),
+      signal:controller.signal,
+      cache:"no-store"
+    });
 
-   if (Array.isArray(dexData)) {
-    const dexNames = [...new Set(dexData.map(x => {
-     if (typeof x === "string") return x;
-     if (Array.isArray(x)) return x[0];
-     return x?.name;
-    }).filter(x => typeof x === "string" && x))];
-
-    for (let i=0;i<dexNames.length;i+=3) {
-     const batch = dexNames.slice(i,i+3);
-
-     const results = await Promise.allSettled(
-      batch.map(dex => request({type:"meta",dex}))
-     );
-
-     results.forEach((result,j) => {
-      if (
-       result.status !== "fulfilled" ||
-       !Array.isArray(result.value?.universe)
-      ) {
-       failed++;
-       return;
-      }
-
-      for (const m of result.value.universe) {
-       if (m.isDelisted) continue;
-
-       const name = m.name.includes(":")
-        ? m.name
-        : batch[j] + ":" + m.name;
-
-       symbols.add(name);
-      }
-     });
-
-     status(
-      "Loading markets · " + symbols.size + " found...",
-      "muted"
-     );
-
-     if (i+3<dexNames.length) await sleep(120);
+    if (!response.ok) {
+      throw Error("HTTP " + response.status);
     }
-   }
-  } catch(e) {
-   failed++;
-   console.warn("Additional DEX discovery:",e);
+
+    return await response.json();
+
+  } finally {
+    clearTimeout(timer);
   }
+}
 
-  allMarkets = [...symbols].sort((a,b) =>
-   a.localeCompare(b)
-  );
+// MARKET DISCOVERY
 
-  updateMarkets();
+async function loadMarkets() {
+  try {
+    const base = await request({type:"meta"});
 
-  status(
-   "● Hyperliquid connected · " +
-   allMarkets.length +
-   " markets loaded" +
-   (failed ? " · " + failed + " DEX fetches failed" : ""),
-   failed ? "orange" : "green"
-  );
+    if (!Array.isArray(base.universe)) {
+      throw Error("Invalid market metadata");
+    }
 
- } catch(e) {
-  status("Market connection failed: " + e.message,"red");
- }
+    const symbols = new Set();
+
+    for (const m of base.universe) {
+      if (!m.isDelisted) {
+        symbols.add(m.name);
+      }
+    }
+
+    let failed = 0;
+
+    try {
+      const dexData = await request({type:"perpDexs"});
+
+      if (Array.isArray(dexData)) {
+        const dexNames = [...new Set(
+          dexData
+            .filter(Boolean)
+            .map(x => {
+              if (typeof x === "string") return x;
+              if (Array.isArray(x)) return x[0];
+              return x.name;
+            })
+            .filter(Boolean)
+        )];
+
+        for (let i=0;i<dexNames.length;i+=3) {
+          const batch = dexNames.slice(i,i+3);
+
+          const results = await Promise.allSettled(
+            batch.map(dex =>
+              request({type:"meta",dex})
+            )
+          );
+
+          results.forEach((result,j) => {
+            if (
+              result.status !== "fulfilled" ||
+              !Array.isArray(result.value?.universe)
+            ) {
+              failed++;
+              return;
+            }
+
+            for (const m of result.value.universe) {
+              if (m.isDelisted) continue;
+
+              const name = m.name.includes(":")
+                ? m.name
+                : batch[j] + ":" + m.name;
+
+              symbols.add(name);
+            }
+          });
+
+          setStatus(
+            "Loading markets · " +
+            symbols.size + " found...",
+            "muted"
+          );
+
+          if (i+3<dexNames.length) {
+            await sleep(150);
+          }
+        }
+      }
+
+    } catch(e) {
+      failed++;
+      console.warn("DEX discovery:",e);
+    }
+
+    allMarkets = [...symbols].sort(
+      (a,b) => a.localeCompare(b)
+    );
+
+    marketsReady = true;
+    updateMarkets();
+
+    setStatus(
+      "● Hyperliquid connected · " +
+      allMarkets.length +
+      " markets loaded" +
+      (failed ? " · Some DEX requests failed" : ""),
+      failed ? "orange" : "green"
+    );
+
+  } catch(e) {
+    marketsReady = false;
+    setStatus(
+      "Market connection failed: " + e.message,
+      "red"
+    );
+  }
 }
 
 function updateMarkets() {
- const q = $("search").value.trim().toUpperCase();
- const select = $("market");
- const previous = select.value;
+  const q = $("search").value.trim().toUpperCase();
+  const select = $("market");
+  const previous = select.value;
 
- const matches = allMarkets.filter(name =>
-  name.toUpperCase().includes(q)
- );
+  const matches = allMarkets.filter(name =>
+    name.toUpperCase().includes(q)
+  );
 
- select.replaceChildren();
+  select.replaceChildren();
 
- for (const name of matches) {
-  const option = document.createElement("option");
-  option.value = name;
-  option.textContent = name;
-  select.appendChild(option);
- }
+  for (const name of matches) {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  }
 
- if (matches.includes(previous)) {
-  select.value = previous;
- } else if (matches.includes("SOL")) {
-  select.value = "SOL";
- } else if (matches.length) {
-  select.value = matches[0];
- }
+  if (matches.includes(previous)) {
+    select.value = previous;
+  } else if (matches.includes("SOL")) {
+    select.value = "SOL";
+  } else if (matches.length) {
+    select.value = matches[0];
+  }
 }
+
+// WEEK TIME
 
 function mondayUTC(offset) {
- const now = new Date();
- const weekday = (now.getUTCDay()+6)%7;
+  const now = new Date();
+  const weekday = (now.getUTCDay()+6)%7;
 
- const start = Date.UTC(
-  now.getUTCFullYear(),
-  now.getUTCMonth(),
-  now.getUTCDate()-weekday
- );
+  const start = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate()-weekday
+  );
 
- return start-offset*WEEK;
+  return start-offset*WEEK;
 }
 
-function completedCandles(raw, cutoff) {
- if (!Array.isArray(raw)) throw Error("Invalid candle response");
+// CANDLE DATA
 
- return raw.map(x => ({
-  t:Number(x.t),
-  T:Number(x.T),
-  o:Number(x.o),
-  h:Number(x.h),
-  l:Number(x.l),
-  c:Number(x.c),
-  v:Number(x.v)
- })).filter(x =>
-  [x.t,x.T,x.o,x.h,x.l,x.c,x.v]
-   .every(Number.isFinite) &&
-  x.T <= cutoff
- ).sort((a,b) => a.t-b.t);
+function completedCandles(raw,cutoff) {
+  if (!Array.isArray(raw)) {
+    throw Error("Invalid candle response");
+  }
+
+  return raw.map(x => ({
+    t:Number(x.t),
+    T:Number(x.T),
+    o:Number(x.o),
+    h:Number(x.h),
+    l:Number(x.l),
+    c:Number(x.c),
+    v:Number(x.v)
+  })).filter(x =>
+    [x.t,x.T,x.o,x.h,x.l,x.c,x.v]
+      .every(Number.isFinite) &&
+    x.T<=cutoff
+  ).sort((a,b)=>a.t-b.t);
 }
 
 async function getCandles(coin,tf,start,end) {
- const raw = await request({
-  type:"candleSnapshot",
-  req:{
-   coin:coin,
-   interval:tf,
-   startTime:start,
-   endTime:end
-  }
- });
+  const raw = await request({
+    type:"candleSnapshot",
+    req:{
+      coin,
+      interval:tf,
+      startTime:start,
+      endTime:end
+    }
+  });
 
- return completedCandles(raw,Math.min(end,Date.now()));
+  return completedCandles(
+    raw,
+    Math.min(end,Date.now())
+  );
 }
 
-// EMA50 USING ONLY AVAILABLE HISTORICAL CANDLES
+// EMA50
 
 function EMA(values,length=50) {
- const output = new Array(values.length).fill(NaN);
- if (values.length<length) return output;
+  const output = new Array(values.length).fill(NaN);
 
- let previous = values.slice(0,length)
-  .reduce((a,b)=>a+b,0)/length;
+  if (values.length<length) return output;
 
- output[length-1]=previous;
+  let previous = values.slice(0,length)
+    .reduce((a,b)=>a+b,0)/length;
 
- const k = 2/(length+1);
+  output[length-1]=previous;
 
- for (let i=length;i<values.length;i++) {
-  previous=values[i]*k+previous*(1-k);
-  output[i]=previous;
- }
+  const k=2/(length+1);
 
- return output;
+  for (let i=length;i<values.length;i++) {
+    previous=values[i]*k+previous*(1-k);
+    output[i]=previous;
+  }
+
+  return output;
 }
 
 function emaAt(candles,time) {
- const available=candles.filter(c => c.T<=time);
- if (available.length<50) return NaN;
+  const available=candles.filter(c=>c.T<=time);
 
- const series=EMA(available.map(c=>c.c),50);
- return series.at(-1);
+  if (available.length<50) return NaN;
+
+  return EMA(
+    available.map(c=>c.c),
+    50
+  ).at(-1);
 }
 
-// 15M VOLUME RATIO VS PREVIOUS 20 CANDLES
+// VOLUME RATIO
 
 function volumeRatio(data,index) {
- if (index<20) return NaN;
+  if (index<20) return NaN;
 
- const previous=data.slice(index-20,index);
+  const previous=data.slice(index-20,index);
 
- const avg=previous.reduce(
-  (sum,c)=>sum+c.v,0
- )/20;
+  const avg=previous.reduce(
+    (sum,c)=>sum+c.v,0
+  )/20;
 
- if (!(avg>0)) return NaN;
+  if (!(avg>0)) return NaN;
 
- return data[index].v/avg;
+  return data[index].v/avg;
 }
 
-// SWEEP + TWO CONFIRMED 15M CLOSES + VOLUME 1.0X
+// LOAD ONE WEEK
 
-function findSetup(candles,mondayLow,mondayEnd,testEnd) {
- let sweep=null;
- let count=0;
- let setup=null;
- let lastSweep=null;
-
- for (let i=0;i<candles.length;i++) {
-  const c=candles[i];
-
-  if (c.t<mondayEnd || c.T>testEnd) continue;
-
-  if (!sweep) {
-   if (c.l<mondayLow) {
-    sweep={low:c.l,time:c.t};
-    lastSweep={...sweep};
-    count=c.c>mondayLow ? 1 : 0;
-   }
-   continue;
-  }
-
-  // New lower low invalidates the previous
-  // acceptance sequence.
-  if (c.l<sweep.low) {
-   sweep.low=c.l;
-   sweep.time=c.t;
-   count=0;
-  }
-
-  lastSweep={...sweep};
-
-  if (c.c>mondayLow) {
-   count++;
-  } else {
-   count=0;
-  }
-
-  if (count>=2) {
-   const ratio=volumeRatio(candles,i);
-
-   // Volume must pass on the second
-   // confirmation candle.
-   if (!(ratio>=MIN_VOLUME)) {
-    continue;
-   }
-
-   const stop=sweep.low*0.999;
-
-   if (!(stop<c.c)) continue;
-
-   setup={
-    entry:c.c,
-    entryTime:c.T,
-    entryIndex:i,
-    sweepLow:sweep.low,
-    stop,
-    volume:ratio,
-    candle:c
-   };
-
-   break;
-  }
- }
-
- return {setup,sweep:lastSweep};
-}
-
-// EVALUATE TRADE FROM ENTRY TO SELECTED WEEK END
-
-function evaluateTrade(data,entry,tp1,tp2) {
- let state="OPEN";
- let exitPrice=null;
- let exitTime=null;
- let reachedTP1=false;
- let acceptedTP1=false;
-
- // TP1 is an EMA zone, not necessarily a
- // guaranteed executable limit order.
- for (const c of data) {
-  if (c.t<entry.entryTime) continue;
-
-  // Conservative same-candle assumption:
-  // SL takes priority over targets.
-  if (c.l<=entry.stop) {
-   state="STOPPED";
-   exitPrice=entry.stop;
-   exitTime=c.T;
-   break;
-  }
-
-  if (!reachedTP1 && c.h>=tp1) {
-   reachedTP1=true;
-  }
-
-  if (reachedTP1 && c.c>tp1) {
-   acceptedTP1=true;
-  }
-
-  // Simplified rejection rule:
-  // Price touches TP1 but closes back below
-  // the original TP1 reference before acceptance.
-  if (reachedTP1 && !acceptedTP1 && c.c<tp1) {
-   state="TP1_REJECTION";
-   exitPrice=c.c;
-   exitTime=c.T;
-   break;
-  }
-
-  if (acceptedTP1 && c.h>=tp2) {
-   state="TP2_REACHED";
-   exitPrice=tp2;
-   exitTime=c.T;
-   break;
-  }
- }
-
- return {
-  state,
-  exitPrice,
-  exitTime,
-  reachedTP1,
-  acceptedTP1
- };
-}
-
-function metric(label,value,cls="") {
- return `<div class="metric">
-  <small>${html(label)}</small>
-  <strong class="${cls}">${html(String(value))}</strong>
- </div>`;
-}
-
-function showSignal(title,message,setup,targets,assessment,isFresh) {
- let cls=isFresh ? "long" : "closed";
-
- if (!setup) cls="wait";
-
- let output=`
-  <div class="signal ${cls}">${html(title)}</div>
-  <p class="muted">${html(message)}</p>
- `;
-
- if (setup && targets) {
-  const risk=setup.entry-setup.stop;
-  const rr1=risk>0?(targets.tp1-setup.entry)/risk:NaN;
-  const rr2=risk>0?(targets.tp2-setup.entry)/risk:NaN;
-
-  output+=`
-   <div class="grid">
-    ${metric("ENTRY",fmt(setup.entry),"green")}
-    ${metric("STOP LOSS",fmt(setup.stop),"red")}
-    ${metric("TP1 · 1H EMA50",fmt(targets.tp1),"green")}
-    ${metric("TP2 · 4H EMA50",fmt(targets.tp2),"orange")}
-    ${metric("TP1 R:R",Number.isFinite(rr1)?rr1.toFixed(2)+"R":"—")}
-    ${metric("TP2 R:R",Number.isFinite(rr2)?rr2.toFixed(2)+"R":"—")}
-    ${metric("ENTRY VOLUME",setup.volume.toFixed(2)+"×","lime")}
-    ${metric("SWEEP LOW",fmt(setup.sweepLow),"red")}
-   </div>
-
-   <div class="info">
-    <b>Confirmation:</b>
-    ${new Date(setup.entryTime).toUTCString()}<br>
-    <b>Volume:</b> ${setup.volume.toFixed(2)}×
-    (minimum ${MIN_VOLUME.toFixed(1)}×)<br>
-    <b>Management:</b> Monitor 1H EMA50 rejection.
-    Continue toward 4H EMA50 only after acceptance.
-   </div>
-  `;
-
-  if (assessment) {
-   output+=`
-    <div class="info">
-     <b>Trade monitoring:</b>
-     ${html(assessment.state)}<br>
-     TP1 touched: ${assessment.reachedTP1?"YES":"NO"}<br>
-     TP1 accepted: ${assessment.acceptedTP1?"YES":"NO"}
-     ${Number.isFinite(assessment.exitPrice)
-      ? "<br>Exit reference: "+fmt(assessment.exitPrice)
-      : ""}
-    </div>
-   `;
-  }
- }
-
- $("result").innerHTML=output;
-}
-
-// CANDLESTICK CHART
-
-function drawChart() {
- if (!chartCache) return;
-
- const {candles,levels}=chartCache;
- const canvas=$("chart");
- const rect=canvas.getBoundingClientRect();
-
- if (!rect.width || !rect.height || !candles.length) return;
-
- const dpr=Math.min(window.devicePixelRatio||1,2);
-
- canvas.width=Math.round(rect.width*dpr);
- canvas.height=Math.round(rect.height*dpr);
-
- const ctx=canvas.getContext("2d");
- ctx.setTransform(dpr,0,0,dpr,0,0);
-
- const w=rect.width;
- const h=rect.height;
-
- ctx.fillStyle="#070e13";
- ctx.fillRect(0,0,w,h);
-
- const visible=candles.slice(-chartCount);
-
- const left=10,right=70,top=15,bottom=44;
- const pw=w-left-right;
- const ph=h-top-bottom;
-
- const prices=visible.flatMap(c=>[c.h,c.l]);
-
- for (const n of Object.values(levels)) {
-  if (Number.isFinite(n)) prices.push(n);
- }
-
- let lo=Math.min(...prices);
- let hi=Math.max(...prices);
-
- const margin=(hi-lo||Math.abs(hi)*.01||1)*.1;
- lo-=margin;
- hi+=margin;
-
- const y=p=>top+(hi-p)/(hi-lo)*ph;
- const step=pw/visible.length;
- const x=i=>left+(i+.5)*step;
-
- ctx.font="11px Arial";
-
- for (let i=0;i<5;i++) {
-  const price=hi-(hi-lo)*i/4;
-  const yy=y(price);
-
-  ctx.strokeStyle="#233640";
-  ctx.beginPath();
-  ctx.moveTo(left,yy);
-  ctx.lineTo(w-right,yy);
-  ctx.stroke();
-
-  ctx.fillStyle="#93a7b0";
-  ctx.fillText(fmt(price),w-right+8,yy+4);
- }
-
- // Price candles
-
- visible.forEach((c,i)=>{
-  const xx=x(i);
-  const col=c.c>=c.o?"#25c9a4":"#ff6881";
-
-  ctx.strokeStyle=col;
-  ctx.fillStyle=col;
-  ctx.lineWidth=1.2;
-
-  ctx.beginPath();
-  ctx.moveTo(xx,y(c.h));
-  ctx.lineTo(xx,y(c.l));
-  ctx.stroke();
-
-  const upper=y(Math.max(c.o,c.c));
-  const lower=y(Math.min(c.o,c.c));
-  const bw=Math.max(2,step*.65);
-
-  ctx.fillRect(
-   xx-bw/2,
-   upper,
-   bw,
-   Math.max(1,lower-upper)
-  );
- });
-
- const lines=[
-  ["MON HIGH",levels.high,"#62a8ff"],
-  ["MON LOW",levels.low,"#d5ff35"],
-  ["1H EMA50",levels.tp1,"#25c9a4"],
-  ["4H EMA50",levels.tp2,"#f6ae60"],
-  ["SL",levels.stop,"#ff6881"]
- ];
-
- // Draw horizontal price levels
-
- for (const [name,price,color] of lines) {
-  if (!Number.isFinite(price)) continue;
-
-  const yy=y(price);
-  if (yy<top || yy>h-bottom) continue;
-
-  ctx.strokeStyle=color;
-  ctx.lineWidth=1.3;
-  ctx.setLineDash([5,4]);
-
-  ctx.beginPath();
-  ctx.moveTo(left,yy);
-  ctx.lineTo(w-right,yy);
-  ctx.stroke();
-
-  ctx.setLineDash([]);
-
-  ctx.fillStyle=color;
-  ctx.font="10px Arial";
-  ctx.fillText(name,left+5,Math.max(12,yy-5));
- }
-
- // Time axis
-
- ctx.fillStyle="#889ca7";
- ctx.font="10px Arial";
-
- for (let i=0;i<visible.length;i+=Math.max(12,Math.floor(visible.length/4))) {
-  const date=new Date(visible[i].t);
-
-  ctx.fillText(
-   (date.getUTCMonth()+1)+"/"+
-   date.getUTCDate()+" "+
-   String(date.getUTCHours()).padStart(2,"0")+":"+
-   String(date.getUTCMinutes()).padStart(2,"0"),
-   x(i),
-   h-14
-  );
- }
-
- $("overlay").classList.add("hidden");
-}
-
-// FULL WEEKLY RANGE ANALYSIS
-
-async function analyze() {
- const run=++currentRun;
- const coin=$("market").value;
- const offset=Number($("week").value);
- const button=$("analyze");
-
- if (!coin) {
-  status("Select a market first.","red");
-  return;
- }
-
- button.disabled=true;
- button.textContent="ANALYZING...";
-
- $("overlay").classList.remove("hidden");
- $("overlay").textContent="Loading Hyperliquid candles...";
- $("result").innerHTML='<span class="muted">Analyzing...</span>';
-
- chartCache=null;
-
- for (const id of [
-  "mondayHigh","mondayLow","sweepLow",
-  "lastClose","ema1h","ema4h"
- ]) {
-  $(id).textContent="—";
- }
-
- try {
+async function loadWeek(coin,offset) {
   const monday=mondayUTC(offset);
   const mondayEnd=monday+DAY;
   const end=Math.min(Date.now(),monday+WEEK);
 
   if (end<mondayEnd) {
-   throw Error("Monday range is not completed yet.");
+    throw Error("Monday range is not complete.");
   }
 
-  status("Downloading "+coin+" market data...");
-
-  // 15m warmup gives enough candles for
-  // Monday entry volume calculations.
   const [m15,h1,h4]=await Promise.all([
-   getCandles(coin,"15m",monday-6*HOUR,end),
-   getCandles(coin,"1h",monday-120*HOUR,end),
-   getCandles(coin,"4h",monday-480*HOUR,end)
+    getCandles(coin,"15m",monday-6*HOUR,end),
+    getCandles(coin,"1h",monday-120*HOUR,end),
+    getCandles(coin,"4h",monday-480*HOUR,end)
   ]);
 
-  if (run!==currentRun) return;
-
   const mondayBars=m15.filter(c=>
-   c.t>=monday &&
-   c.T<=mondayEnd
+    c.t>=monday && c.T<=mondayEnd
   );
 
   if (mondayBars.length<90) {
-   throw Error("Insufficient Monday candles.");
+    throw Error("Insufficient Monday candles.");
   }
 
   if (h1.length<50 || h4.length<50) {
-   throw Error("Insufficient EMA50 candle history.");
+    throw Error("Insufficient EMA50 history.");
   }
 
-  const mondayHigh=Math.max(...mondayBars.map(c=>c.h));
-  const mondayLow=Math.min(...mondayBars.map(c=>c.l));
+  const high=Math.max(...mondayBars.map(c=>c.h));
+  const low=Math.min(...mondayBars.map(c=>c.l));
 
-  const last=m15.at(-1);
+  return {
+    coin,offset,monday,mondayEnd,end,
+    m15,h1,h4,high,low,
+    last:m15.at(-1)
+  };
+}
 
-  $("mondayHigh").textContent=fmt(mondayHigh);
-  $("mondayLow").textContent=fmt(mondayLow);
-  $("lastClose").textContent=fmt(last.c);
+// FIND CONFIRMED SWEEP
 
-  $("weekInfo").textContent=
-   "Monday "+new Date(monday).toUTCString()+
-   " · UTC range completed.";
+function findSetup(data) {
+  const {m15,low,mondayEnd,end}=data;
 
-  const scan=findSetup(m15,mondayLow,mondayEnd,end);
+  let sweep=null;
+  let count=0;
+  let setup=null;
 
-  if (scan.sweep) {
-   $("sweepLow").textContent=fmt(scan.sweep.low);
+  for (let i=0;i<m15.length;i++) {
+    const c=m15[i];
+
+    if (c.t<mondayEnd || c.T>end) continue;
+
+    if (!sweep) {
+      if (c.l<low) {
+        sweep={low:c.l,time:c.t};
+        count=c.c>low ? 1 : 0;
+      }
+      continue;
+    }
+
+    if (c.l<sweep.low) {
+      sweep.low=c.l;
+      sweep.time=c.t;
+      count=0;
+    }
+
+    if (c.c>low) {
+      count++;
+    } else {
+      count=0;
+    }
+
+    if (count>=2) {
+      const volume=volumeRatio(m15,i);
+
+      if (!(volume>=MIN_VOLUME)) continue;
+
+      const stop=sweep.low*0.999;
+
+      if (!(stop<c.c)) continue;
+
+      setup={
+        entry:c.c,
+        entryTime:c.T,
+        sweepLow:sweep.low,
+        stop,
+        volume,
+        index:i
+      };
+
+      break;
+    }
   }
 
-  // Display market-context EMA from the latest
-  // completed candle at or before test end.
-  const context1=emaAt(h1,end);
-  const context4=emaAt(h4,end);
+  return {sweep,setup};
+}
 
-  let tp1=context1;
-  let tp2=context4;
-  let stop=NaN;
+// CALCULATE ALL THREE TARGETS
 
-  if (!scan.sweep) {
-   showSignal(
-    "WAIT",
-    "No Monday Low sweep confirmed.",
-    null,null,null,false
-   );
+function buildTargets(data,setup) {
+  const tp1=emaAt(data.h1,setup.entryTime);
+  const tp2=emaAt(data.h4,setup.entryTime);
 
-  } else if (!scan.setup) {
-   showSignal(
-    "WAIT",
-    "Sweep found, but two accepted 15m closes " +
-    "with volume ≥1.0× were not confirmed.",
-    null,null,null,false
-   );
+  // Monday High becomes TP3 only
+  // when it lies above the 4H EMA50 target.
+  const tp3=data.high>tp2 ? data.high : NaN;
 
-  } else {
-   const entry=scan.setup;
+  const risk=setup.entry-setup.stop;
 
-   // Freeze both targets at entry time.
-   // Future prices do not affect historical targets.
-   tp1=emaAt(h1,entry.entryTime);
-   tp2=emaAt(h4,entry.entryTime);
-   stop=entry.stop;
+  const rr1=risk>0
+    ? (tp1-setup.entry)/risk
+    : NaN;
 
-   const risk=entry.entry-stop;
-   const rr=(tp1-entry.entry)/risk;
+  const rr2=risk>0
+    ? (tp2-setup.entry)/risk
+    : NaN;
 
-   const valid=
+  const rr3=risk>0 && Number.isFinite(tp3)
+    ? (tp3-setup.entry)/risk
+    : NaN;
+
+  const valid=
     Number.isFinite(tp1) &&
     Number.isFinite(tp2) &&
     risk>0 &&
-    tp1>entry.entry &&
+    tp1>setup.entry &&
     tp2>tp1 &&
-    rr>=MIN_RR;
+    rr1>=MIN_RR;
 
-   if (!valid) {
-    showSignal(
-     "WAIT",
-     "Sweep and volume confirmed, but EMA50 targets " +
-     "or minimum TP1 risk/reward 2R did not qualify.",
-     null,null,null,false
-    );
-   } else {
-    const later=m15.filter(c=>c.t>=entry.entryTime);
-
-    const assessment=evaluateTrade(
-     later,entry,tp1,tp2
-    );
-
-    const fresh=
-     offset===0 &&
-     Date.now()-entry.entryTime<=30*MINUTE &&
-     assessment.state==="OPEN";
-
-    const stateLabel=fresh
-     ? "LONG"
-     : assessment.state==="OPEN"
-      ? "HISTORICAL SETUP"
-      : assessment.state;
-
-    showSignal(
-     stateLabel,
-     fresh
-      ? "Fresh Weekly Range LONG setup confirmed."
-      : "Historical setup detected. This is not a new entry.",
-     entry,
-     {tp1,tp2},
-     assessment,
-     fresh
-    );
-   }
-  }
-
-  $("ema1h").textContent=fmt(tp1);
-  $("ema4h").textContent=fmt(tp2);
-
-  $("emaNote").textContent=scan.setup
-   ? "EMA targets frozen at historical entry time."
-   : "Latest completed EMA50 values for context.";
-
-  // Chart only displays prices from the selected week.
-  chartCache={
-   candles:m15.filter(c=>c.t>=monday),
-   levels:{
-    high:mondayHigh,
-    low:mondayLow,
-    tp1,
-    tp2,
-    stop
-   }
+  return {
+    tp1,tp2,tp3,
+    rr1,rr2,rr3,valid
   };
-
-  chartCount=90;
-  drawChart();
-
-  status(
-   "● Analysis completed · "+coin+
-   " · Volume threshold 1.0×",
-   "green"
-  );
-
- } catch(e) {
-  if (run!==currentRun) return;
-
-  status("Analysis error: "+e.message,"red");
-
-  $("result").innerHTML=
-   '<span class="red">No signal generated: '+
-   html(e.message)+"</span>";
-
-  $("overlay").textContent=
-   "Chart unavailable: "+e.message;
-
- } finally {
-  if (run===currentRun) {
-   button.disabled=false;
-   button.textContent="RUN WEEKLY RANGE ANALYSIS →";
-  }
- }
 }
 
-$("search").addEventListener("input",updateMarkets);
+// HISTORICAL TRADE MONITORING
 
-$("analyze").addEventListener("click",analyze);
+function evaluateTrade(data,setup,targets) {
+  let state="OPEN";
+  let exitPrice=NaN;
+  let exitTime=null;
+  let touchedTP1=false;
+  let acceptedTP1=false;
+  let touchedTP2=false;
+  let touchedTP3=false;
+
+  const later=data.m15.filter(
+    c=>c.t>=setup.entryTime
+  );
+
+  for (const c of later) {
+    // Conservative bar ordering assumption.
+    if (c.l<=setup.stop) {
+      state="STOPPED";
+      exitPrice=setup.stop;
+      exitTime=c.T;
+      break;
+    }
+
+    if (c.h>=targets.tp1) {
+      touchedTP1=true;
+    }
+
+    if (
+      touchedTP1 &&
+      c.c>targets.tp1
+    ) {
+      acceptedTP1=true;
+    }
+
+    if (
+      touchedTP1 &&
+      !acceptedTP1 &&
+      c.c<targets.tp1
+    ) {
+      state="TP1_REJECTION";
+      exitPrice=c.c;
+      exitTime=c.T;
+      break;
+    }
+
+    if (
+      acceptedTP1 &&
+      c.h>=targets.tp2
+    ) {
+      touchedTP2=true;
+    }
+
+    if (
+      touchedTP2 &&
+      Number.isFinite(targets.tp3) &&
+      c.h>=targets.tp3
+    ) {
+      touchedTP3=true;
+      state="TP3_REACHED";
+      exitPrice=targets.tp3;
+      exitTime=c.T;
+      break;
+    }
+  }
+
+  if (state==="OPEN" && touchedTP2) {
+    state="TP2_REACHED";
+  }
+
+  return {
+    state,
+    exitPrice,
+    exitTime,
+    touchedTP1,
+    acceptedTP1,
+    touchedTP2,
+    touchedTP3
+  };
+}
+
+// ANALYSIS ENGINE
+
+function analyzeWeek(data) {
+  const scan=findSetup(data);
+
+  if (!scan.sweep) {
+    return {
+      status:"WAIT",
+      reason:"No Monday Low sweep found.",
+      scan
+    };
+  }
+
+  if (!scan.setup) {
+    return {
+      status:"WAIT",
+      reason:
+        "Sweep found, but two confirmed 15m closes " +
+        "with volume ≥1.0× were not completed.",
+      scan
+    };
+  }
+
+  const targets=buildTargets(data,scan.setup);
+
+  if (!targets.valid) {
+    return {
+      status:"WAIT",
+      reason:
+        "Sweep and volume confirmed, but " +
+        "EMA50 targets or TP1 minimum 2R " +
+        "did not qualify.",
+      scan,
+      targets
+    };
+  }
+
+  const assessment=evaluateTrade(
+    data,scan.setup,targets
+  );
+
+  const fresh=
+    data.offset===0 &&
+    Date.now()-scan.setup.entryTime<=30*MINUTE &&
+    assessment.state==="OPEN";
+
+  return {
+    status:fresh
+      ? "LONG"
+      : "HISTORICAL SETUP",
+    reason:fresh
+      ? "Fresh Weekly Range LONG setup confirmed."
+      : "Historical setup — not a fresh entry.",
+    scan,
+    targets,
+    assessment,
+    fresh
+  };
+}
+
+// SIGNAL HTML
+
+function metric(label,value,cls="") {
+  return `
+    <div class="metric">
+      <small>${escapeHTML(label)}</small>
+      <strong class="${cls}">
+        ${escapeHTML(String(value))}
+      </strong>
+    </div>
+  `;
+}
+
+function renderSignal(data,result) {
+  const setup=result.scan?.setup;
+  const t=result.targets;
+
+  const cls=result.status==="LONG"
+    ? "long"
+    : result.status==="WAIT"
+      ? "wait"
+      : "closed";
+
+  let output=`
+    <div class="signal ${cls}">
+      ${escapeHTML(result.status)}
+    </div>
+    <p class="muted">
+      ${escapeHTML(result.reason)}
+    </p>
+  `;
+
+  if (setup && t) {
+    output+=`
+      <div class="grid">
+        ${metric("ENTRY",fmt(setup.entry),"green")}
+        ${metric("STOP LOSS",fmt(setup.stop),"red")}
+        ${metric("TP1 · 1H EMA50",fmt(t.tp1),"green")}
+        ${metric("TP2 · 4H EMA50",fmt(t.tp2),"orange")}
+        ${metric("TP3 · MONDAY HIGH",
+          Number.isFinite(t.tp3)
+            ? fmt(t.tp3)
+            : "NOT VALID",
+          "lime")}
+        ${metric("ENTRY VOLUME",
+          fmt(setup.volume)+"×","blue")}
+        ${metric("TP1 R:R",fmt(t.rr1)+"R")}
+        ${metric("TP2 R:R",fmt(t.rr2)+"R")}
+        ${metric("TP3 R:R",
+          Number.isFinite(t.rr3)
+            ? fmt(t.rr3)+"R"
+            : "—")}
+        ${metric("SWEEP LOW",
+          fmt(setup.sweepLow),"red")}
+      </div>
+
+      <div class="info">
+        <b>Entry candle:</b><br>
+        ${new Date(setup.entryTime).toUTCString()}
+        <br>
+        <b>Volume:</b>
+        ${fmt(setup.volume)}×
+        <br>
+        <b>Minimum:</b>
+        ${MIN_VOLUME.toFixed(1)}×
+        <br>
+        TP2 requires acceptance above TP1.
+        TP3 is conditional on remaining
+        valid above TP2.
+      </div>
+    `;
+
+    if (result.assessment) {
+      const a=result.assessment;
+
+      output+=`
+        <div class="info">
+          <b>Historical Monitoring</b><br>
+          Status: ${escapeHTML(a.state)}<br>
+          TP1 touched:
+          ${a.touchedTP1?"YES":"NO"}<br>
+          TP1 accepted:
+          ${a.acceptedTP1?"YES":"NO"}<br>
+          TP2 touched:
+          ${a.touchedTP2?"YES":"NO"}<br>
+          TP3 touched:
+          ${a.touchedTP3?"YES":"NO"}
+        </div>
+      `;
+    }
+  }
+
+  return output;
+}
+
+// DRAW CHART
+
+function drawChart() {
+  if (!chartCache) return;
+
+  const {candles,levels}=chartCache;
+  const canvas=$("chart");
+  const rect=canvas.getBoundingClientRect();
+
+  if (!rect.width || !rect.height || !candles.length) {
+    return;
+  }
+
+  const dpr=Math.min(
+    window.devicePixelRatio||1,2
+  );
+
+  canvas.width=Math.round(rect.width*dpr);
+  canvas.height=Math.round(rect.height*dpr);
+
+  const ctx=canvas.getContext("2d");
+
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const w=rect.width;
+  const h=rect.height;
+
+  ctx.fillStyle="#070e13";
+  ctx.fillRect(0,0,w,h);
+
+  const visible=candles.slice(-chartCount);
+
+  const left=10;
+  const right=72;
+  const top=15;
+  const bottom=45;
+
+  const pw=w-left-right;
+  const ph=h-top-bottom;
+
+  const prices=visible.flatMap(c=>[c.h,c.l]);
+
+  for (const n of Object.values(levels)) {
+    if (Number.isFinite(n)) prices.push(n);
+  }
+
+  let lo=Math.min(...prices);
+  let hi=Math.max(...prices);
+
+  const margin=(hi-lo||Math.abs(hi)*.01||1)*.1;
+
+  lo-=margin;
+  hi+=margin;
+
+  const y=p=>top+(hi-p)/(hi-lo)*ph;
+  const step=pw/visible.length;
+  const x=i=>left+(i+.5)*step;
+
+  ctx.font="11px Arial";
+
+  // Price grid
+  for (let i=0;i<5;i++) {
+    const price=hi-(hi-lo)*i/4;
+    const yy=y(price);
+
+    ctx.strokeStyle="#233640";
+    ctx.beginPath();
+    ctx.moveTo(left,yy);
+    ctx.lineTo(w-right,yy);
+    ctx.stroke();
+
+    ctx.fillStyle="#93a7b0";
+    ctx.fillText(fmt(price),w-right+8,yy+4);
+  }
+
+  // Candlesticks
+  visible.forEach((c,i)=>{
+    const xx=x(i);
+    const col=c.c>=c.o?"#25c9a4":"#ff6881";
+
+    ctx.strokeStyle=col;
+    ctx.fillStyle=col;
+    ctx.lineWidth=1.2;
+
+    ctx.beginPath();
+    ctx.moveTo(xx,y(c.h));
+    ctx.lineTo(xx,y(c.l));
+    ctx.stroke();
+
+    const upper=y(Math.max(c.o,c.c));
+    const lower=y(Math.min(c.o,c.c));
+    const bw=Math.max(2,step*.65);
+
+    ctx.fillRect(
+      xx-bw/2,
+      upper,
+      bw,
+      Math.max(1,lower-upper)
+    );
+  });
+
+  // Target and range lines
+  const lines=[
+    ["MON HIGH",levels.high,"#62a8ff"],
+    ["MON LOW",levels.low,"#d5ff35"],
+    ["TP1",levels.tp1,"#25c9a4"],
+    ["TP2",levels.tp2,"#f6ae60"],
+    ["TP3",levels.tp3,"#b68cff"],
+    ["SL",levels.stop,"#ff6881"]
+  ];
+
+  for (const [name,price,color] of lines) {
+    if (!Number.isFinite(price)) continue;
+
+    const yy=y(price);
+
+    if (yy<top || yy>h-bottom) continue;
+
+    ctx.strokeStyle=color;
+    ctx.lineWidth=1.3;
+    ctx.setLineDash([5,4]);
+
+    ctx.beginPath();
+    ctx.moveTo(left,yy);
+    ctx.lineTo(w-right,yy);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    ctx.fillStyle=color;
+    ctx.font="10px Arial";
+    ctx.fillText(name,left+5,Math.max(12,yy-5));
+  }
+
+  ctx.fillStyle="#889ca7";
+  ctx.font="10px Arial";
+
+  for (
+    let i=0;
+    i<visible.length;
+    i+=Math.max(12,Math.floor(visible.length/4))
+  ) {
+    const date=new Date(visible[i].t);
+
+    ctx.fillText(
+      (date.getUTCMonth()+1)+"/"+
+      date.getUTCDate()+" "+
+      String(date.getUTCHours()).padStart(2,"0"),
+      x(i),
+      h-14
+    );
+  }
+
+  $("overlay").classList.add("hidden");
+}
+
+// LOCAL SIGNAL HISTORY
+
+const HISTORY_KEY="yoyo_weekly_range_v2";
+
+function getHistory() {
+  try {
+    return JSON.parse(
+      localStorage.getItem(HISTORY_KEY)||"[]"
+    );
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveHistory(coin,data,result) {
+  if (!result.scan?.setup ||
+      !result.targets?.valid) return;
+
+  try {
+    const history=getHistory();
+
+    const item={
+      id:coin+":"+result.scan.setup.entryTime,
+      coin,
+      week:new Date(data.monday).toISOString(),
+      entryTime:result.scan.setup.entryTime,
+      entry:result.scan.setup.entry,
+      stop:result.scan.setup.stop,
+      tp1:result.targets.tp1,
+      tp2:result.targets.tp2,
+      tp3:result.targets.tp3,
+      status:result.assessment?.state||"OPEN",
+      volume:result.scan.setup.volume
+    };
+
+    const filtered=history.filter(
+      x=>x.id!==item.id
+    );
+
+    filtered.unshift(item);
+
+    localStorage.setItem(
+      HISTORY_KEY,
+      JSON.stringify(filtered.slice(0,100))
+    );
+
+    renderHistory();
+
+  } catch(e) {
+    console.warn("History storage unavailable:",e);
+  }
+}
+
+function renderHistory() {
+  const history=getHistory();
+
+  if (!history.length) {
+    $("history").innerHTML=
+      '<p class="muted">No saved signals yet.</p>';
+    return;
+  }
+
+  $("history").innerHTML=history.map(x=>`
+    <div class="scan-item">
+      <strong>${escapeHTML(x.coin)}</strong>
+      <span class="muted small">
+        · ${escapeHTML(x.status)}
+      </span>
+
+      <p class="muted small">
+        ${new Date(x.entryTime).toUTCString()}
+      </p>
+
+      <div class="grid">
+        ${metric("ENTRY",fmt(x.entry))}
+        ${metric("SL",fmt(x.stop),"red")}
+        ${metric("TP1",fmt(x.tp1),"green")}
+        ${metric("TP2",fmt(x.tp2),"orange")}
+        ${metric("TP3",fmt(x.tp3),"lime")}
+        ${metric("VOLUME",fmt(x.volume)+"×")}
+      </div>
+    </div>
+  `).join("");
+}
+
+// SINGLE-MARKET ANALYSIS
+
+async function analyze() {
+  const run=++currentRun;
+  const coin=$("market").value;
+  const offset=Number($("week").value);
+  const button=$("analyze");
+
+  if (!coin) {
+    setStatus("Select a market first.","red");
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="ANALYZING...";
+
+  $("overlay").classList.remove("hidden");
+  $("overlay").textContent="Loading market candles...";
+  $("result").innerHTML=
+    '<span class="muted">Analyzing...</span>';
+
+  chartCache=null;
+
+  for (const id of [
+    "mondayHigh","mondayLow",
+    "sweepLow","lastClose"
+  ]) {
+    $(id).textContent="—";
+  }
+
+  try {
+    const data=await loadWeek(coin,offset);
+
+    if (run!==currentRun) return;
+
+    const result=analyzeWeek(data);
+
+    $("mondayHigh").textContent=fmt(data.high);
+    $("mondayLow").textContent=fmt(data.low);
+    $("lastClose").textContent=fmt(data.last.c);
+
+    $("sweepLow").textContent=
+      result.scan?.sweep
+        ? fmt(result.scan.sweep.low)
+        : "—";
+
+    $("weekInfo").textContent=
+      "Monday " +
+      new Date(data.monday).toUTCString() +
+      " · Range completed.";
+
+    $("result").innerHTML=
+      renderSignal(data,result);
+
+    const setup=result.scan?.setup;
+    const targets=result.targets;
+
+    chartCache={
+      candles:data.m15.filter(
+        c=>c.t>=data.monday
+      ),
+      levels:{
+        high:data.high,
+        low:data.low,
+        tp1:targets?.valid ? targets.tp1 : NaN,
+        tp2:targets?.valid ? targets.tp2 : NaN,
+        tp3:targets?.valid ? targets.tp3 : NaN,
+        stop:targets?.valid ? setup?.stop : NaN
+      }
+    };
+
+    chartCount=90;
+    drawChart();
+
+    saveHistory(coin,data,result);
+
+    setStatus(
+      "● Analysis complete · "+coin+
+      " · Volume ≥1.0×",
+      "green"
+    );
+
+  } catch(e) {
+    if (run!==currentRun) return;
+
+    setStatus(
+      "Analysis failed: "+e.message,
+      "red"
+    );
+
+    $("result").innerHTML=
+      '<span class="red">No signal: '+
+      escapeHTML(e.message)+"</span>";
+
+    $("overlay").textContent=
+      "Chart unavailable: "+e.message;
+
+  } finally {
+    if (run===currentRun) {
+      button.disabled=false;
+      button.textContent=
+        "RUN WEEKLY RANGE ANALYSIS →";
+    }
+  }
+}
+
+// MULTI-MARKET SCANNER
+
+async function scanMarkets() {
+  if (scanRunning) return;
+
+  if (!marketsReady) {
+    $("scanStatus").textContent=
+      "Wait for market discovery to finish.";
+    return;
+  }
+
+  const count=Number($("scanCount").value);
+  const start=Number($("scanStart").value);
+  const offset=Number($("week").value);
+
+  const selected=allMarkets.slice(
+    start,
+    start+count
+  );
+
+  if (!selected.length) {
+    $("scanStatus").textContent=
+      "No markets in selected range.";
+    return;
+  }
+
+  scanRunning=true;
+  $("scanBtn").disabled=true;
+
+  $("scanResults").replaceChildren();
+
+  let qualified=0;
+  let checked=0;
+  let errors=0;
+
+  try {
+    for (const coin of selected) {
+      $("scanStatus").textContent=
+        "Scanning " + (checked+1) +
+        "/" + selected.length +
+        " · " + coin;
+
+      try {
+        const data=await loadWeek(coin,offset);
+        const result=analyzeWeek(data);
+
+        if (result.targets?.valid) {
+          qualified++;
+
+          const card=document.createElement("div");
+          card.className="scan-item";
+
+          card.innerHTML=`
+            <strong>${escapeHTML(coin)}</strong>
+            <span class="green">
+              · ${escapeHTML(result.status)}
+            </span>
+            <p class="muted small">
+              ${new Date(
+                result.scan.setup.entryTime
+              ).toUTCString()}
+            </p>
+
+            <div class="grid">
+              ${metric("ENTRY",
+                fmt(result.scan.setup.entry))}
+              ${metric("SL",
+                fmt(result.scan.setup.stop),"red")}
+              ${metric("TP1",
+                fmt(result.targets.tp1),"green")}
+              ${metric("TP2",
+                fmt(result.targets.tp2),"orange")}
+              ${metric("TP3",
+                fmt(result.targets.tp3),"lime")}
+              ${metric("VOLUME",
+                fmt(result.scan.setup.volume)+"×")}
+            </div>
+          `;
+
+          $("scanResults").appendChild(card);
+
+          saveHistory(coin,data,result);
+        }
+
+      } catch(e) {
+        errors++;
+        console.warn("Scan failed:",coin,e.message);
+      }
+
+      checked++;
+      await sleep(300);
+    }
+
+    $("scanStatus").textContent=
+      "Scan completed · " +
+      checked + " checked · " +
+      qualified + " qualifying setups · " +
+      errors + " errors";
+
+    if (!qualified) {
+      $("scanResults").innerHTML=
+        '<p class="muted">No qualifying Weekly Range setup found in this batch.</p>';
+    }
+
+  } finally {
+    scanRunning=false;
+    $("scanBtn").disabled=false;
+  }
+}
+
+// CONTROLS
+
+$("search").addEventListener(
+  "input",
+  updateMarkets
+);
+
+$("analyze").addEventListener(
+  "click",
+  analyze
+);
+
+$("scanBtn").addEventListener(
+  "click",
+  scanMarkets
+);
+
+$("clearHistory").addEventListener(
+  "click",
+  ()=>{
+    if (confirm("Clear saved signal history?")) {
+      localStorage.removeItem(HISTORY_KEY);
+      renderHistory();
+    }
+  }
+);
 
 $("zoomIn").onclick=()=>{
- if (!chartCache) return;
- chartCount=Math.max(20,Math.round(chartCount*.8));
- drawChart();
+  if (!chartCache) return;
+
+  chartCount=Math.max(
+    20,
+    Math.round(chartCount*.8)
+  );
+
+  drawChart();
 };
 
 $("zoomOut").onclick=()=>{
- if (!chartCache) return;
- chartCount=Math.min(
-  chartCache.candles.length,
-  Math.round(chartCount*1.25)
- );
- drawChart();
+  if (!chartCache) return;
+
+  chartCount=Math.min(
+    chartCache.candles.length,
+    Math.round(chartCount*1.25)
+  );
+
+  drawChart();
 };
 
 $("resetZoom").onclick=()=>{
- chartCount=90;
- drawChart();
+  chartCount=90;
+  drawChart();
 };
 
 window.addEventListener("resize",drawChart);
 
+// START
+
+renderHistory();
 loadMarkets();
 
 </script>
