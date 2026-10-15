@@ -1686,7 +1686,9 @@ async function scanMarkets() {
   }
 
   const start=Number($("scanStart").value);
-  const count=Number($("scanCount").value);
+  const count=$("scanCount").value==="all"
+  ? allMarkets.length
+  : Number($("scanCount").value);
   const offset=Number($("week").value);
 
   const selected=allMarkets.slice(start,start+count);
