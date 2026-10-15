@@ -1983,6 +1983,46 @@ loadMarkets();
 
   console.log("YOYO ALL MARKETS SCANNER READY");
 })();
+</script><script>
+/* YOYO TRADE PRO — ALL MARKETS SCANNER FIX */
+(function () {
+  "use strict";
+
+  const scanCount = document.getElementById("scanCount");
+  const scanStart = document.getElementById("scanStart");
+  const scanButton = document.getElementById("scanBtn");
+
+  if (!scanCount || !scanStart || !scanButton) return;
+
+  // Ensure ALL MARKETS option exists.
+  let allOption = [...scanCount.options].find(
+    option => option.value === "all"
+  );
+
+  if (!allOption) {
+    allOption = new Option("ALL MARKETS", "all");
+    scanCount.add(allOption);
+  }
+
+  // Fix the count before the original scanner reads it.
+  scanButton.addEventListener("click", function () {
+    if (scanCount.value !== "all") return;
+
+    const start = Number(scanStart.value) || 0;
+    const total = allMarkets.length;
+
+    const remaining = Math.max(0, total - start);
+
+    scanCount.add(
+      new Option(
+        "ALL MARKETS (" + remaining + ")",
+        String(remaining)
+      )
+    );
+
+    scanCount.value = String(remaining);
+  }, true);
+})();
 </script>
 </body>
 </html>
