@@ -1803,6 +1803,56 @@ $("resetZoom").onclick=()=>{
 renderHistory();
 loadMarkets();
 
+</script><script>
+/* YOYO TRADE PRO — WAIT / HISTORICAL DISPLAY FIX */
+(function () {
+  "use strict";
+
+  function fixSignalDisplay() {
+    const headings = document.querySelectorAll(
+      ".strategy-result h3, .strategy-result"
+    );
+
+    headings.forEach(function (item) {
+      const card = item.classList.contains("strategy-result")
+        ? item
+        : item.closest(".strategy-result");
+
+      if (!card) return;
+
+      const badge = card.querySelector(".signal");
+      if (!badge) return;
+
+      const status = badge.textContent.trim().toUpperCase();
+
+      if (status === "WAIT") {
+        card.querySelectorAll(".grid").forEach(function (grid) {
+          grid.style.display = "none";
+        });
+
+        card.querySelectorAll(".info").forEach(function (info) {
+          if (
+            info.textContent.includes("Entry Time") ||
+            info.textContent.includes("Monitoring")
+          ) {
+            info.style.display = "none";
+          }
+        });
+      }
+    });
+  }
+
+  const observer = new MutationObserver(fixSignalDisplay);
+
+  window.addEventListener("DOMContentLoaded", function () {
+    fixSignalDisplay();
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+})();
 </script>
 </body>
 </html>
