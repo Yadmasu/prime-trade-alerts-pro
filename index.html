@@ -1853,6 +1853,136 @@ loadMarkets();
     });
   });
 })();
+</script><script>
+/* YOYO TRADE PRO — ALL MARKETS SCANNER */
+(function () {
+  "use strict";
+
+  const countSelect = document.getElementById("scanCount");
+
+  if (countSelect && !countSelect.querySelector('option[value="all"]')) {
+    const option = document.createElement("option");
+    option.value = "all";
+    option.textContent = "ALL MARKETS";
+    countSelect.appendChild(option);
+  }
+
+  scanMarkets = async function () {
+    if (scanRunning) return;
+
+    if (!marketsReady) {
+      $("scanStatus").textContent = "Wait for markets to load.";
+      return;
+    }
+
+    const all = $("scanCount").value === "all";
+    const start = Number($("scanStart").value);
+    const count = Number($("scanCount").value);
+    const offset = Number($("week").value);
+
+    const selected = all
+      ? [...allMarkets]
+      : allMarkets.slice(start, start + count);
+
+    scanRunning = true;
+    $("scanBtn").disabled = true;
+    $("scanBtn").textContent = "SCANNING...";
+    $("scanResults").replaceChildren();
+
+    let checked = 0;
+    let qualified = 0;
+    let fresh = 0;
+    let errors = 0;
+
+    try {
+      for (const coin of selected) {
+        checked++;
+
+        $("scanStatus").textContent =
+          "Scanning " + checked + "/" + selected.length +
+          " · " + coin +
+          " · Fresh: " + fresh;
+
+        try {
+          const data = await loadData(coin, offset);
+          const results = analyzeStrategies(data);
+
+          for (const r of results.filter(x => x.valid)) {
+            qualified++;
+
+            if (r.fresh) fresh++;
+
+            const card = document.createElement("div");
+            card.className = "scan-item";
+
+            const label = r.fresh
+              ? r.side + " · FRESH"
+              : r.side + " · HISTORICAL";
+
+            card.innerHTML = `
+              <b class="${r.side === "LONG" ? "green" : "red"}">
+                ${esc(coin)} · ${esc(label)}
+              </b>
+
+              <p class="muted small">
+                ${esc(r.strategy)}<br>
+                ${esc(localTime(r.setup.entryTime))}
+              </p>
+
+              ${
+                r.fresh
+                  ? `
+                    <div class="grid">
+                      ${metric("ENTRY", fmt(r.setup.entry), "blue")}
+                      ${metric("SL", fmt(r.setup.stop), "red")}
+                      ${metric("TP1", fmt(r.targets.tp1), "green")}
+                      ${metric("TP2", fmt(r.targets.tp2), "gold")}
+                      ${metric("TP3", fmt(r.targets.tp3), "green")}
+                      ${metric("VOLUME", fmt(r.setup.volume) + "×")}
+                    </div>
+                  `
+                  : `
+                    <div class="info">
+                      Historical setup only — DO NOT CHASE.
+                    </div>
+                  `
+              }
+            `;
+
+            $("scanResults").appendChild(card);
+          }
+
+          saveHistory(data, results);
+
+        } catch (e) {
+          errors++;
+          console.warn("Scan error:", coin, e);
+        }
+
+        await sleep(500);
+      }
+
+      $("scanStatus").textContent =
+        "SCAN COMPLETE · " +
+        checked + " markets checked · " +
+        fresh + " fresh signals · " +
+        qualified + " total qualifying setups · " +
+        errors + " errors";
+
+      if (!qualified) {
+        $("scanResults").textContent =
+          "No qualifying setups found.";
+      }
+
+    } finally {
+      scanRunning = false;
+      $("scanBtn").disabled = false;
+      $("scanBtn").textContent = "SCAN MARKETS →";
+    }
+  };
+
+  console.log("YOYO ALL MARKETS SCANNER READY");
+})();
 </script>
 </body>
 </html>
