@@ -1,542 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080d18">
-<title>YOYO TRADE PRO V3</title>
-<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
-<style>
-:root{--bg:#080d18;--panel:#111d30;--card:#18283e;--border:#30425c;--text:#f0f6ff;--muted:#a1b2c8;--green:#21d6a5;--red:#ff627d;--gold:#f5c66a;--blue:#76b4ff}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-header{padding:16px;background:#0d1727;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.logo{font-size:20px;font-weight:900}.logo span{color:var(--green)}
-.badge{color:var(--gold);border:1px solid #665632;border-radius:20px;padding:7px;font-size:11px}
-main{max-width:1150px;margin:auto;padding:12px}
-.panel{background:linear-gradient(145deg,#16263d,#0f1929);border:1px solid var(--border);border-radius:15px;padding:15px;margin-bottom:13px}
-h1{font-size:22px;margin:0 0 8px}h2{font-size:18px;margin:0 0 12px}
-p{line-height:1.55}.muted{color:var(--muted)}.green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.metric{background:var(--card);border:1px solid var(--border);padding:12px;border-radius:11px;overflow-wrap:anywhere}
-.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric strong{font-size:17px}
-label{display:block;color:var(--muted);margin:12px 0 6px}
-input,select,button{font:inherit;border-radius:9px}
-input,select{width:100%;background:#0b1627;color:white;padding:12px;border:1px solid #3b526d}
-button{background:#1b3048;color:white;padding:11px;border:1px solid #3b526d;cursor:pointer}
-button.active{color:var(--green);border-color:var(--green)}button:disabled{opacity:.5}
-.primary{width:100%;background:var(--green);color:#06241e;border:none;font-weight:900;padding:15px;margin-top:14px}
-.chartbox{position:relative;height:430px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-#chart{width:100%;height:100%}
-.overlay{position:absolute;inset:0;background:#0b1422ee;display:flex;justify-content:center;align-items:center;text-align:center;padding:15px;color:var(--muted);z-index:2}
-.hidden{display:none!important}
-.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.toolbar button{font-size:12px}
-.card{background:#0d1a2b;border:1px solid var(--border);border-radius:11px;padding:14px;margin-top:10px}
-.notice{background:#14283e;border-left:3px solid var(--blue);padding:12px;border-radius:8px}
-.status{padding:12px 0;overflow-wrap:anywhere}
-.signal-title{font-size:25px;font-weight:900;margin:0 0 8px}
-.pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#25384d;margin:4px 4px 4px 0;font-size:12px}
-footer{text-align:center;color:var(--muted);padding:25px}
-@media(min-width:700px){.chartbox{height:580px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-</style>
-</head>
-<body>
-<header>
-  <div class="logo">YOYO <span>TRADE PRO</span></div>
-  <div class="badge">V3 · 4 STRATEGIES</div>
-</header>
-<main>
-<section class="panel">
-  <h1>Professional Trading Dashboard</h1>
-  <p class="muted">Hyperliquid Perpetuals · Multi-Timeframe Analysis · No Auto Trading</p>
-  <div class="notice"><b class="green">LONG / SHORT / WAIT</b><br>
-    Manual analysis provides a trade plan. Only fully confirmed, fresh signals are marked CONFIRMED.
-  </div>
-</section>
-
-<section class="panel">
-  <h2>Market & Strategy</h2>
-  <label>Search Hyperliquid Market</label>
-  <input id="search" placeholder="SOL, XRP, HYPE...">
-  <div class="grid">
-    <div><label>Market</label><select id="market"><option value="SOL">SOL</option></select></div>
-    <div><label>Strategy</label>
-      <select id="strategy">
-        <option value="monday">Monday Range</option>
-        <option value="ema13">EMA13 / EMA89</option>
-        <option value="ema21">EMA21 Trend</option>
-        <option value="cross">EMA9 / EMA21 Cross</option>
-      </select>
-    </div>
-    <div><label>Chart Timeframe</label>
-      <select id="tf">
-        <option value="1m">1m</option>
-        <option value="5m">5m</option>
-        <option value="15m" selected>15m</option>
-        <option value="1h">1H</option>
-        <option value="4h">4H</option>
-        <option value="1d">1D</option>
-        <option value="1w">1W</option>
-        <option value="1M">1M</option>
-      </select>
-    </div>
-    <div><label>Analysis Mode</label>
-      <select id="mode">
-        <option value="single">Single Timeframe</option>
-        <option value="multi" selected>Multi Timeframe (15m + 1H)</option>
-      </select>
-    </div>
-    <div><label>Monday Range Week</label>
-      <select id="week">
-        <option value="0">Current Week</option>
-        <option value="1">Previous Week</option>
-      </select>
-    </div>
-  </div>
-  <div id="status" class="status muted">Connecting...</div>
-  <button id="analyze" class="primary">ANALYZE NOW →</button>
-</section>
-
-<section class="panel">
-  <h2>Trading Chart</h2>
-  <div class="toolbar" id="toolbar">
-    <button data-tool="cursor" class="active">Cursor</button>
-    <button data-tool="trend">Trendline</button>
-    <button data-tool="sr">S/R</button>
-    <button data-tool="fib">Fibonacci</button>
-    <button data-tool="long">Long Tool</button>
-    <button data-tool="short">Short Tool</button>
-    <button id="clearDraw">Clear</button>
-    <button id="zoomIn">Zoom +</button>
-    <button id="zoomOut">Zoom −</button>
-    <button id="fullscreen">Full Screen</button>
-  </div>
-  <p id="toolHelp" class="muted">Select a drawing tool and tap the chart.</p>
-  <div class="chartbox" id="chartbox">
-    <div id="chart"></div>
-    <div id="overlay" class="overlay">Select market and tap Analyze.</div>
-  </div>
-  <p id="legend" class="muted"></p>
-</section>
-
-<section class="panel">
-  <h2>Trading Signal & Risk Plan</h2>
-  <div id="result" class="card">No analysis yet.</div>
-</section>
-
-<section class="panel">
-  <h2>Monday Trading Range</h2>
-  <div class="grid">
-    <div class="metric"><small>MONDAY HIGH</small><strong id="monHigh">—</strong></div>
-    <div class="metric"><small>MONDAY LOW</small><strong id="monLow">—</strong></div>
-    <div class="metric"><small>LAST CLOSE</small><strong id="lastClose">—</strong></div>
-    <div class="metric"><small>NEW YORK TIME</small><strong id="lastTime">—</strong></div>
-  </div>
-</section>
-
-<section class="panel">
-  <h2>EMA9 / EMA21 Confirmed Alert Check</h2>
-  <p class="muted">15m completed cross · 1H trend · Volume ≥ 1.2× · Minimum TP1 = 2R.</p>
-  <button id="checkAlert" class="primary">CHECK CONFIRMED SIGNAL →</button>
-  <div id="alertResult" class="card muted">No alert check yet.</div>
-  <p class="muted">This button checks the selected market only. Background phone push and Telegram require a hosted server.</p>
-</section>
-
-<section class="panel">
-  <h2>Multi-Market Scanner</h2>
-  <p class="muted">Scans Hyperliquid markets while this page remains open. Large scans may take time or hit API limits.</p>
-  <label>Markets to scan</label>
-  <select id="scanCount">
-    <option value="5">5 Markets</option>
-    <option value="10" selected>10 Markets</option>
-    <option value="20">20 Markets</option>
-    <option value="all">ALL Markets</option>
-  </select>
-  <button id="scanBtn" class="primary">SCAN MARKETS →</button>
-  <p id="scanStatus" class="muted">Scanner ready.</p>
-  <div id="scanResults"></div>
-</section>
-</main>
-
-<footer>YOYO TRADE PRO © 2026<br>Educational research · No automatic execution</footer>
-
-<script>
-"use strict";
-const API="https://api.hyperliquid.xyz/info";
-const $=id=>document.getElementById(id);
-const MIN=60000,HOUR=60*MIN,DAY=24*HOUR;
-const TFMS={"1m":MIN,"5m":5*MIN,"15m":15*MIN,"1h":HOUR,"4h":4*HOUR,"1d":DAY,"1w":7*DAY};
-let markets=["SOL"],chart=null,candleSeries=null,extraSeries=[],priceLines=[],drawings=[],bars=[];
-let cache=null,tool="cursor",firstPoint=null,busy=false,chartCoin="",chartTf="";
-function fmt(n){
-  if(!Number.isFinite(n))return "—";
-  return Number(n).toLocaleString("en-US",{maximumFractionDigits:Math.abs(n)<1?7:Math.abs(n)<100?4:2});
-}
-function et(ms){return new Date(ms).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"});}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function status(s,cls="muted"){$("status").textContent=s;$("status").className="status "+cls;}
-async function api(body){
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
-  try{
-    const response=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:controller.signal});
-    if(!response.ok)throw Error("HTTP "+response.status);
-    return await response.json();
-  }finally{clearTimeout(timer);}
-}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080d18"><title>YOYO TRADE PRO V3.6</title><style>
+:root{--bg:#080d18;--panel:#101c2e;--edge:#30445e;--fg:#edf5ff;--muted:#a7b9ce;--lime:#dafa4b;--green:#21d6a5;--red:#ff637c}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px system-ui,-apple-system,sans-serif}header{padding:18px 4%;background:#0d1727;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center}.brand{font-weight:900;font-size:21px}.brand b{color:var(--green)}.tag{color:var(--lime);font-size:12px}main{max-width:1200px;margin:auto;padding:15px}.panel{border:1px solid var(--edge);background:linear-gradient(140deg,#14243a,#0d1727);border-radius:17px;padding:18px;margin-bottom:15px}h1{font-size:24px;margin:0 0 6px}h2{font-size:19px;margin:0 0 14px}.muted{color:var(--muted)}.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;color:var(--muted);margin-bottom:7px}select,input,button{font:inherit;color:var(--fg);border:1px solid #405672;background:#0b1627;border-radius:10px;padding:12px;width:100%}button{cursor:pointer}.tabs,.timegrid{display:grid;gap:8px}.tabs{grid-template-columns:1fr 1fr;margin:14px 0}.timegrid{grid-template-columns:repeat(4,1fr)}.tabs button.active,.timegrid button.active{border-color:var(--lime);color:var(--lime);background:#2a301a}.primary{margin-top:14px;background:var(--lime);color:#101600;font-weight:900;border:0}.notice{background:#142b3c;border-left:3px solid var(--green);padding:12px;border-radius:9px;margin:12px 0}.chartwrap{height:480px;border:1px solid var(--edge);border-radius:12px;overflow:hidden;background:#0b1422}#tvchart{width:100%;height:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:#18283e;border:1px solid var(--edge);border-radius:10px;padding:12px;overflow-wrap:anywhere}.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric strong{font-size:18px}.green{color:var(--green)}.red{color:var(--red)}.gold{color:#f6c96b}.signalhead{font-size:25px;font-weight:900;margin:0 0 10px}.hidden{display:none}.status{padding:12px 0;color:var(--muted)}.mini{font-size:12px;line-height:1.6}footer{text-align:center;padding:25px;color:var(--muted)}@media(min-width:750px){.controls{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(5,1fr)}.chartwrap{height:630px}}@media(max-width:420px){.timegrid{grid-template-columns:repeat(4,1fr)}.timegrid button{padding:12px 5px}.chartwrap{height:410px}}
+</style></head><body><header><div class="brand">YOYO <b>TRADE PRO</b></div><div class="tag">V3.6 Â· MANUAL + ALERTS</div></header><main><section class="panel"><h1>Trading Dashboard</h1><div class="muted">Hyperliquid all discovered perp DEXs + spot Â· Stock charts (signals require stock feed) Â· No auto trading</div><div class="notice">ANALYZE NOW displays an indicative trade plan when sufficient data is available. Only fully verified setups receive a CONFIRMED label. No forced trade.</div></section><section class="panel"><h2>Market & Strategy</h2><div class="controls"><div><label>Market search</label><input id="search" placeholder="SOL, BTC, XRP, AAPL, SPYâ¦" autocomplete="off"><label>Market</label><select id="market"><option value="SOL">SOL</option></select></div><div><label>Strategy</label><select id="strategy"><option value="monday">Monday Range</option><option value="ema9" selected>EMA9 / EMA89</option><option value="ema13">EMA13 / EMA89</option><option value="ema21">EMA21 Trend</option><option value="cross">EMA9 / EMA21 Cross</option></select></div><div><label>Week (Monday Range)</label><select id="week"><option value="0">Current week</option><option value="1">Previous week (research only)</option></select></div></div><h2 style="margin-top:22px">AI-style Multi-Timeframe Analysis</h2><div class="tabs"><button id="single" type="button">Single</button><button id="multi" class="active" type="button">Multi</button></div><div class="timegrid" id="times"><button data-tf="1m">1m</button><button data-tf="5m">5m</button><button data-tf="15m" class="active">15m</button><button data-tf="1h" class="active">1H</button><button data-tf="4h">4H</button><button data-tf="1d">1D</button><button data-tf="1w">1W</button><button data-tf="1M">1M</button></div><div class="status" id="status">Connectingâ¦</div><div class="notice" id="connectionHelp">If opened in iPhone Files preview, live data and embedded TradingView may be blocked. Publish on HTTPS (GitHub Pages) and open in Safari. Tap ANALYZE NOW to calculate signals.</div><button id="analyze" class="primary">ANALYZE NOW â</button><div class="notice" style="margin-top:14px"><b>EMA9 / EMA89 TREND ALERT Â· Volume â¥ 1.2Ã Â· TP1 â¥ 2R</b><p class="muted mini">Manual Analyze never waits for volume. Alerts require a completed 15m EMA9/89 setup, 1H trend, volume confirmation, and valid stop. Alerts check the selected Hyperliquid market while this page is open.</p><button id="alertsToggle" type="button">ENABLE SIGNAL NOTIFICATIONS</button><p id="alertsStatus" class="muted mini">Alerts off. iPhone browser notifications may require a home-screen web app and supported browser permissions. Closing this page stops monitoring.</p></div></section><section class="panel"><h2>TradingView Â· Live Chart</h2><div id="tvnote" class="muted mini" style="margin-bottom:9px">The embedded TradingView widget is a genuine TradingView chart. Programmatic strategy overlays are not supported by this widget.</div><div class="chartwrap"><div id="tvchart"></div></div><p id="chartcaption" class="muted mini">Chart timeframe follows your selection. Multi mode uses 15m as the display when selected, with 1H as confirmation.</p></section><section class="panel"><h2>Trade Plan Â· LONG / SHORT / WAIT</h2><div id="result" class="notice"><div class="signalhead">âª WAIT â NOT ANALYZED</div><div class="grid"><div class="metric"><small>ENTRY</small><strong>â</strong></div><div class="metric"><small>STOP LOSS</small><strong>â</strong></div><div class="metric"><small>TP1</small><strong>â</strong></div><div class="metric"><small>TP2</small><strong>â</strong></div><div class="metric"><small>TP3</small><strong>â</strong></div><div class="metric"><small>VOLUME FILTER</small><strong>â¥ 1.2Ã</strong></div></div><p class="muted">Tap Analyze to check for a confirmed setup.</p></div><p class="muted mini">Entry, SL and TP values are calculated separately from the TradingView chart. These are not guaranteed fills or profits. Never use a stale signal as a live entry.</p></section><section class="panel"><h2>Signal Details</h2><div class="grid"><div class="metric"><small>Strategy</small><strong id="strategyMetric">â</strong></div><div class="metric"><small>15m close</small><strong id="lastClose">â</strong></div><div class="metric"><small>1H trend</small><strong id="trend">â</strong></div><div class="metric"><small>Volume ratio (minimum 1.2Ã)</small><strong id="vol">â</strong></div><div class="metric"><small>NY candle time</small><strong id="time">â</strong></div></div></section></main><footer>YOYO TRADE PRO V3.6 Â© 2026 Â· Research only Â· No automatic execution</footer><script>
+'use strict';
+const API='https://api.hyperliquid.xyz/info', $=id=>document.getElementById(id),MIN=60000,HOUR=3600000,DAY=86400000;
+let alertTimer=null,alertBusy=false,alertSeen=new Set();
+let markets=['SOL'],marketInfo=new Map([['SOL',{kind:'perp',coin:'SOL',tv:'BINANCE:SOLUSDT'}]]),metaMap=new Map(),mode='multi',selected=new Set(['15m','1h']),analysisSeq=0;
+const intervals={'1m':'1','5m':'5','15m':'15','1h':'60','4h':'240','1d':'D','1w':'W','1M':'M'};
+const tfMs={'1m':MIN,'5m':5*MIN,'15m':15*MIN,'1h':HOUR,'4h':4*HOUR,'1d':DAY,'1w':7*DAY,'1M':30*DAY};
+const fmt=n=>Number.isFinite(n)?Number(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<1?6:Math.abs(n)<100?4:2}):'â';
+const ny=t=>new Date(t).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(body){const c=new AbortController(),timer=setTimeout(()=>c.abort(),16000);try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:c.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(timer)}}
+const STOCKS=('AAPL MSFT NVDA TSLA AMZN GOOGL META AMD AVGO NFLX PLTR COIN MSTR HOOD SOFI INTC MU TSM JPM BAC GS SPY QQQ IWM DIA').split(' ');
 async function loadMarkets(){
-  try{
-    const meta=await api({type:"meta"});
-    markets=(meta.universe||[]).filter(x=>!x.isDelisted).map(x=>x.name).sort();
-    if(!markets.length)throw Error("No markets returned");
-    updateMarkets();
-    status("● Connected · "+markets.length+" markets","green");
-  }catch(e){status("Connection error: "+e.message,"red");}
+ const found=new Map();let failures=[];
+ function add(id,item){if(!found.has(id))found.set(id,item)}
+ try{
+  const dexNames=[''];
+  try{const dex=await api({type:'perpDexs'});for(const row of (dex||[])){const name=typeof row==='string'?row:Array.isArray(row)?row[0]:row?.name;if(name&&name!=='default'&&!dexNames.includes(name))dexNames.push(name)}}catch(e){failures.push('Additional perp DEX discovery unavailable')}
+  for(const dex of dexNames){try{
+   const body={type:'meta'};if(dex)body.dex=dex;
+   const meta=await api(body);
+   for(const asset of meta.universe||[]){if(asset.isDelisted)continue;const coin=asset.name;const id=(dex?dex+':':'')+coin;add(id,{kind:'perp',coin:id,label:id+' Â· PERP',tv:(!dex&&/^[A-Z0-9]+$/.test(coin))?'BINANCE:'+coin+'USDT':null});}
+  }catch(e){failures.push('Perp DEX '+(dex||'default')+' unavailable')}}
+  try{const spot=await api({type:'spotMeta'});for(const asset of spot.universe||[]){const id='SPOT:'+asset.name;add(id,{kind:'spot',coin:'@'+asset.index,label:asset.name+' Â· HL SPOT',tv:null})}}catch(e){failures.push('Spot catalog unavailable')}
+ }catch(e){failures.push('Hyperliquid unavailable: '+e.message)}
+ for(const ticker of STOCKS)add('STOCK:'+ticker,{kind:'stock',coin:ticker,label:ticker+' Â· STOCK (chart only)',tv: ['SPY','QQQ','IWM','DIA'].includes(ticker)?'AMEX:'+ticker:'NASDAQ:'+ticker});
+ if(!found.size)throw Error('No market catalog available');
+ marketInfo=found;markets=[...found.keys()].sort((a,b)=>a.localeCompare(b));updateMarkets();
+ $('status').textContent=`${[...found.values()].filter(x=>x.kind==='perp').length} perpetuals Â· ${[...found.values()].filter(x=>x.kind==='spot').length} spot pairs Â· ${STOCKS.length} stock chart symbols. ${failures.join('; ')}`;
+ $('status').className='status '+(failures.length?'':'green');
 }
-function updateMarkets(){
-  const q=$("search").value.trim().toUpperCase(),current=$("market").value;
-  const filtered=markets.filter(x=>x.toUpperCase().includes(q));
-  $("market").replaceChildren();
-  for(const name of filtered){const o=document.createElement("option");o.value=name;o.textContent=name;$("market").appendChild(o);}
-  if(filtered.includes(current))$("market").value=current;
-  else if(filtered.includes("SOL"))$("market").value="SOL";
-  else if(filtered.length)$("market").value=filtered[0];
+function updateMarkets(){const q=$('search').value.toUpperCase().trim(),previous=$('market').value;const filtered=markets.filter(id=>id.toUpperCase().includes(q)||marketInfo.get(id)?.label.toUpperCase().includes(q));$('market').replaceChildren();for(const id of filtered){const opt=document.createElement('option');opt.value=id;opt.textContent=marketInfo.get(id)?.label||id;$('market').append(opt)}if(filtered.includes(previous))$('market').value=previous;else if(filtered.includes('SOL'))$('market').value='SOL';else if(filtered.length)$('market').value=filtered[0];}
+function getDisplayTf(){if(selected.has('15m'))return '15m';return [...selected][0]||'15m'}
+function syncButtons(){for(const b of document.querySelectorAll('[data-tf]'))b.classList.toggle('active',selected.has(b.dataset.tf));$('single').classList.toggle('active',mode==='single');$('multi').classList.toggle('active',mode==='multi');$('chartcaption').textContent=`Chart: ${getDisplayTf()} Â· Signal engine: ${mode==='multi'?'15m entry + 1H trend':'15m entry + 1H trend (fixed for safety)'} Â· Strategy: ${$('strategy').selectedOptions[0].textContent}. Changing display timeframe does not mislabel a 15m signal.`}
+function setMode(m){analysisSeq++;mode=m;if(m==='single')selected=new Set([getDisplayTf()]);else selected=new Set(['15m','1h']);syncButtons();renderTV();invalidate()}
+function invalidate(){renderResult({reason:'Settings changed. Tap Analyze for a new signal.'},$('market').value,'')}
+function renderTV(){const coin=$('market').value||'SOL',info=marketInfo.get(coin),tf=getDisplayTf(),container=$('tvchart');container.replaceChildren();const holder=document.createElement('div');holder.className='tradingview-widget-container';holder.style.height='100%';holder.style.width='100%';const widget=document.createElement('div');widget.className='tradingview-widget-container__widget';widget.style.height='100%';widget.style.width='100%';holder.append(widget);const script=document.createElement('script');script.src='https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';script.async=true;script.textContent=JSON.stringify({autosize:true,symbol:info?.tv||'BINANCE:SOLUSDT',interval:intervals[tf],timezone:'America/New_York',theme:'dark',style:'1',locale:'en',allow_symbol_change:true,calendar:false,hide_side_toolbar:false,withdateranges:true,details:false,support_host:'https://www.tradingview.com'});holder.append(script);container.append(holder);$('chartcaption').textContent=info?.tv?`TradingView display: ${info.label} / ${tf}. Chart data may differ from Hyperliquid prices.`:`No verified TradingView mapping for ${info?.label||coin}. Do not rely on the chart for this market. Signals use Hyperliquid data.`}
+function ema(vals,n){const out=Array(vals.length).fill(null);if(vals.length<n)return out;let prev=vals.slice(0,n).reduce((a,b)=>a+b,0)/n;out[n-1]=prev;const k=2/(n+1);for(let i=n;i<vals.length;i++)out[i]=prev=vals[i]*k+prev*(1-k);return out}
+function atr(c,n=14){if(c.length<n+1)return null;const tr=[];for(let i=1;i<c.length;i++)tr.push(Math.max(c[i].h-c[i].l,Math.abs(c[i].h-c[i-1].c),Math.abs(c[i].l-c[i-1].c)));return tr.slice(-n).reduce((a,b)=>a+b,0)/n}
+function volRatio(c){if(c.length<22)return null;const i=c.length-1,avg=c.slice(i-20,i).reduce((s,x)=>s+x.v,0)/20;return avg>0?c[i].v/avg:null}
+async function candles(coin,interval,days){const now=Date.now();const raw=await api({type:'candleSnapshot',req:{coin,interval,startTime:now-days*DAY,endTime:now}});const duration=tfMs[interval];return(raw||[]).map(x=>({t:+x.t,T:+x.T,o:+x.o,h:+x.h,l:+x.l,c:+x.c,v:+x.v})).filter(x=>[x.t,x.o,x.h,x.l,x.c,x.v].every(Number.isFinite)&&x.t+duration<=Date.now()).sort((a,b)=>a.t-b.t)}
+function nyParts(ms){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(new Date(ms));return Object.fromEntries(parts.map(p=>[p.type,p.value]))}
+function mondayUtc(offset){const p=nyParts(Date.now()),week={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};const d=new Date(Date.UTC(+p.year,+p.month-1,+p.day-(week[p.weekday]||0)-offset*7));const date=d.toISOString().slice(0,10);for(const hr of [4,5]){const ms=Date.parse(date+`T0${hr}:00:00Z`);const q=nyParts(ms);const hh=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',hourCycle:'h23'}).format(new Date(ms));if(q.year===date.slice(0,4)&&q.month===date.slice(5,7)&&q.day===date.slice(8,10)&&Number(hh)===0)return ms}return Date.parse(date+'T04:00:00Z')}
+function signal(c,h,strategy,week){const last=c.at(-1),prev=c.at(-2),hc=h.at(-1);if(!last||!prev||!hc||c.length<110||h.length<95)return{reason:'Insufficient completed candles'};const i=c.length-1,j=h.length-1,cv=c.map(x=>x.c),hv=h.map(x=>x.c),e13=ema(cv,13),e89=ema(cv,89),e21=ema(cv,21),e9=ema(cv,9),he13=ema(hv,13),he89=ema(hv,89),he21=ema(hv,21),he9=ema(hv,9),vr=volRatio(c),a=atr(c),up=hc.c>he89[j]&&he13[j]>he89[j],down=hc.c<he89[j]&&he13[j]<he89[j];let side=null,reason='No confirmed setup',levels=null;const fresh=Date.now()-(last.t+15*MIN)<=20*MIN&&Date.now()>=last.t+15*MIN;const volOk=vr!==null&&vr>=1.2;
+if(strategy==='ema9'){const pl=c.slice(-5,-1).some((x,k)=>x.l<=e9[i-4+k]*1.002),ps=c.slice(-5,-1).some((x,k)=>x.h>=e9[i-4+k]*.998);if(up&&e9[i]>e89[i]&&last.c>e9[i]&&last.c>last.o&&pl)side='LONG';else if(down&&e9[i]<e89[i]&&last.c<e9[i]&&last.c<last.o&&ps)side='SHORT'}
+ if(strategy==='ema13'){const pl=c.slice(-5,-1).some((x,k)=>x.l<=e13[i-4+k]*1.002),ps=c.slice(-5,-1).some((x,k)=>x.h>=e13[i-4+k]*.998);if(up&&e13[i]>e89[i]&&last.c>e13[i]&&last.c>last.o&&pl)side='LONG';else if(down&&e13[i]<e89[i]&&last.c<e13[i]&&last.c<last.o&&ps)side='SHORT'}
+if(strategy==='ema21'){if(up&&last.c>e21[i]&&prev.l<=e21[i-1]*1.002&&last.c>last.o)side='LONG';else if(down&&last.c<e21[i]&&prev.h>=e21[i-1]*.998&&last.c<last.o)side='SHORT'}
+if(strategy==='cross'){if(e9[i-1]<=e21[i-1]&&e9[i]>e21[i]&&up&&last.c>last.o)side='LONG';else if(e9[i-1]>=e21[i-1]&&e9[i]<e21[i]&&down&&last.c<last.o)side='SHORT'}
+if(strategy==='monday'){const start=mondayUtc(week),end=start+DAY;const monday=c.filter(x=>x.t>=start&&x.t<end);if(monday.length<90||last.t<end)return{reason:'Monday range incomplete / unavailable',vr,trend:up?'UP':down?'DOWN':'MIXED'};const high=Math.max(...monday.map(x=>x.h)),low=Math.min(...monday.map(x=>x.l));levels={high,low};if(prev.c>high&&last.c>high&&last.c>last.o&&up)side='LONG';else if(prev.c<low&&last.c<low&&last.c<last.o&&down)side='SHORT'}
+const info={vr,trend:up?'UP':down?'DOWN':'MIXED',levels};if(week>0)return{...info,reason:'Previous week is research only â no live entry'};if(!side)return{...info,reason};if(!volOk)return{...info,reason:'Setup detected but volume below 1.2Ã'};if(!fresh)return{...info,reason:'Setup is stale; no live entry'};if(!Number.isFinite(a)||a<=0)return{...info,reason:'ATR unavailable'};const entry=last.c,stop=side==='LONG'?Math.min(...c.slice(-5).map(x=>x.l))-a*.15:Math.max(...c.slice(-5).map(x=>x.h))+a*.15,risk=Math.abs(entry-stop);if(risk<=0||risk/entry>.07)return{...info,reason:'Stop risk invalid or above 7%'};return{...info,side,entry,stop,tp1:entry+(side==='LONG'?2:-2)*risk,tp2:entry+(side==='LONG'?3:-3)*risk,tp3:entry+(side==='LONG'?4:-4)*risk,time:last.t+15*MIN,reason:'Confirmed on latest completed 15m candle'}}
+function buildPlan(c,h,chosen,confirmed){
+ const last=c.at(-1),prev=c.at(-2),hour=h.at(-1);
+ if(!last||!prev||!hour||c.length<95||h.length<95)return null;
+ const closes=c.map(x=>x.c),hourCloses=h.map(x=>x.c),i=c.length-1,j=h.length-1;
+ const e13=ema(closes,13),e89=ema(closes,89),e21=ema(closes,21),e9=ema(closes,9);
+ const he13=ema(hourCloses,13),he89=ema(hourCloses,89),he21=ema(hourCloses,21);
+ const a=atr(c),vr=volRatio(c);
+ if(!Number.isFinite(a)||a<=0||!Number.isFinite(last.c)||last.c<=0)return null;
+ let score=0;
+ score+=last.c>e89[i]?1:-1;
+ score+=e13[i]>e89[i]?1:-1;
+ score+=hour.c>he89[j]?1:-1;
+ score+=he13[j]>he89[j]?1:-1;
+ if(chosen==='ema9')score+=e9[i]>e89[i]?2:-2;
+  if(chosen==='ema21')score+=last.c>e21[i]?2:-2;
+ if(chosen==='cross')score+=e9[i]>e21[i]?2:-2;
+ if(chosen==='monday'){
+   const start=mondayUtc(0),mon=c.filter(x=>x.t>=start&&x.t<start+DAY);
+   if(mon.length>=90){const high=Math.max(...mon.map(x=>x.h)),low=Math.min(...mon.map(x=>x.l));score+=last.c>high?2:last.c<low?-2:0;}
+ }
+ const side=score>0?'LONG':score<0?'SHORT':null;
+ if(!side)return {reason:'Mixed direction: no defensible LONG or SHORT plan',vr};
+ const entry=last.c;
+ const structure=side==='LONG'?Math.min(...c.slice(-6).map(x=>x.l)):Math.max(...c.slice(-6).map(x=>x.h));
+ const stop=side==='LONG'?Math.min(structure-a*.15,entry-a*1.35):Math.max(structure+a*.15,entry+a*1.35);
+ const risk=Math.abs(entry-stop);
+ if(!Number.isFinite(risk)||risk<=0||risk/entry>.07)return {reason:'Risk invalid or greater than 7%; no plan',vr};
+ const sign=side==='LONG'?1:-1;
+ return {side,entry,stop,tp1:entry+sign*2*risk,tp2:entry+sign*3*risk,tp3:entry+sign*4*risk,vr,time:last.t+15*MIN,score,confirmed:false,reason:'Indicative plan â NOT a confirmed signal. Wait for entry confirmation.'};
 }
-function nyParts(ms){
-  const p=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",weekday:"short"}).formatToParts(new Date(ms));
-  const get=k=>p.find(x=>x.type===k)?.value;
-  return {y:+get("year"),m:+get("month"),d:+get("day"),w:get("weekday")};
+function renderPlan(s,coin,strategy){
+ const color=s.side==='LONG'?'green':'red';
+ $('result').innerHTML=`<div class="signalhead ${color}">${s.side==='LONG'?'ð¢':'ð´'} ${s.side} Â· TRADE PLAN</div><p class="gold"><b>UNCONFIRMED Â· NOT AN ENTRY ALERT</b></p><p class="muted">${esc(coin)} Â· ${esc(strategy)} Â· ${ny(s.time)}</p><div class="grid"><div class="metric"><small>ENTRY REFERENCE</small><strong class="gold">${fmt(s.entry)}</strong></div><div class="metric"><small>STOP LOSS</small><strong class="red">${fmt(s.stop)}</strong></div><div class="metric"><small>TP1 Â· 2R</small><strong class="green">${fmt(s.tp1)}</strong></div><div class="metric"><small>TP2 Â· 3R</small><strong class="green">${fmt(s.tp2)}</strong></div><div class="metric"><small>TP3 Â· 4R</small><strong class="green">${fmt(s.tp3)}</strong></div><div class="metric"><small>VOLUME</small><strong>${Number.isFinite(s.vr)?s.vr.toFixed(2)+'Ã':'â'} (min 1.2Ã)</strong></div></div><p class="muted mini">${esc(s.reason)} Â· Levels use last completed 15m candle; current market price may differ. Do not treat this plan as a live trade signal.</p>`;
 }
-function mondayStart(offset=0){
-  const p=nyParts(Date.now()),w={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[p.w]||0;
-  const d=new Date(Date.UTC(p.y,p.m-1,p.d-w-offset*7));
-  const y=d.getUTCFullYear(),m=d.getUTCMonth(),day=d.getUTCDate();
-  const probe=new Date(Date.UTC(y,m,day,12));
-  const nyHour=+new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",hourCycle:"h23"}).format(probe);
-  return Date.UTC(y,m,day,nyHour===8?4:5);
+function renderResult(s,coin,strategy){if(!s.side){$('result').innerHTML=`<div class="signalhead">âª WAIT â NO TRADE</div><p class="muted">${esc(s.reason)}</p><div class="grid">${['ENTRY','STOP LOSS','TP1','TP2','TP3','VOLUME â¥ 1.2Ã'].map(label=>`<div class="metric"><small>${label}</small><strong>â</strong></div>`).join('')}</div><p class="muted mini">If market data is unavailable, prices are not invented.</p>`;return}const color=s.side==='LONG'?'green':'red';$('result').innerHTML=`<div class="signalhead ${color}">${s.side==='LONG'?'ð¢':'ð´'} ${s.side} Â· ${esc(coin)}</div><p class="muted">${esc(strategy)} Â· ${ny(s.time)} Â· Hyperliquid perpetual Â· Confirmed 15m / 1H</p><div class="grid"><div class="metric"><small>ENTRY reference</small><strong class="gold">${fmt(s.entry)}</strong></div><div class="metric"><small>STOP LOSS</small><strong class="red">${fmt(s.stop)}</strong></div><div class="metric"><small>TP1 Â· 2R</small><strong class="green">${fmt(s.tp1)}</strong></div><div class="metric"><small>TP2 Â· 3R</small><strong class="green">${fmt(s.tp2)}</strong></div><div class="metric"><small>TP3 Â· 4R</small><strong class="green">${fmt(s.tp3)}</strong></div><div class="metric"><small>VOLUME</small><strong>${Number.isFinite(s.vr)?s.vr.toFixed(2)+"Ã":"â"}</strong></div></div><p class="muted mini">Validating current tradable priceâ¦</p>`}
+async function analyze(){const id=$('market').value,info=marketInfo.get(id),coin=info?.coin;if(info?.kind==='stock'){renderResult({reason:'Stock chart available; stock signal data feed is NOT connected. No fabricated entry/SL/TP.'},id,'');$('status').textContent='Stock signal feed requires a licensed stock market data provider.';return;}if(!coin){$('status').textContent='Choose a market first.';return;}const seq=++analysisSeq,btn=$('analyze');btn.disabled=true;$('status').textContent='Loading completed candlesâ¦';$('result').innerHTML='<div class="signalhead">â³ ANALYZINGâ¦</div><p>Building trade plan from 15m / 1H Â· Volume threshold 1.2Ã</p>';try{const [c,h]=await Promise.all([candles(coin,'15m',13),candles(coin,'1h',17)]);if(seq!==analysisSeq)return;const s=signal(c,h,$('strategy').value,+$('week').value);$('strategyMetric').textContent=$('strategy').selectedOptions[0].textContent;$('lastClose').textContent=fmt(c.at(-1)?.c);$('trend').textContent=s.trend||'â';$('vol').textContent=Number.isFinite(s.vr)?s.vr.toFixed(2)+'Ã':'â';$('time').textContent=c.length?ny(c.at(-1).t+15*MIN):'â';if(s.side&&info.kind==='perp'&&!coin.includes(':')){try{const [meta,contexts]=await api({type:'metaAndAssetCtxs'});const index=(meta.universe||[]).findIndex(x=>x.name===coin),mark=Number(contexts?.[index]?.markPx),mid=Number(contexts?.[index]?.midPx),current=Number.isFinite(mid)&&mid>0?mid:mark;const maxDrift=Math.min(s.entry*.005,atr(c)*.35);if(!Number.isFinite(current)||current<=0)s.reason='Current price unavailable; cannot validate entry';else if(Math.abs(current-s.entry)>maxDrift)s.reason=`Price moved from entry (${fmt(current)} now). Do not chase`;else if((s.side==='LONG'&&current<=s.stop)||(s.side==='SHORT'&&current>=s.stop))s.reason='Stop invalidated before entry';else s.current=current;if(!s.current)delete s.side}catch(e){delete s.side;s.reason='Live price validation failed: '+e.message}}if(s.side&&info.kind==='perp'&&!coin.includes(':')){renderResult(s,id,$('strategy').selectedOptions[0].textContent)}else{const plan=buildPlan(c,h,$('strategy').value);if(plan?.side){renderPlan(plan,id,$('strategy').selectedOptions[0].textContent)}else{renderResult({reason:plan?.reason||s.reason},id,'')}}if(s.side&&info.kind==='perp'&&!coin.includes(':'))$('result').querySelector('.mini').textContent=`Current price ${fmt(s.current)} within entry drift tolerance. Entry is a reference, not an order or guarantee.`;$('status').textContent=`Analysis complete Â· ${c.length} 15m candles Â· ${h.length} 1H candles`}catch(e){if(seq!==analysisSeq)return;$('status').textContent='Data error: '+e.message;renderResult({reason:'Data unavailable: '+e.message},id,'')}finally{if(seq===analysisSeq)btn.disabled=false}}
+// Independent alert-only rules; manual analysis is intentionally not volume-gated.
+async function checkCrossAlert(){
+ if(alertBusy||document.hidden)return;
+ const id=$('market').value,info=marketInfo.get(id);
+ if(!info||info.kind!=='perp'){$('alertsStatus').textContent='Select a Hyperliquid PERP for alerts.';return;}
+ alertBusy=true;
+ try{
+  const [c,h]=await Promise.all([candles(info.coin,'15m',13),candles(info.coin,'1h',17)]);
+  if(c.length<110||h.length<95)return;
+   const i=c.length-1,j=h.length-1,last=c[i],e9=ema(c.map(x=>x.c),9),e89=ema(c.map(x=>x.c),89),he9=ema(h.map(x=>x.c),9),he89=ema(h.map(x=>x.c),89);
+   const ratio=volRatio(c),up=h[j].c>he89[j]&&he9[j]>he89[j]&&last.c>e89[i]&&e9[i]>e89[i],down=h[j].c<he89[j]&&he9[j]<he89[j]&&last.c<e89[i]&&e9[i]<e89[i];
+   const pl=c.slice(-5,-1).some((x,k)=>x.l<=e9[i-4+k]*1.002),ps=c.slice(-5,-1).some((x,k)=>x.h>=e9[i-4+k]*.998);
+   const side=up&&pl&&last.c>e9[i]&&last.c>last.o?'LONG':down&&ps&&last.c<e9[i]&&last.c<last.o?'SHORT':null;
+   if(!side||!Number.isFinite(ratio)||ratio<1.2||Date.now()-(last.t+15*MIN)>20*MIN)return;
+  const a=atr(c);if(!a||a<=0)return;
+  const entry=last.c,stop=side==='LONG'?Math.min(...c.slice(-5).map(x=>x.l))-a*.15:Math.max(...c.slice(-5).map(x=>x.h))+a*.15,risk=Math.abs(entry-stop);
+  if(!risk||risk/entry>.07||(side==='LONG'&&stop>=entry)||(side==='SHORT'&&stop<=entry))return;
+  const key='yoyo-v36-alert:'+id+':'+side+':'+last.t;
+  if(localStorage.getItem(key))return;
+  localStorage.setItem(key,'1');
+  const sign=side==='LONG'?1:-1;
+  const body=`${id} ${side} | Entry ${fmt(entry)} | SL ${fmt(stop)} | TP1 ${fmt(entry+sign*2*risk)} | TP2 ${fmt(entry+sign*3*risk)} | TP3 ${fmt(entry+sign*4*risk)} | Vol ${ratio.toFixed(2)}Ã`;
+  $('alertsStatus').textContent='Latest confirmed cross: '+body;
+  if('Notification' in window&&Notification.permission==='granted')new Notification('YOYO Â· EMA9/89 SIGNAL',{body,tag:key});
+ }catch(e){$('alertsStatus').textContent='Alert check failed: '+e.message}
+ finally{alertBusy=false}
 }
-async function fetchCandles(coin,interval,start,end){
-  const raw=await api({type:"candleSnapshot",req:{coin,interval,startTime:start,endTime:end}});
-  const now=Date.now(),duration=TFMS[interval]||0;
-  return (raw||[]).map(x=>({t:+x.t,T:+x.T,o:+x.o,h:+x.h,l:+x.l,c:+x.c,v:+x.v}))
-    .filter(x=>Number.isFinite(x.c)&&Number.isFinite(x.t)&&x.t+duration<=now)
-    .sort((a,b)=>a.t-b.t);
-}
-function ema(values,period){
-  const out=Array(values.length).fill(null);if(values.length<period)return out;
-  let sum=0;for(let i=0;i<period;i++)sum+=values[i];
-  let prev=sum/period;out[period-1]=prev;const k=2/(period+1);
-  for(let i=period;i<values.length;i++){prev=values[i]*k+prev*(1-k);out[i]=prev;}
-  return out;
-}
-function avgVolume(c,i,count=20){
-  if(i<count)return null;
-  let sum=0;for(let j=i-count;j<i;j++)sum+=c[j].v;
-  return sum/count;
-}
-function atr(c,period=14){
-  if(c.length<period+2)return null;
-  let sum=0;
-  for(let i=c.length-period;i<c.length;i++){
-    const x=c[i],p=c[i-1];
-    sum+=Math.max(x.h-x.l,Math.abs(x.h-p.c),Math.abs(x.l-p.c));
-  }
-  return sum/period;
-}
-function last(a){return a[a.length-1];}
-async function loadData(coin,tf="15m",offset=0){
-  const monday=mondayStart(offset),now=Date.now();
-  const end=offset?Math.min(now,monday+7*DAY):now;
-  const start15=Math.max(monday-10*DAY,end-14*DAY);
-  const [m15,h1]=await Promise.all([
-    fetchCandles(coin,"15m",start15,end),
-    fetchCandles(coin,"1h",end-35*DAY,end)
-  ]);
-  if(m15.length<100)throw Error("Not enough 15m candles");
-  const mondayBars=m15.filter(x=>x.t>=monday&&x.t<monday+DAY);
-  const high=mondayBars.length?Math.max(...mondayBars.map(x=>x.h)):null;
-  const low=mondayBars.length?Math.min(...mondayBars.map(x=>x.l)):null;
-  let view=m15;
-  if(tf==="1h")view=h1;
-  else if(tf==="1M"){
-    view=await fetchCandles(coin,"1M",now-1100*DAY,now);
-  }else if(tf!=="15m"){
-    view=await fetchCandles(coin,tf,now-(tf==="1w"?750:tf==="1d"?365:tf==="4h"?100:tf==="1m"?2:tf==="5m"?7:30)*DAY,now);
-  }
-  if(!view.length)throw Error("No chart candles for "+tf);
-  return {coin,monday,end,m15,h1,view,high,low,last:last(m15)};
-}
-function signal(data,side,entry,stop,strategy,confirmed=false,reason=""){
-  if(!Number.isFinite(entry)||!Number.isFinite(stop)||entry<=0)return null;
-  const risk=Math.abs(entry-stop),sign=side==="LONG"?1:-1;
-  if(risk<=0||(side==="LONG"&&stop>=entry)||(side==="SHORT"&&stop<=entry))return null;
-  if(risk/entry>0.07)return null;
-  return {coin:data.coin,side,entry,stop,tp1:entry+sign*2*risk,tp2:entry+sign*3*risk,tp3:entry+sign*4*risk,
-    strategy,confirmed,reason,time:data.last.T,fresh:Date.now()-data.last.T<=30*MIN};
-}
-function plan(data,side,strategy,confirmed=false,reason=""){
-  const c=data.m15,close=last(c).c,a=atr(c)||close*.008;
-  const recent=c.slice(-6),lo=Math.min(...recent.map(x=>x.l)),hi=Math.max(...recent.map(x=>x.h));
-  const stop=side==="LONG"?Math.min(lo,close-1.3*a)-.15*a:Math.max(hi,close+1.3*a)+.15*a;
-  return signal(data,side,close,stop,strategy,confirmed,reason);
-}
-function chooseSide(data,mode="multi",strategy="cross"){
-  const c=data.m15,h=data.h1,cl=c.map(x=>x.c),hc=h.map(x=>x.c),i=c.length-1,j=h.length-1;
-  const a=ema(cl,strategy==="ema13"?13:strategy==="ema21"?21:9);
-  const b=ema(cl,strategy==="ema13"?89:strategy==="ema21"?89:21);
-  const current=last(c);
-  if(mode==="single")return current.c>=a[i]?"LONG":"SHORT";
-  if(h.length>=90){
-    const ha=ema(hc,strategy==="ema13"?13:strategy==="ema21"?21:9);
-    const hb=ema(hc,strategy==="ema13"?89:strategy==="ema21"?89:21);
-    if(Number.isFinite(ha[j])&&Number.isFinite(hb[j])){
-      if(ha[j]>hb[j]&&current.c>a[i])return "LONG";
-      if(ha[j]<hb[j]&&current.c<a[i])return "SHORT";
-    }
-  }
-  return current.c>=a[i]?"LONG":"SHORT";
-}
-function getSignal(data,strategy,mode="multi"){
-  const c=data.m15,h=data.h1,i=c.length-1,j=h.length-1,x=last(c),vol=avgVolume(c,i),volOK=!!vol&&x.v>=1.2*vol;
-  let side=chooseSide(data,mode,strategy),confirmed=false,reason="";
-  if(strategy==="monday"){
-    if(Number.isFinite(data.high)&&Number.isFinite(data.low)&&x.t>=data.monday+DAY){
-      if(x.c>data.high&&c[i-1].c<=data.high){side="LONG";confirmed=volOK&&x.c>x.o;}
-      else if(x.c<data.low&&c[i-1].c>=data.low){side="SHORT";confirmed=volOK&&x.c<x.o;}
-      reason=confirmed?"Monday range breakout confirmed":"Monday range breakout not fully confirmed";
-    }else reason="Monday range not ready";
-  }else if(strategy==="ema13"){
-    const e13=ema(c.map(x=>x.c),13),e89=ema(c.map(x=>x.c),89);
-    const he13=ema(h.map(x=>x.c),13),he89=ema(h.map(x=>x.c),89);
-    const up=e13[i]>e89[i]&&x.c>e89[i],down=e13[i]<e89[i]&&x.c<e89[i];
-    const hup=h.length>=90&&he13[j]>he89[j]&&h[j].c>he89[j];
-    const hdown=h.length>=90&&he13[j]<he89[j]&&h[j].c<he89[j];
-    const pbLong=c.slice(-5,-1).some((v,k)=>v.l<=(e13[i-4+k]||0)*1.002);
-    const pbShort=c.slice(-5,-1).some((v,k)=>v.h>=(e13[i-4+k]||Infinity)*.998);
-    if(up){side="LONG";confirmed=volOK&&pbLong&&x.c>x.o&&(mode==="single"||hup);}
-    else if(down){side="SHORT";confirmed=volOK&&pbShort&&x.c<x.o&&(mode==="single"||hdown);}
-    reason=confirmed?"EMA13/89 pullback confirmed":"Trend or pullback / volume not fully confirmed";
-  }else if(strategy==="ema21"){
-    const e21=ema(c.map(x=>x.c),21),he21=ema(h.map(x=>x.c),21);
-    const up=x.c>e21[i]&&e21[i]>e21[i-1];
-    const down=x.c<e21[i]&&e21[i]<e21[i-1];
-    const hup=h.length>=23&&h[j].c>he21[j],hdown=h.length>=23&&h[j].c<he21[j];
-    if(up){side="LONG";confirmed=volOK&&x.c>x.o&&(mode==="single"||hup);}
-    else if(down){side="SHORT";confirmed=volOK&&x.c<x.o&&(mode==="single"||hdown);}
-    reason=confirmed?"EMA21 trend confirmed":"EMA21 trend / volume not fully confirmed";
-  }else{
-    const e9=ema(c.map(x=>x.c),9),e21=ema(c.map(x=>x.c),21);
-    const he9=ema(h.map(x=>x.c),9),he21=ema(h.map(x=>x.c),21);
-    const crossUp=e9[i-1]<=e21[i-1]&&e9[i]>e21[i];
-    const crossDown=e9[i-1]>=e21[i-1]&&e9[i]<e21[i];
-    const hup=h.length>=23&&he9[j]>he21[j]&&h[j].c>he21[j];
-    const hdown=h.length>=23&&he9[j]<he21[j]&&h[j].c<he21[j];
-    if(crossUp){side="LONG";confirmed=volOK&&x.c>x.o&&(mode==="single"||hup);}
-    else if(crossDown){side="SHORT";confirmed=volOK&&x.c<x.o&&(mode==="single"||hdown);}
-    reason=confirmed?"EMA9/21 fresh cross confirmed":"Fresh EMA9/21 cross / volume / 1H confirmation missing";
-  }
-  const names={monday:"Monday Range",ema13:"EMA13 / EMA89",ema21:"EMA21 Trend",cross:"EMA9 / EMA21 Cross"};
-  const s=plan(data,side,names[strategy],confirmed,reason);
-  if(s){s.volumeRatio=vol?x.v/vol:null;s.confirmed=s.confirmed&&s.fresh;}
-  return s;
-}
-function metric(label,value,color=""){return `<div class="metric"><small>${label}</small><strong class="${color}">${value}</strong></div>`;}
-function renderSignal(data,s){
-  if(!s){$("result").innerHTML='<h2 class="gold">WAIT</h2><p>No valid risk plan. Stop distance exceeds 7% or data is insufficient.</p>';return;}
-  const color=s.side==="LONG"?"green":"red";
-  const state=s.confirmed?"CONFIRMED":"UNCONFIRMED · RESEARCH ONLY";
-  $("result").innerHTML=`
-    <div class="signal-title ${color}">${s.side} <span class="pill">${state}</span></div>
-    <p class="muted">${s.strategy} · ${et(s.time)}</p>
-    <div class="grid">
-      ${metric("ENTRY",fmt(s.entry),"gold")}
-      ${metric("STOP LOSS",fmt(s.stop),"red")}
-      ${metric("TP1 · 2R",fmt(s.tp1),"green")}
-      ${metric("TP2 · 3R",fmt(s.tp2),"green")}
-      ${metric("TP3 · 4R",fmt(s.tp3),"green")}
-      ${metric("VOLUME",s.volumeRatio?fmt(s.volumeRatio)+"×":"—")}
-    </div>
-    <p class="muted">${s.reason}</p>
-    <p class="muted">This is a hypothetical plan from the last completed 15m close, not a live executable quote. Unconfirmed plans are not trading alerts. No profit is guaranteed.</p>`;
-}
-function createChart(){
-  if(chart)return;
-  if(!window.LightweightCharts)throw Error("Chart library unavailable. Open the hosted site in Safari.");
-  chart=LightweightCharts.createChart($("chart"),{
-    width:$("chart").clientWidth,height:$("chart").clientHeight,
-    layout:{background:{type:"solid",color:"#0b1422"},textColor:"#a1b2c8"},
-    grid:{vertLines:{color:"#1b2a3c"},horzLines:{color:"#1b2a3c"}},
-    timeScale:{timeVisible:true},rightPriceScale:{borderColor:"#30425c"}
-  });
-  candleSeries=chart.addCandlestickSeries({upColor:"#21d6a5",downColor:"#ff627d",borderUpColor:"#21d6a5",borderDownColor:"#ff627d",wickUpColor:"#21d6a5",wickDownColor:"#ff627d"});
-  chart.subscribeClick(onChartClick);
-  if(window.ResizeObserver)new ResizeObserver(()=>chart.applyOptions({width:$("chart").clientWidth,height:$("chart").clientHeight})).observe($("chart"));
-}
-function clearDrawings(){
-  if(!chart)return;
-  for(const s of drawings)chart.removeSeries(s);
-  drawings=[];firstPoint=null;
-}
-function clearChartExtras(){
-  if(!chart)return;
-  for(const s of extraSeries)chart.removeSeries(s);
-  extraSeries=[];
-  for(const p of priceLines)candleSeries.removePriceLine(p);
-  priceLines=[];
-  clearDrawings();
-}
-function addLine(price,title,color){
-  if(!Number.isFinite(price))return;
-  priceLines.push(candleSeries.createPriceLine({price,title,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true}));
-}
-function addEMA(c,period,color){
-  const v=ema(c.map(x=>x.c),period);
-  const s=chart.addLineSeries({color,lineWidth:2,priceLineVisible:false,lastValueVisible:false});
-  s.setData(c.flatMap((x,i)=>Number.isFinite(v[i])?[{time:Math.floor(x.t/1000),value:v[i]}]:[]));
-  extraSeries.push(s);
-}
-function drawChart(data,s){
-  createChart();clearChartExtras();
-  const c=data.view;
-  bars=c.map(x=>({time:Math.floor(x.t/1000),open:x.o,high:x.h,low:x.l,close:x.c}));
-  candleSeries.setData(bars);
-  const strategy=$("strategy").value;
-  if(strategy==="monday"){
-    addLine(data.high,"MON HIGH","#76b4ff");addLine(data.low,"MON LOW","#f5c66a");
-    $("legend").textContent="Monday High / Low";
-  }else if(strategy==="ema13"){
-    addEMA(c,13,"#f5c66a");addEMA(c,89,"#b59bff");$("legend").textContent="EMA13 Gold · EMA89 Purple";
-  }else if(strategy==="ema21"){
-    addEMA(c,21,"#21d6a5");$("legend").textContent="EMA21 Green";
-  }else{
-    addEMA(c,9,"#f5c66a");addEMA(c,21,"#76b4ff");$("legend").textContent="EMA9 Gold · EMA21 Blue";
-  }
-  if(s){
-    addLine(s.entry,"ENTRY","#76b4ff");
-    addLine(s.stop,"SL","#ff627d");
-    addLine(s.tp1,"TP1","#21d6a5");
-    addLine(s.tp2,"TP2","#f5c66a");
-    addLine(s.tp3,"TP3","#b59bff");
-  }
-  chart.timeScale().fitContent();
-  $("overlay").classList.add("hidden");
-}
-function drawSegment(a,b,color){
-  const s=chart.addLineSeries({color,lineWidth:2,priceLineVisible:false,lastValueVisible:false});
-  s.setData([a,b].sort((x,y)=>x.time-y.time));drawings.push(s);
-}
-function drawHorizontal(price,color="#76b4ff"){
-  if(bars.length<2)return;
-  drawSegment({time:bars[0].time,value:price},{time:last(bars).time,value:price},color);
-}
-function onChartClick(p){
-  if(tool==="cursor"||!p?.point||typeof p.time!=="number")return;
-  const price=candleSeries.coordinateToPrice(p.point.y);
-  if(!Number.isFinite(price))return;
-  const point={time:p.time,value:price};
-  if(tool==="sr"){drawHorizontal(price);return;}
-  if(!firstPoint){firstPoint=point;$("toolHelp").textContent="Tap second point.";return;}
-  const first=firstPoint;firstPoint=null;
-  if(first.time===point.time)return;
-  if(tool==="trend")drawSegment(first,point,"#f5c66a");
-  if(tool==="fib"){
-    const lo=Math.min(first.value,point.value),hi=Math.max(first.value,point.value);
-    for(const f of [0,.382,.5,.618,1])drawHorizontal(lo+(hi-lo)*f,f===.5?"#f5c66a":"#76b4ff");
-  }
-  if(tool==="long"||tool==="short"){
-    const entry=first.value,risk=Math.abs(point.value-entry),sign=tool==="long"?1:-1;
-    if(!risk)return;
-    drawHorizontal(entry,"#76b4ff");drawHorizontal(entry-sign*risk,"#ff627d");
-    for(const r of [2,3,4])drawHorizontal(entry+sign*r*risk,"#21d6a5");
-  }
-  $("toolHelp").textContent="Drawing added.";
-}
-async function analyze(){
-  const coin=$("market").value;if(!coin)return;
-  $("analyze").disabled=true;$("overlay").classList.remove("hidden");$("overlay").textContent="Loading market data...";
-  $("result").textContent="Analyzing...";
-  try{
-    const data=await loadData(coin,$("tf").value,+$("week").value);
-    const s=getSignal(data,$("strategy").value,$("mode").value);
-    cache={data,s};
-    $("monHigh").textContent=fmt(data.high);$("monLow").textContent=fmt(data.low);
-    $("lastClose").textContent=fmt(data.last.c);$("lastTime").textContent=et(data.last.T);
-    renderSignal(data,s);drawChart(data,s);
-    status("● Analysis complete · "+coin,"green");
-  }catch(e){
-    cache=null;status("Error: "+e.message,"red");$("result").textContent="Analysis unavailable.";
-    $("overlay").classList.remove("hidden");$("overlay").textContent="Chart error: "+e.message;
-  }finally{$("analyze").disabled=false;}
-}
-async function checkAlert(){
-  const coin=$("market").value;if(!coin)return;
-  $("checkAlert").disabled=true;$("alertResult").textContent="Checking...";
-  try{
-    const data=await loadData(coin,"15m",0);
-    const s=getSignal(data,"cross","multi");
-    if(s?.confirmed){
-      $("alertResult").innerHTML=`<h2 class="${s.side==="LONG"?"green":"red"}">${coin} · CONFIRMED ${s.side}</h2>
-        <div class="grid">${metric("ENTRY",fmt(s.entry))}${metric("SL",fmt(s.stop))}${metric("TP1",fmt(s.tp1))}${metric("TP2",fmt(s.tp2))}${metric("TP3",fmt(s.tp3))}</div>`;
-    }else{
-      $("alertResult").textContent="WAIT — No fresh EMA9/21 cross with 1H trend and volume ≥ 1.2×.";
-    }
-  }catch(e){$("alertResult").textContent="Check failed: "+e.message;}
-  finally{$("checkAlert").disabled=false;}
-}
-async function scan(){
-  if(busy)return;busy=true;$("scanBtn").disabled=true;$("scanResults").replaceChildren();
-  const count=$("scanCount").value==="all"?markets.length:+$("scanCount").value;
-  const selected=markets.slice(0,count),strategy=$("strategy").value,mode=$("mode").value;
-  let found=0,errors=0;
-  try{
-    for(let i=0;i<selected.length;i++){
-      const coin=selected[i];$("scanStatus").textContent=`Scanning ${i+1}/${selected.length}: ${coin}`;
-      try{
-        const data=await loadData(coin,"15m",0),s=getSignal(data,strategy,mode);
-        if(s?.confirmed){
-          found++;const el=document.createElement("div");el.className="card";
-          const h=document.createElement("h2");h.className=s.side==="LONG"?"green":"red";h.textContent=coin+" · CONFIRMED "+s.side;
-          const p=document.createElement("p");p.textContent=`ENTRY ${fmt(s.entry)} | SL ${fmt(s.stop)} | TP1 ${fmt(s.tp1)} | TP2 ${fmt(s.tp2)} | TP3 ${fmt(s.tp3)}`;
-          el.append(h,p);$("scanResults").appendChild(el);
-        }
-      }catch(e){errors++;console.warn(coin,e);}
-      await sleep(350);
-    }
-    $("scanStatus").textContent=`Complete · ${selected.length} checked · ${found} confirmed · ${errors} errors`;
-    if(!found)$("scanResults").textContent="No fresh confirmed signals.";
-  }finally{busy=false;$("scanBtn").disabled=false;}
-}
-$("search").addEventListener("input",updateMarkets);
-$("analyze").addEventListener("click",analyze);
-$("checkAlert").addEventListener("click",checkAlert);
-$("scanBtn").addEventListener("click",scan);
-for(const id of ["strategy","mode"]){
-  $(id).addEventListener("change",()=>{
-    if(!cache)return;
-    cache.s=getSignal(cache.data,$("strategy").value,$("mode").value);
-    renderSignal(cache.data,cache.s);drawChart(cache.data,cache.s);
-  });
-}
-$("tf").addEventListener("change",()=>{
-  cache=null;$("result").textContent="Timeframe changed. Tap Analyze.";
-  $("overlay").classList.remove("hidden");$("overlay").textContent="Tap Analyze to load chart timeframe.";
-});
-for(const id of ["market","week"]){
-  $(id).addEventListener("change",()=>{
-    cache=null;$("result").textContent="Selection changed. Tap Analyze.";
-    $("overlay").classList.remove("hidden");$("overlay").textContent="Tap Analyze for selected market.";
-  });
-}
-$("toolbar").addEventListener("click",e=>{
-  const b=e.target.closest("button[data-tool]");if(!b)return;
-  tool=b.dataset.tool;firstPoint=null;
-  document.querySelectorAll("button[data-tool]").forEach(x=>x.classList.toggle("active",x===b));
-  $("toolHelp").textContent=tool==="cursor"?"Cursor active.":"Tap chart to draw "+tool;
-});
-$("clearDraw").onclick=clearDrawings;
-$("zoomIn").onclick=()=>{if(!chart)return;const s=chart.timeScale(),v=s.options().barSpacing||6;s.applyOptions({barSpacing:Math.min(45,v*1.3)});};
-$("zoomOut").onclick=()=>{if(!chart)return;const s=chart.timeScale(),v=s.options().barSpacing||6;s.applyOptions({barSpacing:Math.max(2,v/1.3)});};
-$("fullscreen").onclick=()=>{const el=$("chartbox");if(document.fullscreenElement)document.exitFullscreen?.();else el.requestFullscreen?.();};
-loadMarkets();
-</script>
-</body>
-</html>
+$('alertsToggle').onclick=async()=>{
+ if(alertTimer){clearInterval(alertTimer);alertTimer=null;$('alertsToggle').textContent='ENABLE SIGNAL NOTIFICATIONS';$('alertsStatus').textContent='Alerts off.';return;}
+ if('Notification' in window&&Notification.permission==='default'){
+  try{await Notification.requestPermission()}catch(e){}
+ }
+ alertTimer=setInterval(checkCrossAlert,60000);
+ $('alertsToggle').textContent='STOP SIGNAL MONITORING';
+ $('alertsStatus').textContent='Monitoring selected PERP while page is open; browser notification permission: '+(('Notification' in window)?Notification.permission:'unsupported')+'.';
+ checkCrossAlert();
+};
+$('search').addEventListener('input',updateMarkets);$('market').addEventListener('change',()=>{analysisSeq++;renderTV();invalidate()});$('strategy').addEventListener('change',()=>{analysisSeq++;renderTV();invalidate()});$('week').addEventListener('change',()=>{analysisSeq++;invalidate()});$('single').onclick=()=>setMode('single');$('multi').onclick=()=>setMode('multi');$('times').addEventListener('click',e=>{const b=e.target.closest('[data-tf]');if(!b)return;const tf=b.dataset.tf;analysisSeq++;if(mode==='single')selected=new Set([tf]);else{if(selected.has(tf)&&selected.size>1)selected.delete(tf);else selected.add(tf)}syncButtons();renderTV();invalidate()});$('analyze').onclick=analyze;syncButtons();loadMarkets().then(()=>renderTV());
+</script></body></html>
