@@ -4,247 +4,101 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080d18">
-<title>YOYO TRADE PRO V2</title>
-
+<title>YOYO TRADE PRO V3</title>
 <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
-
 <style>
-:root{
-  --bg:#080d18;
-  --panel:#111d30;
-  --card:#18283e;
-  --border:#30425c;
-  --text:#f0f6ff;
-  --muted:#a1b2c8;
-  --green:#21d6a5;
-  --red:#ff627d;
-  --gold:#f5c66a;
-  --blue:#76b4ff;
-}
+:root{--bg:#080d18;--panel:#111d30;--card:#18283e;--border:#30425c;--text:#f0f6ff;--muted:#a1b2c8;--green:#21d6a5;--red:#ff627d;--gold:#f5c66a;--blue:#76b4ff}
 *{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-}
-header{
-  padding:17px;
-  background:#0d1727;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.logo{font-size:20px;font-weight:900}
-.logo span{color:var(--green)}
-.badge{
-  color:var(--gold);
-  border:1px solid #665632;
-  border-radius:20px;
-  padding:7px;
-  font-size:11px;
-}
-main{max-width:1150px;margin:auto;padding:13px}
-.panel{
-  background:linear-gradient(145deg,#16263d,#0f1929);
-  border:1px solid var(--border);
-  border-radius:15px;
-  padding:16px;
-  margin-bottom:13px;
-}
-h1{font-size:23px;margin:0 0 8px}
-h2{font-size:18px;margin:0 0 12px}
-p{line-height:1.6}
-.muted{color:var(--muted)}
-.green{color:var(--green)}
-.red{color:var(--red)}
-.gold{color:var(--gold)}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-.metric{
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:12px;
-  border-radius:11px;
-  overflow-wrap:anywhere;
-}
-.metric small{
-  display:block;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-.metric strong{font-size:17px}
-label{
-  display:block;
-  color:var(--muted);
-  margin:12px 0 6px;
-}
-input,select,button{
-  font:inherit;
-  border-radius:9px;
-}
-input,select{
-  width:100%;
-  background:#0b1627;
-  color:white;
-  padding:12px;
-  border:1px solid #3b526d;
-}
-button{
-  background:#1b3048;
-  color:white;
-  padding:11px;
-  border:1px solid #3b526d;
-  cursor:pointer;
-}
-button.active{
-  color:var(--green);
-  border-color:var(--green);
-}
-button:disabled{opacity:.5}
-.primary{
-  width:100%;
-  background:var(--green);
-  color:#06241e;
-  border:none;
-  font-weight:900;
-  padding:15px;
-  margin-top:14px;
-}
-.chartbox{
-  position:relative;
-  height:430px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  overflow:hidden;
-}
+body{margin:0;background:var(--bg);color:var(--text);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{padding:16px;background:#0d1727;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.logo{font-size:20px;font-weight:900}.logo span{color:var(--green)}
+.badge{color:var(--gold);border:1px solid #665632;border-radius:20px;padding:7px;font-size:11px}
+main{max-width:1150px;margin:auto;padding:12px}
+.panel{background:linear-gradient(145deg,#16263d,#0f1929);border:1px solid var(--border);border-radius:15px;padding:15px;margin-bottom:13px}
+h1{font-size:22px;margin:0 0 8px}h2{font-size:18px;margin:0 0 12px}
+p{line-height:1.55}.muted{color:var(--muted)}.green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.metric{background:var(--card);border:1px solid var(--border);padding:12px;border-radius:11px;overflow-wrap:anywhere}
+.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric strong{font-size:17px}
+label{display:block;color:var(--muted);margin:12px 0 6px}
+input,select,button{font:inherit;border-radius:9px}
+input,select{width:100%;background:#0b1627;color:white;padding:12px;border:1px solid #3b526d}
+button{background:#1b3048;color:white;padding:11px;border:1px solid #3b526d;cursor:pointer}
+button.active{color:var(--green);border-color:var(--green)}button:disabled{opacity:.5}
+.primary{width:100%;background:var(--green);color:#06241e;border:none;font-weight:900;padding:15px;margin-top:14px}
+.chartbox{position:relative;height:430px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
 #chart{width:100%;height:100%}
-.overlay{
-  position:absolute;
-  inset:0;
-  background:#0b1422ee;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:15px;
-  color:var(--muted);
-}
+.overlay{position:absolute;inset:0;background:#0b1422ee;display:flex;justify-content:center;align-items:center;text-align:center;padding:15px;color:var(--muted);z-index:2}
 .hidden{display:none!important}
-.toolbar{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-.toolbar button{font-size:12px}
-.card{
-  background:#0d1a2b;
-  border:1px solid var(--border);
-  border-radius:11px;
-  padding:14px;
-  margin-top:10px;
-}
-.notice{
-  background:#14283e;
-  border-left:3px solid var(--blue);
-  padding:12px;
-  border-radius:8px;
-}
-.status{
-  padding:12px 0;
-  overflow-wrap:anywhere;
-}
-footer{
-  text-align:center;
-  color:var(--muted);
-  padding:25px;
-}
-@media(min-width:700px){
-  .chartbox{height:580px}
-  .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.toolbar button{font-size:12px}
+.card{background:#0d1a2b;border:1px solid var(--border);border-radius:11px;padding:14px;margin-top:10px}
+.notice{background:#14283e;border-left:3px solid var(--blue);padding:12px;border-radius:8px}
+.status{padding:12px 0;overflow-wrap:anywhere}
+.signal-title{font-size:25px;font-weight:900;margin:0 0 8px}
+.pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#25384d;margin:4px 4px 4px 0;font-size:12px}
+footer{text-align:center;color:var(--muted);padding:25px}
+@media(min-width:700px){.chartbox{height:580px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 </head>
-
 <body>
-
 <header>
   <div class="logo">YOYO <span>TRADE PRO</span></div>
-  <div class="badge">V2 · 3 STRATEGIES</div>
+  <div class="badge">V3 · 4 STRATEGIES</div>
 </header>
-
 <main>
-
 <section class="panel">
   <h1>Professional Trading Dashboard</h1>
-  <p class="muted">
-    Hyperliquid Perpetuals · 15m Entry · 1H Confirmation
-  </p>
-  <div class="notice">
-    <b class="green">LIVE LONG / SHORT / WAIT</b><br>
-    Completed candles only. No automatic trading.
-    Historical signals are not displayed as live entries.
+  <p class="muted">Hyperliquid Perpetuals · Multi-Timeframe Analysis · No Auto Trading</p>
+  <div class="notice"><b class="green">LONG / SHORT / WAIT</b><br>
+    Manual analysis provides a trade plan. Only fully confirmed, fresh signals are marked CONFIRMED.
   </div>
 </section>
 
 <section class="panel">
   <h2>Market & Strategy</h2>
-
-  <label>Search Market</label>
+  <label>Search Hyperliquid Market</label>
   <input id="search" placeholder="SOL, XRP, HYPE...">
-
   <div class="grid">
-    <div>
-      <label>Market</label>
-      <select id="market">
-        <option value="SOL">SOL</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Strategy</label>
+    <div><label>Market</label><select id="market"><option value="SOL">SOL</option></select></div>
+    <div><label>Strategy</label>
       <select id="strategy">
         <option value="monday">Monday Range</option>
         <option value="ema13">EMA13 / EMA89</option>
-        <option value="ema9">EMA9 / EMA21 Cross</option>
+        <option value="ema21">EMA21 Trend</option>
+        <option value="cross">EMA9 / EMA21 Cross</option>
       </select>
     </div>
-
-    <div>
-      <label>Timeframe</label>
+    <div><label>Chart Timeframe</label>
       <select id="tf">
-        <option value="15m">15m</option>
+        <option value="1m">1m</option>
+        <option value="5m">5m</option>
+        <option value="15m" selected>15m</option>
         <option value="1h">1H</option>
         <option value="4h">4H</option>
+        <option value="1d">1D</option>
+        <option value="1w">1W</option>
+        <option value="1M">1M</option>
       </select>
     </div>
-
-    <div>
-      <label>Week</label>
+    <div><label>Analysis Mode</label>
+      <select id="mode">
+        <option value="single">Single Timeframe</option>
+        <option value="multi" selected>Multi Timeframe (15m + 1H)</option>
+      </select>
+    </div>
+    <div><label>Monday Range Week</label>
       <select id="week">
         <option value="0">Current Week</option>
         <option value="1">Previous Week</option>
       </select>
     </div>
   </div>
-
-  <div id="status" class="status muted">
-    Connecting...
-  </div>
-
-  <button id="analyze" class="primary">
-    ANALYZE MARKET →
-  </button>
+  <div id="status" class="status muted">Connecting...</div>
+  <button id="analyze" class="primary">ANALYZE NOW →</button>
 </section>
 
 <section class="panel">
   <h2>Trading Chart</h2>
-
   <div class="toolbar" id="toolbar">
     <button data-tool="cursor" class="active">Cursor</button>
     <button data-tool="trend">Trendline</button>
@@ -257,62 +111,40 @@ footer{
     <button id="zoomOut">Zoom −</button>
     <button id="fullscreen">Full Screen</button>
   </div>
-
-  <p id="toolHelp" class="muted">
-    Select a drawing tool and tap the chart.
-  </p>
-
+  <p id="toolHelp" class="muted">Select a drawing tool and tap the chart.</p>
   <div class="chartbox" id="chartbox">
     <div id="chart"></div>
-    <div id="overlay" class="overlay">
-      Select market and tap Analyze.
-    </div>
+    <div id="overlay" class="overlay">Select market and tap Analyze.</div>
   </div>
-
   <p id="legend" class="muted"></p>
 </section>
 
 <section class="panel">
-  <h2>Live Trading Signal</h2>
-  <div id="result" class="card">
-    No analysis yet.
-  </div>
+  <h2>Trading Signal & Risk Plan</h2>
+  <div id="result" class="card">No analysis yet.</div>
 </section>
 
 <section class="panel">
   <h2>Monday Trading Range</h2>
-
   <div class="grid">
-    <div class="metric">
-      <small>MONDAY HIGH</small>
-      <strong id="monHigh">—</strong>
-    </div>
-
-    <div class="metric">
-      <small>MONDAY LOW</small>
-      <strong id="monLow">—</strong>
-    </div>
-
-    <div class="metric">
-      <small>LAST CLOSE</small>
-      <strong id="lastClose">—</strong>
-    </div>
-
-    <div class="metric">
-      <small>NEW YORK TIME</small>
-      <strong id="lastTime">—</strong>
-    </div>
+    <div class="metric"><small>MONDAY HIGH</small><strong id="monHigh">—</strong></div>
+    <div class="metric"><small>MONDAY LOW</small><strong id="monLow">—</strong></div>
+    <div class="metric"><small>LAST CLOSE</small><strong id="lastClose">—</strong></div>
+    <div class="metric"><small>NEW YORK TIME</small><strong id="lastTime">—</strong></div>
   </div>
 </section>
 
 <section class="panel">
+  <h2>EMA9 / EMA21 Confirmed Alert Check</h2>
+  <p class="muted">15m completed cross · 1H trend · Volume ≥ 1.2× · Minimum TP1 = 2R.</p>
+  <button id="checkAlert" class="primary">CHECK CONFIRMED SIGNAL →</button>
+  <div id="alertResult" class="card muted">No alert check yet.</div>
+  <p class="muted">This button checks the selected market only. Background phone push and Telegram require a hosted server.</p>
+</section>
+
+<section class="panel">
   <h2>Multi-Market Scanner</h2>
-
-  <p class="muted">
-    Scans markets while this webpage remains open.
-    Background push notifications are not yet enabled.
-  </p>
-
+  <p class="muted">Scans Hyperliquid markets while this page remains open. Large scans may take time or hit API limits.</p>
   <label>Markets to scan</label>
   <select id="scanCount">
     <option value="5">5 Markets</option>
@@ -320,1207 +152,391 @@ footer{
     <option value="20">20 Markets</option>
     <option value="all">ALL Markets</option>
   </select>
-
-  <button id="scanBtn" class="primary">
-    SCAN MARKETS →
-  </button>
-
+  <button id="scanBtn" class="primary">SCAN MARKETS →</button>
   <p id="scanStatus" class="muted">Scanner ready.</p>
   <div id="scanResults"></div>
 </section>
-
 </main>
 
-<footer>
-  YOYO TRADE PRO © 2026<br>
-  Educational research · No automatic execution
-</footer>
+<footer>YOYO TRADE PRO © 2026<br>Educational research · No automatic execution</footer>
 
 <script>
 "use strict";
-
-const API = "https://api.hyperliquid.xyz/info";
-
-const $ = id => document.getElementById(id);
-
-const MIN = 60000;
-const HOUR = 60 * MIN;
-const DAY = 24 * HOUR;
-
-let markets = ["SOL"];
-let chart = null;
-let candleSeries = null;
-let extraSeries = [];
-let priceLines = [];
-let drawings = [];
-let bars = [];
-let cache = null;
-let tool = "cursor";
-let firstPoint = null;
-let busy = false;
-
-function fmt(n) {
-  if (!Number.isFinite(n)) return "—";
-
-  return Number(n).toLocaleString("en-US", {
-    maximumFractionDigits:
-      Math.abs(n) < 1 ? 6 :
-      Math.abs(n) < 100 ? 4 : 2
-  });
+const API="https://api.hyperliquid.xyz/info";
+const $=id=>document.getElementById(id);
+const MIN=60000,HOUR=60*MIN,DAY=24*HOUR;
+const TFMS={"1m":MIN,"5m":5*MIN,"15m":15*MIN,"1h":HOUR,"4h":4*HOUR,"1d":DAY,"1w":7*DAY};
+let markets=["SOL"],chart=null,candleSeries=null,extraSeries=[],priceLines=[],drawings=[],bars=[];
+let cache=null,tool="cursor",firstPoint=null,busy=false,chartCoin="",chartTf="";
+function fmt(n){
+  if(!Number.isFinite(n))return "—";
+  return Number(n).toLocaleString("en-US",{maximumFractionDigits:Math.abs(n)<1?7:Math.abs(n)<100?4:2});
 }
-
-function et(ms) {
-  return new Date(ms).toLocaleString("en-US", {
-    timeZone: "America/New_York",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short"
-  });
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function api(body) {
-  const controller = new AbortController();
-
-  const timer = setTimeout(
-    () => controller.abort(),
-    15000
-  );
-
-  try {
-    const response = await fetch(API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error("HTTP " + response.status);
-    }
-
+function et(ms){return new Date(ms).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"});}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function status(s,cls="muted"){$("status").textContent=s;$("status").className="status "+cls;}
+async function api(body){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
+  try{
+    const response=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:controller.signal});
+    if(!response.ok)throw Error("HTTP "+response.status);
     return await response.json();
-
-  } finally {
-    clearTimeout(timer);
-  }
+  }finally{clearTimeout(timer);}
 }
-
-async function loadMarkets() {
-  try {
-    const meta = await api({type:"meta"});
-
-    markets = (meta.universe || [])
-      .filter(x => !x.isDelisted)
-      .map(x => x.name)
-      .sort();
-
+async function loadMarkets(){
+  try{
+    const meta=await api({type:"meta"});
+    markets=(meta.universe||[]).filter(x=>!x.isDelisted).map(x=>x.name).sort();
+    if(!markets.length)throw Error("No markets returned");
     updateMarkets();
-
-    $("status").textContent =
-      "● Connected · " + markets.length + " markets";
-
-    $("status").className = "status green";
-
-  } catch (e) {
-    $("status").textContent =
-      "Connection error: " + e.message;
-  }
+    status("● Connected · "+markets.length+" markets","green");
+  }catch(e){status("Connection error: "+e.message,"red");}
 }
-
-function updateMarkets() {
-  const q = $("search").value.trim().toUpperCase();
-  const current = $("market").value;
-
-  const filtered = markets.filter(
-    x => x.toUpperCase().includes(q)
-  );
-
+function updateMarkets(){
+  const q=$("search").value.trim().toUpperCase(),current=$("market").value;
+  const filtered=markets.filter(x=>x.toUpperCase().includes(q));
   $("market").replaceChildren();
-
-  for (const name of filtered) {
-    const option = document.createElement("option");
-    option.value = name;
-    option.textContent = name;
-    $("market").appendChild(option);
-  }
-
-  if (filtered.includes(current)) {
-    $("market").value = current;
-  } else if (filtered.includes("SOL")) {
-    $("market").value = "SOL";
-  }
+  for(const name of filtered){const o=document.createElement("option");o.value=name;o.textContent=name;$("market").appendChild(o);}
+  if(filtered.includes(current))$("market").value=current;
+  else if(filtered.includes("SOL"))$("market").value="SOL";
+  else if(filtered.length)$("market").value=filtered[0];
 }
-
-function mondayStart(offset = 0) {
-  const now = new Date();
-
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short"
-  }).formatToParts(now);
-
-  const get = type =>
-    parts.find(x => x.type === type)?.value;
-
-  const y = Number(get("year"));
-  const m = Number(get("month"));
-  const d = Number(get("day"));
-
-  const weekdays = {
-    Mon:0, Tue:1, Wed:2, Thu:3,
-    Fri:4, Sat:5, Sun:6
-  };
-
-  const shift = weekdays[get("weekday")] || 0;
-
-  const day = new Date(
-    Date.UTC(y, m - 1, d - shift - offset * 7)
-  );
-
-  const date = day.toISOString().slice(0,10);
-
-  const hour = new Date(
-    date + "T12:00:00Z"
-  ).toLocaleString("en-US", {
-    timeZone:"America/New_York",
-    hour:"numeric",
-    hour12:false
-  });
-
-  const utcOffset = Number(hour) === 8 ? 4 : 5;
-
-  return Date.UTC(
-    day.getUTCFullYear(),
-    day.getUTCMonth(),
-    day.getUTCDate(),
-    utcOffset
-  );
+function nyParts(ms){
+  const p=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",weekday:"short"}).formatToParts(new Date(ms));
+  const get=k=>p.find(x=>x.type===k)?.value;
+  return {y:+get("year"),m:+get("month"),d:+get("day"),w:get("weekday")};
 }
-
-async function fetchCandles(coin, interval, start, end) {
-  const raw = await api({
-    type: "candleSnapshot",
-    req: {
-      coin,
-      interval,
-      startTime: start,
-      endTime: end
-    }
-  });
-
-  const duration = {
-    "15m":15*MIN,
-    "1h":HOUR,
-    "4h":4*HOUR
-  }[interval];
-
-  const now = Date.now();
-
-  return (raw || [])
-    .map(x => ({
-      t: Number(x.t),
-      T: Number(x.T),
-      o: Number(x.o),
-      h: Number(x.h),
-      l: Number(x.l),
-      c: Number(x.c),
-      v: Number(x.v)
-    }))
-    .filter(x =>
-      Number.isFinite(x.c) &&
-      x.t + duration <= now
-    )
-    .sort((a,b) => a.t - b.t);
+function mondayStart(offset=0){
+  const p=nyParts(Date.now()),w={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[p.w]||0;
+  const d=new Date(Date.UTC(p.y,p.m-1,p.d-w-offset*7));
+  const y=d.getUTCFullYear(),m=d.getUTCMonth(),day=d.getUTCDate();
+  const probe=new Date(Date.UTC(y,m,day,12));
+  const nyHour=+new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",hourCycle:"h23"}).format(probe);
+  return Date.UTC(y,m,day,nyHour===8?4:5);
 }
-
-function ema(values, period) {
-  const result = Array(values.length).fill(null);
-
-  if (values.length < period) return result;
-
-  let sum = 0;
-
-  for (let i=0; i<period; i++) {
-    sum += values[i];
+async function fetchCandles(coin,interval,start,end){
+  const raw=await api({type:"candleSnapshot",req:{coin,interval,startTime:start,endTime:end}});
+  const now=Date.now(),duration=TFMS[interval]||0;
+  return (raw||[]).map(x=>({t:+x.t,T:+x.T,o:+x.o,h:+x.h,l:+x.l,c:+x.c,v:+x.v}))
+    .filter(x=>Number.isFinite(x.c)&&Number.isFinite(x.t)&&x.t+duration<=now)
+    .sort((a,b)=>a.t-b.t);
+}
+function ema(values,period){
+  const out=Array(values.length).fill(null);if(values.length<period)return out;
+  let sum=0;for(let i=0;i<period;i++)sum+=values[i];
+  let prev=sum/period;out[period-1]=prev;const k=2/(period+1);
+  for(let i=period;i<values.length;i++){prev=values[i]*k+prev*(1-k);out[i]=prev;}
+  return out;
+}
+function avgVolume(c,i,count=20){
+  if(i<count)return null;
+  let sum=0;for(let j=i-count;j<i;j++)sum+=c[j].v;
+  return sum/count;
+}
+function atr(c,period=14){
+  if(c.length<period+2)return null;
+  let sum=0;
+  for(let i=c.length-period;i<c.length;i++){
+    const x=c[i],p=c[i-1];
+    sum+=Math.max(x.h-x.l,Math.abs(x.h-p.c),Math.abs(x.l-p.c));
   }
-
-  let previous = sum / period;
-
-  result[period-1] = previous;
-
-  const k = 2 / (period+1);
-
-  for (let i=period; i<values.length; i++) {
-    previous =
-      values[i] * k + previous * (1-k);
-
-    result[i] = previous;
-  }
-
-  return result;
+  return sum/period;
 }
-
-function avgVolume(candles, index, count=20) {
-  if (index < count) return null;
-
-  let total = 0;
-
-  for (let i=index-count; i<index; i++) {
-    total += candles[i].v;
-  }
-
-  return total / count;
-}
-
-function atr(candles, period=14) {
-  if (candles.length < period+2) return null;
-
-  const values = [];
-
-  for (let i=1; i<candles.length; i++) {
-    const c = candles[i];
-    const p = candles[i-1];
-
-    values.push(Math.max(
-      c.h-c.l,
-      Math.abs(c.h-p.c),
-      Math.abs(c.l-p.c)
-    ));
-  }
-
-  return values
-    .slice(-period)
-    .reduce((a,b)=>a+b,0) / period;
-}
-
-async function loadData(coin, offset=0) {
-  const monday = mondayStart(offset);
-
-  const end = offset
-    ? monday + 7*DAY
-    : Date.now();
-
-  const [m15,h1,h4] = await Promise.all([
-    fetchCandles(
-      coin,"15m",
-      monday-10*DAY,end
-    ),
-    fetchCandles(
-      coin,"1h",
-      monday-12*DAY,end
-    ),
-    fetchCandles(
-      coin,"4h",
-      monday-60*DAY,end
-    )
+function last(a){return a[a.length-1];}
+async function loadData(coin,tf="15m",offset=0){
+  const monday=mondayStart(offset),now=Date.now();
+  const end=offset?Math.min(now,monday+7*DAY):now;
+  const start15=Math.max(monday-10*DAY,end-14*DAY);
+  const [m15,h1]=await Promise.all([
+    fetchCandles(coin,"15m",start15,end),
+    fetchCandles(coin,"1h",end-35*DAY,end)
   ]);
-
-  if (m15.length < 100) {
-    throw Error("Not enough 15m candles");
+  if(m15.length<100)throw Error("Not enough 15m candles");
+  const mondayBars=m15.filter(x=>x.t>=monday&&x.t<monday+DAY);
+  const high=mondayBars.length?Math.max(...mondayBars.map(x=>x.h)):null;
+  const low=mondayBars.length?Math.min(...mondayBars.map(x=>x.l)):null;
+  let view=m15;
+  if(tf==="1h")view=h1;
+  else if(tf==="1M"){
+    view=await fetchCandles(coin,"1M",now-1100*DAY,now);
+  }else if(tf!=="15m"){
+    view=await fetchCandles(coin,tf,now-(tf==="1w"?750:tf==="1d"?365:tf==="4h"?100:tf==="1m"?2:tf==="5m"?7:30)*DAY,now);
   }
-
-  const mondayBars = m15.filter(c =>
-    c.t >= monday &&
-    c.t < monday + DAY
-  );
-
-  const high = mondayBars.length
-    ? Math.max(...mondayBars.map(x=>x.h))
-    : null;
-
-  const low = mondayBars.length
-    ? Math.min(...mondayBars.map(x=>x.l))
-    : null;
-
-  return {
-    coin,
-    monday,
-    end,
-    m15,
-    h1,
-    h4,
-    high,
-    low,
-    last:m15.at(-1)
-  };
+  if(!view.length)throw Error("No chart candles for "+tf);
+  return {coin,monday,end,m15,h1,view,high,low,last:last(m15)};
 }
-
-function makeSignal(data,side,entry,stop,strategy) {
-  if (!Number.isFinite(entry) ||
-      !Number.isFinite(stop)) return null;
-
-  const risk = Math.abs(entry-stop);
-
-  if (risk <= 0) return null;
-
-  if (side==="LONG" && stop>=entry) return null;
-  if (side==="SHORT" && stop<=entry) return null;
-
-  if (risk/entry > 0.07) return null;
-
-  const sign = side==="LONG" ? 1 : -1;
-
-  return {
-    coin:data.coin,
-    side,
-    strategy,
-    entry,
-    stop,
-    tp1:entry+sign*2*risk,
-    tp2:entry+sign*3*risk,
-    tp3:entry+sign*4*risk,
-    time:data.last.t,
-    fresh:
-      Date.now()-data.last.T <= 30*MIN &&
-      Date.now() >= data.last.T
-  };
+function signal(data,side,entry,stop,strategy,confirmed=false,reason=""){
+  if(!Number.isFinite(entry)||!Number.isFinite(stop)||entry<=0)return null;
+  const risk=Math.abs(entry-stop),sign=side==="LONG"?1:-1;
+  if(risk<=0||(side==="LONG"&&stop>=entry)||(side==="SHORT"&&stop<=entry))return null;
+  if(risk/entry>0.07)return null;
+  return {coin:data.coin,side,entry,stop,tp1:entry+sign*2*risk,tp2:entry+sign*3*risk,tp3:entry+sign*4*risk,
+    strategy,confirmed,reason,time:data.last.T,fresh:Date.now()-data.last.T<=30*MIN};
 }
-
-function mondaySignal(data) {
-  const c = data.m15;
-  const n = c.length;
-
-  if (!Number.isFinite(data.high) ||
-      !Number.isFinite(data.low)) return null;
-
-  if (n < 25) return null;
-
-  const a = c[n-3];
-  const b = c[n-2];
-  const last = c[n-1];
-
-  if (last.t < data.monday+DAY) return null;
-
-  const volume = avgVolume(c,n-1);
-
-  if (!volume || last.v < volume) return null;
-
-  const volatility = atr(c) || last.c*0.01;
-
-  const longConfirmed =
-    a.l < data.high &&
-    b.c > data.high &&
-    last.c > data.high &&
-    last.c > last.o;
-
-  const shortConfirmed =
-    a.h > data.low &&
-    b.c < data.low &&
-    last.c < data.low &&
-    last.c < last.o;
-
-  if (longConfirmed) {
-    return makeSignal(
-      data,
-      "LONG",
-      last.c,
-      Math.min(a.l,b.l,last.l)-0.15*volatility,
-      "Monday Range"
-    );
-  }
-
-  if (shortConfirmed) {
-    return makeSignal(
-      data,
-      "SHORT",
-      last.c,
-      Math.max(a.h,b.h,last.h)+0.15*volatility,
-      "Monday Range"
-    );
-  }
-
-  return null;
+function plan(data,side,strategy,confirmed=false,reason=""){
+  const c=data.m15,close=last(c).c,a=atr(c)||close*.008;
+  const recent=c.slice(-6),lo=Math.min(...recent.map(x=>x.l)),hi=Math.max(...recent.map(x=>x.h));
+  const stop=side==="LONG"?Math.min(lo,close-1.3*a)-.15*a:Math.max(hi,close+1.3*a)+.15*a;
+  return signal(data,side,close,stop,strategy,confirmed,reason);
 }
-
-function ema13Signal(data) {
-  const c = data.m15;
-  const h = data.h1;
-
-  if (c.length < 100 || h.length < 100) {
-    return null;
-  }
-
-  const closes = c.map(x=>x.c);
-  const hc = h.map(x=>x.c);
-
-  const e13 = ema(closes,13);
-  const e89 = ema(closes,89);
-  const he13 = ema(hc,13);
-  const he89 = ema(hc,89);
-
-  const i = c.length-1;
-  const j = h.length-1;
-
-  const last = c[i];
-
-  const volume = avgVolume(c,i);
-
-  if (!volume || last.v < volume*1.2) {
-    return null;
-  }
-
-  const volatility = atr(c) || last.c*0.01;
-
-  const up =
-    last.c > e89[i] &&
-    e13[i] > e89[i] &&
-    h[j].c > he89[j] &&
-    he13[j] > he89[j];
-
-  const down =
-    last.c < e89[i] &&
-    e13[i] < e89[i] &&
-    h[j].c < he89[j] &&
-    he13[j] < he89[j];
-
-  const pullbackLong = c
-    .slice(-5,-1)
-    .some((x,k) =>
-      x.l <= e13[i-4+k]*1.002
-    );
-
-  const pullbackShort = c
-    .slice(-5,-1)
-    .some((x,k) =>
-      x.h >= e13[i-4+k]*0.998
-    );
-
-  if (up &&
-      pullbackLong &&
-      last.c > e13[i] &&
-      last.c > last.o) {
-
-    return makeSignal(
-      data,
-      "LONG",
-      last.c,
-      Math.min(...c.slice(-5).map(x=>x.l))
-        -0.15*volatility,
-      "EMA13 / EMA89"
-    );
-  }
-
-  if (down &&
-      pullbackShort &&
-      last.c < e13[i] &&
-      last.c < last.o) {
-
-    return makeSignal(
-      data,
-      "SHORT",
-      last.c,
-      Math.max(...c.slice(-5).map(x=>x.h))
-        +0.15*volatility,
-      "EMA13 / EMA89"
-    );
-  }
-
-  return null;
-}
-
-function ema9Signal(data) {
-  const c = data.m15;
-  const h = data.h1;
-
-  if (c.length < 35 || h.length < 35) {
-    return null;
-  }
-
-  const closes = c.map(x=>x.c);
-  const hc = h.map(x=>x.c);
-
-  const e9 = ema(closes,9);
-  const e21 = ema(closes,21);
-
-  const he9 = ema(hc,9);
-  const he21 = ema(hc,21);
-
-  const i = c.length-1;
-  const j = h.length-1;
-
-  const last = c[i];
-  const prev = c[i-1];
-
-  const crossUp =
-    e9[i-1] <= e21[i-1] &&
-    e9[i] > e21[i] &&
-    prev.c <= e21[i-1] &&
-    last.c > e21[i];
-
-  const crossDown =
-    e9[i-1] >= e21[i-1] &&
-    e9[i] < e21[i] &&
-    prev.c >= e21[i-1] &&
-    last.c < e21[i];
-
-  if (!crossUp && !crossDown) return null;
-
-  const volume = avgVolume(c,i);
-
-  const volumeConfirmed =
-    volume && last.v >= volume*1.2;
-
-  const trendUp =
-    h[j].c > he21[j] &&
-    he9[j] > he21[j];
-
-  const trendDown =
-    h[j].c < he21[j] &&
-    he9[j] < he21[j];
-
-  const volatility = atr(c) || last.c*0.01;
-
-  const side = crossUp ? "LONG" : "SHORT";
-
-  if (!volumeConfirmed ||
-      (crossUp && !trendUp) ||
-      (crossDown && !trendDown)) {
-
-    return {
-      coin:data.coin,
-      side,
-      strategy:"EMA9 / EMA21",
-      watch:true,
-      time:last.t,
-      fresh:Date.now()-last.T <= 30*MIN
-    };
-  }
-
-  if (crossUp && last.c > last.o) {
-    return makeSignal(
-      data,
-      "LONG",
-      last.c,
-      Math.min(...c.slice(-5).map(x=>x.l))
-        -0.15*volatility,
-      "EMA9 / EMA21"
-    );
-  }
-
-  if (crossDown && last.c < last.o) {
-    return makeSignal(
-      data,
-      "SHORT",
-      last.c,
-      Math.max(...c.slice(-5).map(x=>x.h))
-        +0.15*volatility,
-      "EMA9 / EMA21"
-    );
-  }
-
-  return {
-    coin:data.coin,
-    side,
-    strategy:"EMA9 / EMA21",
-    watch:true,
-    time:last.t,
-    fresh:Date.now()-last.T <= 30*MIN
-  };
-}
-
-function getSignal(data,mode) {
-  if (mode==="monday") return mondaySignal(data);
-  if (mode==="ema13") return ema13Signal(data);
-  return ema9Signal(data);
-}
-
-function metric(label,value,color="") {
-  return `
-    <div class="metric">
-      <small>${label}</small>
-      <strong class="${color}">${value}</strong>
-    </div>
-  `;
-}
-
-function renderSignal(data,signal) {
-  if (!signal || !signal.fresh) {
-    $("result").innerHTML = `
-      <div class="muted">
-        <strong>WAIT — NO FRESH CONFIRMED SIGNAL</strong>
-        <p>
-          No qualifying setup on the latest completed
-          15m candle. Do not chase historical entries.
-        </p>
-      </div>
-    `;
-    return;
-  }
-
-  if (signal.watch) {
-    $("result").innerHTML = `
-      <h2 class="gold">
-        WATCH ${signal.side}
-      </h2>
-      <p>
-        EMA9/21 cross detected.
-        Waiting for full confirmation.
-      </p>
-      <p class="muted">${et(data.last.T)}</p>
-    `;
-    return;
-  }
-
-  const color = signal.side==="LONG" ? "green" : "red";
-
-  $("result").innerHTML = `
-    <h2 class="${color}">
-      LIVE ${signal.side}
-    </h2>
-
-    <p class="muted">
-      ${signal.strategy} · ${et(data.last.T)}
-    </p>
-
-    <div class="grid">
-      ${metric("ENTRY",fmt(signal.entry),"gold")}
-      ${metric("STOP LOSS",fmt(signal.stop),"red")}
-      ${metric("TP1 · 2R",fmt(signal.tp1),"green")}
-      ${metric("TP2 · 3R",fmt(signal.tp2),"green")}
-      ${metric("TP3 · 4R",fmt(signal.tp3),"green")}
-    </div>
-
-    <p class="muted">
-      Confirm price before trading.
-      Signal does not guarantee profit.
-    </p>
-  `;
-}
-
-function createChart() {
-  if (chart) return;
-
-  if (!window.LightweightCharts) {
-    throw Error("Chart library unavailable");
-  }
-
-  chart = LightweightCharts.createChart($("chart"),{
-    width:$("chart").clientWidth,
-    height:$("chart").clientHeight,
-    layout:{
-      background:{
-        type:"solid",
-        color:"#0b1422"
-      },
-      textColor:"#a1b2c8"
-    },
-    grid:{
-      vertLines:{color:"#1b2a3c"},
-      horzLines:{color:"#1b2a3c"}
-    },
-    timeScale:{
-      timeVisible:true
+function chooseSide(data,mode="multi",strategy="cross"){
+  const c=data.m15,h=data.h1,cl=c.map(x=>x.c),hc=h.map(x=>x.c),i=c.length-1,j=h.length-1;
+  const a=ema(cl,strategy==="ema13"?13:strategy==="ema21"?21:9);
+  const b=ema(cl,strategy==="ema13"?89:strategy==="ema21"?89:21);
+  const current=last(c);
+  if(mode==="single")return current.c>=a[i]?"LONG":"SHORT";
+  if(h.length>=90){
+    const ha=ema(hc,strategy==="ema13"?13:strategy==="ema21"?21:9);
+    const hb=ema(hc,strategy==="ema13"?89:strategy==="ema21"?89:21);
+    if(Number.isFinite(ha[j])&&Number.isFinite(hb[j])){
+      if(ha[j]>hb[j]&&current.c>a[i])return "LONG";
+      if(ha[j]<hb[j]&&current.c<a[i])return "SHORT";
     }
-  });
-
-  candleSeries = chart.addCandlestickSeries({
-    upColor:"#21d6a5",
-    downColor:"#ff627d",
-    borderUpColor:"#21d6a5",
-    borderDownColor:"#ff627d",
-    wickUpColor:"#21d6a5",
-    wickDownColor:"#ff627d"
-  });
-
-  chart.subscribeClick(onChartClick);
-
-  new ResizeObserver(() => {
-    chart.applyOptions({
-      width:$("chart").clientWidth,
-      height:$("chart").clientHeight
-    });
-  }).observe($("chart"));
+  }
+  return current.c>=a[i]?"LONG":"SHORT";
 }
-
-function clearChartExtras() {
-  if (!chart) return;
-
-  for (const s of extraSeries) {
-    chart.removeSeries(s);
+function getSignal(data,strategy,mode="multi"){
+  const c=data.m15,h=data.h1,i=c.length-1,j=h.length-1,x=last(c),vol=avgVolume(c,i),volOK=!!vol&&x.v>=1.2*vol;
+  let side=chooseSide(data,mode,strategy),confirmed=false,reason="";
+  if(strategy==="monday"){
+    if(Number.isFinite(data.high)&&Number.isFinite(data.low)&&x.t>=data.monday+DAY){
+      if(x.c>data.high&&c[i-1].c<=data.high){side="LONG";confirmed=volOK&&x.c>x.o;}
+      else if(x.c<data.low&&c[i-1].c>=data.low){side="SHORT";confirmed=volOK&&x.c<x.o;}
+      reason=confirmed?"Monday range breakout confirmed":"Monday range breakout not fully confirmed";
+    }else reason="Monday range not ready";
+  }else if(strategy==="ema13"){
+    const e13=ema(c.map(x=>x.c),13),e89=ema(c.map(x=>x.c),89);
+    const he13=ema(h.map(x=>x.c),13),he89=ema(h.map(x=>x.c),89);
+    const up=e13[i]>e89[i]&&x.c>e89[i],down=e13[i]<e89[i]&&x.c<e89[i];
+    const hup=h.length>=90&&he13[j]>he89[j]&&h[j].c>he89[j];
+    const hdown=h.length>=90&&he13[j]<he89[j]&&h[j].c<he89[j];
+    const pbLong=c.slice(-5,-1).some((v,k)=>v.l<=(e13[i-4+k]||0)*1.002);
+    const pbShort=c.slice(-5,-1).some((v,k)=>v.h>=(e13[i-4+k]||Infinity)*.998);
+    if(up){side="LONG";confirmed=volOK&&pbLong&&x.c>x.o&&(mode==="single"||hup);}
+    else if(down){side="SHORT";confirmed=volOK&&pbShort&&x.c<x.o&&(mode==="single"||hdown);}
+    reason=confirmed?"EMA13/89 pullback confirmed":"Trend or pullback / volume not fully confirmed";
+  }else if(strategy==="ema21"){
+    const e21=ema(c.map(x=>x.c),21),he21=ema(h.map(x=>x.c),21);
+    const up=x.c>e21[i]&&e21[i]>e21[i-1];
+    const down=x.c<e21[i]&&e21[i]<e21[i-1];
+    const hup=h.length>=23&&h[j].c>he21[j],hdown=h.length>=23&&h[j].c<he21[j];
+    if(up){side="LONG";confirmed=volOK&&x.c>x.o&&(mode==="single"||hup);}
+    else if(down){side="SHORT";confirmed=volOK&&x.c<x.o&&(mode==="single"||hdown);}
+    reason=confirmed?"EMA21 trend confirmed":"EMA21 trend / volume not fully confirmed";
+  }else{
+    const e9=ema(c.map(x=>x.c),9),e21=ema(c.map(x=>x.c),21);
+    const he9=ema(h.map(x=>x.c),9),he21=ema(h.map(x=>x.c),21);
+    const crossUp=e9[i-1]<=e21[i-1]&&e9[i]>e21[i];
+    const crossDown=e9[i-1]>=e21[i-1]&&e9[i]<e21[i];
+    const hup=h.length>=23&&he9[j]>he21[j]&&h[j].c>he21[j];
+    const hdown=h.length>=23&&he9[j]<he21[j]&&h[j].c<he21[j];
+    if(crossUp){side="LONG";confirmed=volOK&&x.c>x.o&&(mode==="single"||hup);}
+    else if(crossDown){side="SHORT";confirmed=volOK&&x.c<x.o&&(mode==="single"||hdown);}
+    reason=confirmed?"EMA9/21 fresh cross confirmed":"Fresh EMA9/21 cross / volume / 1H confirmation missing";
   }
-
-  extraSeries = [];
-
-  for (const p of priceLines) {
-    candleSeries.removePriceLine(p);
-  }
-
-  priceLines = [];
-
+  const names={monday:"Monday Range",ema13:"EMA13 / EMA89",ema21:"EMA21 Trend",cross:"EMA9 / EMA21 Cross"};
+  const s=plan(data,side,names[strategy],confirmed,reason);
+  if(s){s.volumeRatio=vol?x.v/vol:null;s.confirmed=s.confirmed&&s.fresh;}
+  return s;
+}
+function metric(label,value,color=""){return `<div class="metric"><small>${label}</small><strong class="${color}">${value}</strong></div>`;}
+function renderSignal(data,s){
+  if(!s){$("result").innerHTML='<h2 class="gold">WAIT</h2><p>No valid risk plan. Stop distance exceeds 7% or data is insufficient.</p>';return;}
+  const color=s.side==="LONG"?"green":"red";
+  const state=s.confirmed?"CONFIRMED":"UNCONFIRMED · RESEARCH ONLY";
+  $("result").innerHTML=`
+    <div class="signal-title ${color}">${s.side} <span class="pill">${state}</span></div>
+    <p class="muted">${s.strategy} · ${et(s.time)}</p>
+    <div class="grid">
+      ${metric("ENTRY",fmt(s.entry),"gold")}
+      ${metric("STOP LOSS",fmt(s.stop),"red")}
+      ${metric("TP1 · 2R",fmt(s.tp1),"green")}
+      ${metric("TP2 · 3R",fmt(s.tp2),"green")}
+      ${metric("TP3 · 4R",fmt(s.tp3),"green")}
+      ${metric("VOLUME",s.volumeRatio?fmt(s.volumeRatio)+"×":"—")}
+    </div>
+    <p class="muted">${s.reason}</p>
+    <p class="muted">This is a hypothetical plan from the last completed 15m close, not a live executable quote. Unconfirmed plans are not trading alerts. No profit is guaranteed.</p>`;
+}
+function createChart(){
+  if(chart)return;
+  if(!window.LightweightCharts)throw Error("Chart library unavailable. Open the hosted site in Safari.");
+  chart=LightweightCharts.createChart($("chart"),{
+    width:$("chart").clientWidth,height:$("chart").clientHeight,
+    layout:{background:{type:"solid",color:"#0b1422"},textColor:"#a1b2c8"},
+    grid:{vertLines:{color:"#1b2a3c"},horzLines:{color:"#1b2a3c"}},
+    timeScale:{timeVisible:true},rightPriceScale:{borderColor:"#30425c"}
+  });
+  candleSeries=chart.addCandlestickSeries({upColor:"#21d6a5",downColor:"#ff627d",borderUpColor:"#21d6a5",borderDownColor:"#ff627d",wickUpColor:"#21d6a5",wickDownColor:"#ff627d"});
+  chart.subscribeClick(onChartClick);
+  if(window.ResizeObserver)new ResizeObserver(()=>chart.applyOptions({width:$("chart").clientWidth,height:$("chart").clientHeight})).observe($("chart"));
+}
+function clearDrawings(){
+  if(!chart)return;
+  for(const s of drawings)chart.removeSeries(s);
+  drawings=[];firstPoint=null;
+}
+function clearChartExtras(){
+  if(!chart)return;
+  for(const s of extraSeries)chart.removeSeries(s);
+  extraSeries=[];
+  for(const p of priceLines)candleSeries.removePriceLine(p);
+  priceLines=[];
   clearDrawings();
 }
-
-function addLine(price,title,color) {
-  if (!Number.isFinite(price)) return;
-
-  const p = candleSeries.createPriceLine({
-    price,
-    title,
-    color,
-    lineWidth:1,
-    lineStyle:LightweightCharts.LineStyle.Dashed,
-    axisLabelVisible:true
-  });
-
-  priceLines.push(p);
+function addLine(price,title,color){
+  if(!Number.isFinite(price))return;
+  priceLines.push(candleSeries.createPriceLine({price,title,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true}));
 }
-
-function addEMA(candles,period,color) {
-  const values = ema(
-    candles.map(x=>x.c),
-    period
-  );
-
-  const series = chart.addLineSeries({
-    color,
-    lineWidth:2,
-    priceLineVisible:false,
-    lastValueVisible:false
-  });
-
-  const points = candles.flatMap((c,i) =>
-    Number.isFinite(values[i])
-      ? [{
-          time:Math.floor(c.t/1000),
-          value:values[i]
-        }]
-      : []
-  );
-
-  series.setData(points);
-  extraSeries.push(series);
+function addEMA(c,period,color){
+  const v=ema(c.map(x=>x.c),period);
+  const s=chart.addLineSeries({color,lineWidth:2,priceLineVisible:false,lastValueVisible:false});
+  s.setData(c.flatMap((x,i)=>Number.isFinite(v[i])?[{time:Math.floor(x.t/1000),value:v[i]}]:[]));
+  extraSeries.push(s);
 }
-
-function drawChart(data,signal) {
-  createChart();
-  clearChartExtras();
-
-  const tf = $("tf").value;
-
-  const candles =
-    tf==="1h" ? data.h1 :
-    tf==="4h" ? data.h4 :
-    data.m15;
-
-  bars = candles.map(c=>({
-    time:Math.floor(c.t/1000),
-    open:c.o,
-    high:c.h,
-    low:c.l,
-    close:c.c
-  }));
-
+function drawChart(data,s){
+  createChart();clearChartExtras();
+  const c=data.view;
+  bars=c.map(x=>({time:Math.floor(x.t/1000),open:x.o,high:x.h,low:x.l,close:x.c}));
   candleSeries.setData(bars);
-  candleSeries.setMarkers([]);
-
-  const mode = $("strategy").value;
-
-  if (mode==="monday") {
-    addLine(data.high,"MON HIGH","#76b4ff");
-    addLine(data.low,"MON LOW","#f5c66a");
-
-    $("legend").textContent =
-      "Monday High / Low";
-
-  } else if (mode==="ema13") {
-    addEMA(candles,13,"#f5c66a");
-    addEMA(candles,89,"#b59bff");
-
-    $("legend").textContent =
-      "EMA13 Gold · EMA89 Purple";
-
-  } else {
-    addEMA(candles,9,"#f5c66a");
-    addEMA(candles,21,"#76b4ff");
-
-    $("legend").textContent =
-      "EMA9 Gold · EMA21 Blue";
+  const strategy=$("strategy").value;
+  if(strategy==="monday"){
+    addLine(data.high,"MON HIGH","#76b4ff");addLine(data.low,"MON LOW","#f5c66a");
+    $("legend").textContent="Monday High / Low";
+  }else if(strategy==="ema13"){
+    addEMA(c,13,"#f5c66a");addEMA(c,89,"#b59bff");$("legend").textContent="EMA13 Gold · EMA89 Purple";
+  }else if(strategy==="ema21"){
+    addEMA(c,21,"#21d6a5");$("legend").textContent="EMA21 Green";
+  }else{
+    addEMA(c,9,"#f5c66a");addEMA(c,21,"#76b4ff");$("legend").textContent="EMA9 Gold · EMA21 Blue";
   }
-
-  if (signal && signal.fresh && !signal.watch) {
-    addLine(signal.entry,"ENTRY","#76b4ff");
-    addLine(signal.stop,"SL","#ff627d");
-    addLine(signal.tp1,"TP1","#21d6a5");
-    addLine(signal.tp2,"TP2","#f5c66a");
-    addLine(signal.tp3,"TP3","#b59bff");
+  if(s){
+    addLine(s.entry,"ENTRY","#76b4ff");
+    addLine(s.stop,"SL","#ff627d");
+    addLine(s.tp1,"TP1","#21d6a5");
+    addLine(s.tp2,"TP2","#f5c66a");
+    addLine(s.tp3,"TP3","#b59bff");
   }
-
   chart.timeScale().fitContent();
-
   $("overlay").classList.add("hidden");
 }
-
-function clearDrawings() {
-  if (!chart) return;
-
-  for (const s of drawings) {
-    chart.removeSeries(s);
-  }
-
-  drawings = [];
-  firstPoint = null;
+function drawSegment(a,b,color){
+  const s=chart.addLineSeries({color,lineWidth:2,priceLineVisible:false,lastValueVisible:false});
+  s.setData([a,b].sort((x,y)=>x.time-y.time));drawings.push(s);
 }
-
-function drawSegment(a,b,color) {
-  const s = chart.addLineSeries({
-    color,
-    lineWidth:2,
-    priceLineVisible:false,
-    lastValueVisible:false
-  });
-
-  s.setData(
-    [a,b].sort((x,y)=>x.time-y.time)
-  );
-
-  drawings.push(s);
+function drawHorizontal(price,color="#76b4ff"){
+  if(bars.length<2)return;
+  drawSegment({time:bars[0].time,value:price},{time:last(bars).time,value:price},color);
 }
-
-function drawHorizontal(price,color="#76b4ff") {
-  if (bars.length < 2) return;
-
-  drawSegment(
-    {time:bars[0].time,value:price},
-    {time:bars.at(-1).time,value:price},
-    color
-  );
+function onChartClick(p){
+  if(tool==="cursor"||!p?.point||typeof p.time!=="number")return;
+  const price=candleSeries.coordinateToPrice(p.point.y);
+  if(!Number.isFinite(price))return;
+  const point={time:p.time,value:price};
+  if(tool==="sr"){drawHorizontal(price);return;}
+  if(!firstPoint){firstPoint=point;$("toolHelp").textContent="Tap second point.";return;}
+  const first=firstPoint;firstPoint=null;
+  if(first.time===point.time)return;
+  if(tool==="trend")drawSegment(first,point,"#f5c66a");
+  if(tool==="fib"){
+    const lo=Math.min(first.value,point.value),hi=Math.max(first.value,point.value);
+    for(const f of [0,.382,.5,.618,1])drawHorizontal(lo+(hi-lo)*f,f===.5?"#f5c66a":"#76b4ff");
+  }
+  if(tool==="long"||tool==="short"){
+    const entry=first.value,risk=Math.abs(point.value-entry),sign=tool==="long"?1:-1;
+    if(!risk)return;
+    drawHorizontal(entry,"#76b4ff");drawHorizontal(entry-sign*risk,"#ff627d");
+    for(const r of [2,3,4])drawHorizontal(entry+sign*r*risk,"#21d6a5");
+  }
+  $("toolHelp").textContent="Drawing added.";
 }
-
-function onChartClick(p) {
-  if (tool==="cursor" ||
-      !p?.point ||
-      typeof p.time!=="number") return;
-
-  const price =
-    candleSeries.coordinateToPrice(p.point.y);
-
-  if (!Number.isFinite(price)) return;
-
-  const point = {
-    time:p.time,
-    value:price
-  };
-
-  if (tool==="sr") {
-    drawHorizontal(price);
-    return;
-  }
-
-  if (!firstPoint) {
-    firstPoint = point;
-
-    $("toolHelp").textContent =
-      "Tap second point.";
-    return;
-  }
-
-  const first = firstPoint;
-  firstPoint = null;
-
-  if (first.time===point.time) return;
-
-  if (tool==="trend") {
-    drawSegment(first,point,"#f5c66a");
-  }
-
-  if (tool==="fib") {
-    const low = Math.min(first.value,point.value);
-    const high = Math.max(first.value,point.value);
-
-    for (const f of [0,0.382,0.5,0.618,1]) {
-      drawHorizontal(
-        low+(high-low)*f,
-        f===0.5 ? "#f5c66a" : "#76b4ff"
-      );
+async function analyze(){
+  const coin=$("market").value;if(!coin)return;
+  $("analyze").disabled=true;$("overlay").classList.remove("hidden");$("overlay").textContent="Loading market data...";
+  $("result").textContent="Analyzing...";
+  try{
+    const data=await loadData(coin,$("tf").value,+$("week").value);
+    const s=getSignal(data,$("strategy").value,$("mode").value);
+    cache={data,s};
+    $("monHigh").textContent=fmt(data.high);$("monLow").textContent=fmt(data.low);
+    $("lastClose").textContent=fmt(data.last.c);$("lastTime").textContent=et(data.last.T);
+    renderSignal(data,s);drawChart(data,s);
+    status("● Analysis complete · "+coin,"green");
+  }catch(e){
+    cache=null;status("Error: "+e.message,"red");$("result").textContent="Analysis unavailable.";
+    $("overlay").classList.remove("hidden");$("overlay").textContent="Chart error: "+e.message;
+  }finally{$("analyze").disabled=false;}
+}
+async function checkAlert(){
+  const coin=$("market").value;if(!coin)return;
+  $("checkAlert").disabled=true;$("alertResult").textContent="Checking...";
+  try{
+    const data=await loadData(coin,"15m",0);
+    const s=getSignal(data,"cross","multi");
+    if(s?.confirmed){
+      $("alertResult").innerHTML=`<h2 class="${s.side==="LONG"?"green":"red"}">${coin} · CONFIRMED ${s.side}</h2>
+        <div class="grid">${metric("ENTRY",fmt(s.entry))}${metric("SL",fmt(s.stop))}${metric("TP1",fmt(s.tp1))}${metric("TP2",fmt(s.tp2))}${metric("TP3",fmt(s.tp3))}</div>`;
+    }else{
+      $("alertResult").textContent="WAIT — No fresh EMA9/21 cross with 1H trend and volume ≥ 1.2×.";
     }
-  }
-
-  if (tool==="long" || tool==="short") {
-    const entry = first.value;
-    const risk = Math.abs(point.value-entry);
-
-    if (!risk) return;
-
-    const sign = tool==="long" ? 1 : -1;
-
-    drawHorizontal(entry,"#76b4ff");
-    drawHorizontal(entry-sign*risk,"#ff627d");
-
-    for (const r of [2,3,4]) {
-      drawHorizontal(
-        entry+sign*r*risk,
-        "#21d6a5"
-      );
-    }
-  }
-
-  $("toolHelp").textContent =
-    "Drawing added.";
+  }catch(e){$("alertResult").textContent="Check failed: "+e.message;}
+  finally{$("checkAlert").disabled=false;}
 }
-
-async function analyze() {
-  const coin = $("market").value;
-
-  if (!coin) return;
-
-  $("analyze").disabled = true;
-
-  $("overlay").classList.remove("hidden");
-  $("overlay").textContent = "Loading market data...";
-
-  $("result").textContent = "Analyzing...";
-
-  try {
-    const data = await loadData(
-      coin,
-      Number($("week").value)
-    );
-
-    const signal = getSignal(
-      data,
-      $("strategy").value
-    );
-
-    cache = {data,signal};
-
-    $("monHigh").textContent = fmt(data.high);
-    $("monLow").textContent = fmt(data.low);
-    $("lastClose").textContent = fmt(data.last.c);
-    $("lastTime").textContent = et(data.last.T);
-
-    renderSignal(data,signal);
-    drawChart(data,signal);
-
-    $("status").textContent =
-      "● Analysis complete";
-
-    $("status").className = "status green";
-
-  } catch (e) {
-    cache = null;
-
-    $("status").textContent =
-      "Error: " + e.message;
-
-    $("status").className = "status red";
-
-    $("result").textContent =
-      "Analysis unavailable.";
-
-    $("overlay").textContent =
-      "Chart error: " + e.message;
-
-  } finally {
-    $("analyze").disabled = false;
-  }
-}
-
-async function scan() {
-  if (busy) return;
-
-  busy = true;
-
-  $("scanBtn").disabled = true;
-  $("scanResults").replaceChildren();
-
-  const count = $("scanCount").value==="all"
-    ? markets.length
-    : Number($("scanCount").value);
-
-  const selected = markets.slice(0,count);
-
-  const mode = $("strategy").value;
-
-  let found = 0;
-  let errors = 0;
-
-  try {
-    for (let i=0;i<selected.length;i++) {
-      const coin = selected[i];
-
-      $("scanStatus").textContent =
-        `Scanning ${i+1}/${selected.length}: ${coin}`;
-
-      try {
-        const data = await loadData(coin,0);
-        const signal = getSignal(data,mode);
-
-        if (signal && signal.fresh && !signal.watch) {
-          found++;
-
-          const el = document.createElement("div");
-          el.className = "card";
-
-          const title = document.createElement("h2");
-
-          title.className =
-            signal.side==="LONG" ? "green" : "red";
-
-          title.textContent =
-            coin + " · LIVE " + signal.side;
-
-          el.appendChild(title);
-
-          const details = document.createElement("p");
-
-          details.textContent =
-            "ENTRY " + fmt(signal.entry) +
-            " | SL " + fmt(signal.stop) +
-            " | TP1 " + fmt(signal.tp1) +
-            " | TP2 " + fmt(signal.tp2) +
-            " | TP3 " + fmt(signal.tp3);
-
-          el.appendChild(details);
-
-          $("scanResults").appendChild(el);
+async function scan(){
+  if(busy)return;busy=true;$("scanBtn").disabled=true;$("scanResults").replaceChildren();
+  const count=$("scanCount").value==="all"?markets.length:+$("scanCount").value;
+  const selected=markets.slice(0,count),strategy=$("strategy").value,mode=$("mode").value;
+  let found=0,errors=0;
+  try{
+    for(let i=0;i<selected.length;i++){
+      const coin=selected[i];$("scanStatus").textContent=`Scanning ${i+1}/${selected.length}: ${coin}`;
+      try{
+        const data=await loadData(coin,"15m",0),s=getSignal(data,strategy,mode);
+        if(s?.confirmed){
+          found++;const el=document.createElement("div");el.className="card";
+          const h=document.createElement("h2");h.className=s.side==="LONG"?"green":"red";h.textContent=coin+" · CONFIRMED "+s.side;
+          const p=document.createElement("p");p.textContent=`ENTRY ${fmt(s.entry)} | SL ${fmt(s.stop)} | TP1 ${fmt(s.tp1)} | TP2 ${fmt(s.tp2)} | TP3 ${fmt(s.tp3)}`;
+          el.append(h,p);$("scanResults").appendChild(el);
         }
-
-      } catch (e) {
-        errors++;
-        console.warn(coin,e);
-      }
-
-      await sleep(300);
+      }catch(e){errors++;console.warn(coin,e);}
+      await sleep(350);
     }
-
-    $("scanStatus").textContent =
-      `Complete · ${selected.length} checked · ` +
-      `${found} signals · ${errors} errors`;
-
-    if (!found) {
-      $("scanResults").textContent =
-        "No fresh confirmed signals.";
-    }
-
-  } finally {
-    busy = false;
-    $("scanBtn").disabled = false;
-  }
+    $("scanStatus").textContent=`Complete · ${selected.length} checked · ${found} confirmed · ${errors} errors`;
+    if(!found)$("scanResults").textContent="No fresh confirmed signals.";
+  }finally{busy=false;$("scanBtn").disabled=false;}
 }
-
-$("search").addEventListener(
-  "input",
-  updateMarkets
-);
-
-$("analyze").addEventListener(
-  "click",
-  analyze
-);
-
-$("scanBtn").addEventListener(
-  "click",
-  scan
-);
-
-$("strategy").addEventListener("change",()=>{
-  if (!cache) return;
-
-  cache.signal = getSignal(
-    cache.data,
-    $("strategy").value
-  );
-
-  renderSignal(cache.data,cache.signal);
-  drawChart(cache.data,cache.signal);
-});
-
+$("search").addEventListener("input",updateMarkets);
+$("analyze").addEventListener("click",analyze);
+$("checkAlert").addEventListener("click",checkAlert);
+$("scanBtn").addEventListener("click",scan);
+for(const id of ["strategy","mode"]){
+  $(id).addEventListener("change",()=>{
+    if(!cache)return;
+    cache.s=getSignal(cache.data,$("strategy").value,$("mode").value);
+    renderSignal(cache.data,cache.s);drawChart(cache.data,cache.s);
+  });
+}
 $("tf").addEventListener("change",()=>{
-  if (cache) {
-    drawChart(cache.data,cache.signal);
-  }
+  cache=null;$("result").textContent="Timeframe changed. Tap Analyze.";
+  $("overlay").classList.remove("hidden");$("overlay").textContent="Tap Analyze to load chart timeframe.";
 });
-
-$("market").addEventListener("change",()=>{
-  cache = null;
-
-  $("result").textContent =
-    "Market changed. Tap Analyze.";
-
-  $("overlay").classList.remove("hidden");
-  $("overlay").textContent =
-    "Tap Analyze for selected market.";
-});
-
-$("week").addEventListener("change",()=>{
-  cache = null;
-
-  $("result").textContent =
-    "Week changed. Tap Analyze.";
-
-  $("overlay").classList.remove("hidden");
-  $("overlay").textContent =
-    "Tap Analyze for selected week.";
-});
-
+for(const id of ["market","week"]){
+  $(id).addEventListener("change",()=>{
+    cache=null;$("result").textContent="Selection changed. Tap Analyze.";
+    $("overlay").classList.remove("hidden");$("overlay").textContent="Tap Analyze for selected market.";
+  });
+}
 $("toolbar").addEventListener("click",e=>{
-  const b = e.target.closest("button[data-tool]");
-
-  if (!b) return;
-
-  tool = b.dataset.tool;
-  firstPoint = null;
-
-  document.querySelectorAll(
-    "button[data-tool]"
-  ).forEach(x=>{
-    x.classList.toggle("active",x===b);
-  });
-
-  $("toolHelp").textContent =
-    tool==="cursor"
-      ? "Cursor active."
-      : "Tap chart to draw " + tool;
+  const b=e.target.closest("button[data-tool]");if(!b)return;
+  tool=b.dataset.tool;firstPoint=null;
+  document.querySelectorAll("button[data-tool]").forEach(x=>x.classList.toggle("active",x===b));
+  $("toolHelp").textContent=tool==="cursor"?"Cursor active.":"Tap chart to draw "+tool;
 });
-
-$("clearDraw").onclick = clearDrawings;
-
-$("zoomIn").onclick = ()=>{
-  if (!chart) return;
-
-  const scale = chart.timeScale();
-  const current = scale.options().barSpacing || 6;
-
-  scale.applyOptions({
-    barSpacing:Math.min(45,current*1.3)
-  });
-};
-
-$("zoomOut").onclick = ()=>{
-  if (!chart) return;
-
-  const scale = chart.timeScale();
-  const current = scale.options().barSpacing || 6;
-
-  scale.applyOptions({
-    barSpacing:Math.max(2,current/1.3)
-  });
-};
-
-$("fullscreen").onclick = ()=>{
-  const el = $("chartbox");
-
-  if (document.fullscreenElement) {
-    document.exitFullscreen?.();
-  } else {
-    el.requestFullscreen?.();
-  }
-};
-
+$("clearDraw").onclick=clearDrawings;
+$("zoomIn").onclick=()=>{if(!chart)return;const s=chart.timeScale(),v=s.options().barSpacing||6;s.applyOptions({barSpacing:Math.min(45,v*1.3)});};
+$("zoomOut").onclick=()=>{if(!chart)return;const s=chart.timeScale(),v=s.options().barSpacing||6;s.applyOptions({barSpacing:Math.max(2,v/1.3)});};
+$("fullscreen").onclick=()=>{const el=$("chartbox");if(document.fullscreenElement)document.exitFullscreen?.();else el.requestFullscreen?.();};
 loadMarkets();
-
 </script>
-
 </body>
 </html>
