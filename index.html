@@ -1,63 +1,4099 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080d18"><title>YOYO TRADE PRO V3.9</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d18">
+
+<title>YOYO TRADE PRO V4.0</title>
+
 <style>
-:root{--bg:#080d18;--panel:#101c2e;--edge:#30445e;--fg:#edf5ff;--muted:#a7b9ce;--lime:#dafa4b;--green:#21d6a5;--red:#ff637c}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px system-ui,-apple-system,sans-serif}header{padding:18px 4%;background:#0d1727;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center}.brand{font-weight:900;font-size:21px}.brand b{color:var(--green)}.tag{color:var(--lime);font-size:12px}main{max-width:1200px;margin:auto;padding:15px}.panel{border:1px solid var(--edge);background:linear-gradient(140deg,#14243a,#0d1727);border-radius:17px;padding:18px;margin-bottom:15px}h1{font-size:24px;margin:0 0 6px}h2{font-size:19px;margin:0 0 14px}.muted{color:var(--muted)}.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;color:var(--muted);margin-bottom:7px}select,input,button{font:inherit;color:var(--fg);border:1px solid #405672;background:#0b1627;border-radius:10px;padding:12px;width:100%}button{cursor:pointer}button:disabled{opacity:.5}.tabs,.timegrid{display:grid;gap:8px}.tabs{grid-template-columns:1fr 1fr;margin:14px 0}.timegrid{grid-template-columns:repeat(4,1fr)}.tabs button.active,.timegrid button.active{border-color:var(--lime);color:var(--lime);background:#2a301a}.primary{margin-top:14px;background:var(--lime);color:#101600;font-weight:900;border:0}.notice{background:#142b3c;border-left:3px solid var(--green);padding:12px;border-radius:9px;margin:12px 0}.chartwrap{height:480px;border:1px solid var(--edge);border-radius:12px;overflow:hidden;background:#0b1422;position:relative}#tvchart{width:100%;height:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:#18283e;border:1px solid var(--edge);border-radius:10px;padding:12px;overflow-wrap:anywhere}.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric strong{font-size:18px}.green{color:var(--green)}.red{color:var(--red)}.gold{color:#f6c96b}.signalhead{font-size:25px;font-weight:900;margin:0 0 10px}.status{padding:12px 0;color:var(--muted)}.mini{font-size:12px;line-height:1.6}.market-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:14px 0 20px}.market-tabs button{padding:12px 4px;font-size:13px;font-weight:700}.market-tabs button.active{border-color:var(--lime);color:var(--lime);background:#2a301a}.badge{display:inline-block;padding:6px 10px;border-radius:7px;font-weight:800;font-size:12px;margin-bottom:12px}.badge.confirmed{background:#123d35;color:var(--green)}.badge.unconfirmed{background:#34301a;color:var(--lime)}footer{text-align:center;padding:25px;color:var(--muted)}#priceChart{display:block;width:100%;height:100%}#chartLegend{position:absolute;left:12px;top:10px;z-index:2;font-size:12px;background:#080d18cf;padding:7px 9px;border-radius:8px;pointer-events:none}.hint{font-size:12px;color:var(--muted)}@media(min-width:750px){.controls{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(5,1fr)}.chartwrap{height:630px}}@media(max-width:420px){.chartwrap{height:410px}.market-tabs button{font-size:11px;padding:11px 2px}.timegrid button{padding:12px 5px}}
-</style></head><body>
-<header><div class="brand">YOYO <b>TRADE PRO</b></div><div class="tag">V3.9 Â· ANALYSIS + ALERTS</div></header><main>
-<section class="panel"><h1>Trading Dashboard</h1><div class="muted">Hyperliquid perpetuals (discoverable DEXs), spot, and stock watchlist. No automatic trading.</div><div class="notice"><b>ONE SOURCE:</b> Hyperliquid candles drive the displayed price chart, indicators, direction and trade levels. Analysis is available on demand; confirmed entries are separate. Stock symbols remain chart-only.</div></section>
-<section class="panel"><h2>Market &amp; Strategy</h2><div class="market-tabs" id="marketTabs"><button data-filter="all" class="active">All</button><button data-filter="crypto">Crypto</button><button data-filter="perp">Perps</button><button data-filter="spot">Spot</button><button data-filter="stock">Stocks</button></div>
-<div class="controls"><div><label>Market search</label><input id="search" placeholder="SOL, XRP, GOLD, AAPL..." autocomplete="off"><label>Market</label><select id="market"><option value="SOL">SOL</option></select></div><div><label>Strategy</label><select id="strategy"><option value="ema21" selected>EMA21 / EMA89 (Main)</option><option value="ema13">EMA13 / EMA89</option><option value="ema9">EMA9 / EMA89</option><option value="cross">EMA9 / EMA21 Cross</option><option value="monday">Monday Range (Research)</option></select></div><div><label>Week (Monday Range)</label><select id="week"><option value="0">Current week</option><option value="1">Previous week (research only)</option></select></div></div>
-<h2 style="margin-top:22px">Multi-Timeframe Analysis</h2><div class="tabs"><button id="single">Single</button><button id="multi" class="active">Multi</button></div><div class="timegrid" id="times"><button data-tf="1m">1m</button><button data-tf="5m">5m</button><button data-tf="15m" class="active">15m</button><button data-tf="1h" class="active">1H</button><button data-tf="4h">4H</button><button data-tf="1d">1D</button><button data-tf="1w">1W</button><button data-tf="1M">1M</button></div>
-<div class="status" id="status">Connecting...</div><div class="notice" id="connectionHelp">For live data, publish this HTML on HTTPS (for example GitHub Pages) and open in Safari. The iPhone Files preview may block API requests. If the data feed is unavailable, no levels or signals are shown.</div><button id="analyze" class="primary">ANALYZE NOW â</button>
-<div class="notice"><b>EMA21/89 Â· 15m ENTRY + 1H TREND Â· VOLUME â¥ 1.2Ã</b><p class="muted mini">Anytime directional analysis does not require an entry trigger. Confirmed notifications require aligned trend, pullback/reclaim or breakdown, a completed candle, volume and verified live price. Notifications operate only while this page is open.</p><button id="alertsToggle">ENABLE SIGNAL NOTIFICATIONS</button><p id="alertsStatus" class="muted mini">Alerts off. Browser notification support varies on iPhone.</p></div></section>
-<section class="panel"><h2>Live Price Chart Â· Same Feed as Analysis</h2><div id="tvnote" class="muted mini" style="margin-bottom:9px">Hyperliquid price candles. EMA overlays and trade levels are drawn from the exact same candle data used by the analysis. No unrelated TradingView symbol.</div><div class="chartwrap"><div id="chartLegend">Select a market and tap Analyze.</div><div id="tvchart"><canvas id="priceChart"></canvas></div></div><p id="chartcaption" class="muted mini">Chart and analysis use the same market feed.</p></section>
-<section class="panel"><h2>ANYTIME ANALYSIS Â· LONG / SHORT / NEUTRAL</h2><span class="badge unconfirmed">DIRECTIONAL RESEARCH Â· NOT AN ENTRY ALERT</span><div id="manualResult" class="notice"><div class="signalhead">âª NOT ANALYZED</div><p class="muted">Tap Analyze to see the current market bias.</p></div><p class="muted mini">Directional bias can differ from the most recent candle color. The chart displays the same market, EMA lines and analysis levels; timeframe conflicts are explicitly shown.</p></section>
-<section class="panel"><h2>CONFIRMED ENTRY Â· LONG / SHORT / WAIT</h2><span id="confirmedBadge" class="badge unconfirmed">WAITING</span><div id="confirmedResult" class="notice"><div class="signalhead">âª WAIT â NO CONFIRMED ENTRY</div></div><p class="muted mini">Only confirmed, price-validated entries can trigger browser notifications. Confirmation does not guarantee profit.</p></section>
-<section class="panel"><h2>Signal Details</h2><div class="grid"><div class="metric"><small>Strategy</small><strong id="strategyMetric">â</strong></div><div class="metric"><small>15m close</small><strong id="lastClose">â</strong></div><div class="metric"><small>1H trend</small><strong id="trend">â</strong></div><div class="metric"><small>Volume ratio</small><strong id="vol">â</strong></div><div class="metric"><small>NY candle time</small><strong id="time">â</strong></div><div class="metric"><small>RSI14</small><strong id="rsiMetric">â</strong></div><div class="metric"><small>MACD histogram</small><strong id="macdMetric">â</strong></div><div class="metric"><small>Bollinger Bands</small><strong id="bbMetric">â</strong></div><div class="metric"><small>Market feed</small><strong id="feedMetric">â</strong></div><div class="metric"><small>Signal alignment</small><strong id="alignmentMetric">â</strong></div></div></section></main>
-<footer>YOYO TRADE PRO V3.9 Â© 2026 Â· Research only Â· No automatic execution</footer>
+:root{
+  --bg:#080d18;
+  --panel:#101c2e;
+  --edge:#30445e;
+  --fg:#edf5ff;
+  --muted:#a7b9ce;
+  --lime:#dafa4b;
+  --green:#21d6a5;
+  --red:#ff637c;
+  --blue:#58a6ff;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font:15px system-ui,-apple-system,sans-serif;
+}
+
+header{
+  padding:18px 4%;
+  background:#0d1727;
+  border-bottom:1px solid var(--edge);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.brand{
+  font-weight:900;
+  font-size:21px;
+}
+
+.brand b{
+  color:var(--green);
+}
+
+.tag{
+  color:var(--lime);
+  font-size:12px;
+}
+
+main{
+  max-width:1200px;
+  margin:auto;
+  padding:15px;
+}
+
+.panel{
+  border:1px solid var(--edge);
+  background:linear-gradient(140deg,#14243a,#0d1727);
+  border-radius:17px;
+  padding:18px;
+  margin-bottom:15px;
+}
+
+h1{
+  font-size:24px;
+  margin:0 0 6px;
+}
+
+h2{
+  font-size:19px;
+  margin:0 0 14px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.green{
+  color:var(--green);
+}
+
+.red{
+  color:var(--red);
+}
+
+.gold{
+  color:#f6c96b;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.notice{
+  background:#142b3c;
+  border-left:3px solid var(--green);
+  padding:12px;
+  border-radius:9px;
+  margin:12px 0;
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+label{
+  display:block;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+
+select,
+input,
+button{
+  width:100%;
+  padding:12px;
+  font:inherit;
+  color:var(--fg);
+  border:1px solid #405672;
+  background:#0b1627;
+  border-radius:10px;
+}
+
+button{
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.5;
+}
+
+.primary{
+  margin-top:14px;
+  background:var(--lime);
+  color:#101600;
+  font-weight:900;
+  border:0;
+}
+
+.tabs,
+.timegrid{
+  display:grid;
+  gap:8px;
+}
+
+.tabs{
+  grid-template-columns:1fr 1fr;
+  margin:14px 0;
+}
+
+.timegrid{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.tabs button.active,
+.timegrid button.active,
+.market-tabs button.active,
+.mover-tabs button.active{
+  border-color:var(--lime);
+  color:var(--lime);
+  background:#2a301a;
+}
+
+.market-tabs{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+  margin:14px 0 20px;
+}
+
+.market-tabs button{
+  padding:12px 4px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.status{
+  padding:12px 0;
+  color:var(--muted);
+}
+
+.mini{
+  font-size:12px;
+  line-height:1.6;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:7px;
+  font-weight:800;
+  font-size:12px;
+  margin-bottom:12px;
+}
+
+.badge.confirmed{
+  background:#123d35;
+  color:var(--green);
+}
+
+.badge.unconfirmed{
+  background:#34301a;
+  color:var(--lime);
+}
+
+.signalhead{
+  font-size:25px;
+  font-weight:900;
+  margin:0 0 10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.metric{
+  background:#18283e;
+  border:1px solid var(--edge);
+  border-radius:10px;
+  padding:12px;
+  overflow-wrap:anywhere;
+}
+
+.metric small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+
+.metric strong{
+  font-size:18px;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.live-dot{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--green);
+  font-size:12px;
+  font-weight:800;
+}
+
+.live-dot::before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 10px var(--green);
+}
+
+.market-summary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:14px 0;
+}
+
+.mover-tabs{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin:12px 0;
+}
+
+.market-list{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+
+.market-row{
+  display:grid;
+  grid-template-columns:36px minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  background:#0c1829;
+  border:1px solid var(--edge);
+  border-radius:12px;
+}
+
+.market-row:hover{
+  border-color:#56708f;
+}
+
+.market-symbol{
+  font-weight:900;
+}
+
+.market-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.market-price{
+  text-align:right;
+  font-weight:800;
+}
+
+.market-change{
+  min-width:76px;
+  text-align:center;
+  padding:7px 6px;
+  border-radius:8px;
+  font-weight:900;
+}
+
+.market-change.up{
+  color:var(--green);
+  background:#123d35;
+}
+
+.market-change.down{
+  color:var(--red);
+  background:#3b2029;
+}
+
+.star{
+  border:0;
+  background:transparent;
+  padding:4px;
+  color:#71839a;
+  font-size:21px;
+}
+
+.star.saved{
+  color:var(--lime);
+}
+
+.crypto-detail{
+  margin-top:14px;
+  padding:15px;
+  background:#0b1627;
+  border:1px solid var(--edge);
+  border-radius:13px;
+}
+
+.detail-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.detail-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+
+.empty-state{
+  text-align:center;
+  color:var(--muted);
+  padding:22px;
+}
+
+.chartwrap{
+  height:480px;
+  border:1px solid var(--edge);
+  border-radius:12px;
+  overflow:hidden;
+  background:#0b1422;
+  position:relative;
+}
+
+#tvchart{
+  width:100%;
+  height:100%;
+}
+
+#priceChart{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+#chartLegend{
+  position:absolute;
+  left:12px;
+  top:10px;
+  z-index:2;
+  font-size:12px;
+  background:#080d18cf;
+  padding:7px 9px;
+  border-radius:8px;
+  pointer-events:none;
+}
+
+.history-list{
+  display:grid;
+  gap:9px;
+}
+
+.history-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  padding:12px;
+  background:#0c1829;
+  border:1px solid var(--edge);
+  border-radius:11px;
+}
+
+.compact-button{
+  width:auto;
+  padding:8px 12px;
+}
+
+footer{
+  text-align:center;
+  padding:25px;
+  color:var(--muted);
+}
+
+@media(min-width:750px){
+  .controls{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .grid{
+    grid-template-columns:repeat(5,1fr);
+  }
+
+  .market-summary{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .market-row{
+    grid-template-columns:42px minmax(0,1fr) 130px 100px;
+  }
+
+  .chartwrap{
+    height:630px;
+  }
+}
+
+@media(max-width:540px){
+  .mover-tabs{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .market-row{
+    grid-template-columns:32px minmax(0,1fr) auto;
+  }
+
+  .market-change,
+  .market-price{
+    grid-column:3;
+  }
+
+  .detail-actions{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:420px){
+  .chartwrap{
+    height:410px;
+  }
+
+  .market-tabs button{
+    font-size:11px;
+    padding:11px 2px;
+  }
+
+  .timegrid button{
+    padding:12px 5px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">YOYO <b>TRADE PRO</b></div>
+  <div class="tag">V4.0 · LIVE MARKET + ALERTS</div>
+</header>
+
+<main>
+
+<section class="panel">
+  <h1>Trading Dashboard</h1>
+
+  <div class="muted">
+    Hyperliquid perpetuals, spot and stock watchlist.
+    No automatic trading.
+  </div>
+
+  <div class="notice">
+    <b>ONE SOURCE:</b> Hyperliquid candles drive the chart,
+    indicators, direction and trade levels.
+  </div>
+</section>
+
+<section class="panel" id="cryptoMarketPanel">
+
+  <div class="section-title">
+    <h2 style="margin:0">Crypto Market</h2>
+    <span class="live-dot">LIVE</span>
+  </div>
+
+  <div class="market-summary">
+
+    <div class="metric">
+      <small>Perpetual markets</small>
+      <strong id="perpCount">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>Rising</small>
+      <strong id="risingCount" class="green">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>Falling</small>
+      <strong id="fallingCount" class="red">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>24h notional</small>
+      <strong id="marketNotional">—</strong>
+    </div>
+
+  </div>
+
+  <div class="mover-tabs" id="moverTabs">
+    <button data-mover="all" class="active">Most Active</button>
+    <button data-mover="gainers">Gainers</button>
+    <button data-mover="losers">Losers</button>
+    <button data-mover="watchlist">★ Watchlist</button>
+  </div>
+
+  <input
+    id="cryptoSearch"
+    placeholder="Search Hyperliquid markets..."
+    autocomplete="off"
+  >
+
+  <div id="cryptoMarketList" class="market-list">
+    <div class="empty-state">
+      Loading live Hyperliquid markets...
+    </div>
+  </div>
+
+  <p id="marketListStatus" class="muted mini"></p>
+
+  <div id="cryptoDetail" class="crypto-detail hidden"></div>
+
+</section>
+<section class="panel">
+
+  <h2>Market &amp; Strategy</h2>
+
+  <div class="market-tabs" id="marketTabs">
+    <button data-filter="all" class="active">All</button>
+    <button data-filter="crypto">Crypto</button>
+    <button data-filter="perp">Perps</button>
+    <button data-filter="spot">Spot</button>
+    <button data-filter="stock">Stocks</button>
+  </div>
+
+  <div class="controls">
+
+    <div>
+      <label>Market search</label>
+
+      <input
+        id="search"
+        placeholder="SOL, XRP, GOLD, AAPL..."
+        autocomplete="off"
+      >
+
+      <label style="margin-top:10px">Market</label>
+
+      <select id="market">
+        <option value="SOL">SOL</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Strategy</label>
+
+      <select id="strategy">
+        <option value="ema21" selected>
+          EMA21 / EMA89 (Main)
+        </option>
+
+        <option value="ema13">
+          EMA13 / EMA89
+        </option>
+
+        <option value="ema9">
+          EMA9 / EMA89
+        </option>
+
+        <option value="cross">
+          EMA9 / EMA21 Cross
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label>Market Feed</label>
+
+      <input
+        value="Hyperliquid live candles"
+        disabled
+      >
+    </div>
+
+  </div>
+
+  <h2 style="margin-top:22px">
+    Multi-Timeframe Analysis
+  </h2>
+
+  <div class="tabs">
+    <button id="single">Single</button>
+    <button id="multi" class="active">Multi</button>
+  </div>
+
+  <div class="timegrid" id="times">
+    <button data-tf="1m">1m</button>
+    <button data-tf="5m">5m</button>
+    <button data-tf="15m" class="active">15m</button>
+    <button data-tf="1h" class="active">1H</button>
+    <button data-tf="4h">4H</button>
+    <button data-tf="1d">1D</button>
+    <button data-tf="1w">1W</button>
+    <button data-tf="1M">1M</button>
+  </div>
+
+  <div class="status" id="status">
+    Connecting...
+  </div>
+
+  <div class="notice" id="connectionHelp">
+    For live data, publish this HTML on HTTPS and open it
+    in Safari. If the feed is unavailable, no signal or
+    trading level is shown.
+  </div>
+
+  <button id="analyze" class="primary">
+    ANALYZE NOW →
+  </button>
+
+  <div class="notice">
+
+    <b>
+      EMA21/89 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2×
+    </b>
+
+    <p class="muted mini">
+      Confirmed entry requires aligned trend, a completed
+      entry candle, volume confirmation and verified live price.
+    </p>
+
+    <button id="alertsToggle">
+      ENABLE SIGNAL NOTIFICATIONS
+    </button>
+
+    <p id="alertsStatus" class="muted mini">
+      Alerts are currently off.
+    </p>
+
+  </div>
+
+</section>
+
+<section class="panel">
+
+  <h2>Live Price Chart</h2>
+
+  <div class="chartwrap">
+
+    <div id="chartLegend">
+      Select a market and tap Analyze.
+    </div>
+
+    <div id="tvchart">
+      <canvas id="priceChart"></canvas>
+    </div>
+
+  </div>
+
+  <p id="chartcaption" class="muted mini">
+    Chart and analysis use the same Hyperliquid feed.
+  </p>
+
+</section>
+
+<section class="panel">
+
+  <h2>
+    ANYTIME ANALYSIS · LONG / SHORT / NEUTRAL
+  </h2>
+
+  <span class="badge unconfirmed">
+    DIRECTIONAL RESEARCH · NOT AN ENTRY ALERT
+  </span>
+
+  <div id="manualResult" class="notice">
+
+    <div class="signalhead">
+      ⚪ NOT ANALYZED
+    </div>
+
+    <p class="muted">
+      Tap Analyze to see the current market direction.
+    </p>
+
+  </div>
+
+  <p class="muted mini">
+    Directional bias can differ from the latest candle.
+    The 15m and 1H timeframe conflict is shown clearly.
+  </p>
+
+</section>
+
+<section class="panel">
+
+  <h2>
+    CONFIRMED ENTRY · LONG / SHORT / WAIT
+  </h2>
+
+  <span
+    id="confirmedBadge"
+    class="badge unconfirmed"
+  >
+    WAITING
+  </span>
+
+  <div id="confirmedResult" class="notice">
+
+    <div class="signalhead">
+      ⚪ WAIT — NO CONFIRMED ENTRY
+    </div>
+
+  </div>
+
+  <p class="muted mini">
+    ENTRY, STOP LOSS and TP1–TP3 appear only
+    after the signal is confirmed.
+  </p>
+
+</section>
+
+<section class="panel">
+
+  <div class="section-title">
+
+    <h2 style="margin:0">
+      Confirmed Signal History
+    </h2>
+
+    <button
+      id="clearHistory"
+      class="compact-button"
+    >
+      Clear
+    </button>
+
+  </div>
+
+  <p class="muted mini">
+    Confirmed signals are saved separately on this device.
+  </p>
+
+  <div
+    id="signalHistory"
+    class="history-list"
+  ></div>
+
+</section>
+
+<section class="panel">
+
+  <h2>Signal Details</h2>
+
+  <div class="grid">
+
+    <div class="metric">
+      <small>Strategy</small>
+      <strong id="strategyMetric">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>15m close</small>
+      <strong id="lastClose">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>1H trend</small>
+      <strong id="trend">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>Volume ratio</small>
+      <strong id="vol">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>NY candle time</small>
+      <strong id="time">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>RSI14</small>
+      <strong id="rsiMetric">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>MACD histogram</small>
+      <strong id="macdMetric">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>Bollinger Bands</small>
+      <strong id="bbMetric">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>Market feed</small>
+      <strong id="feedMetric">—</strong>
+    </div>
+
+    <div class="metric">
+      <small>Signal alignment</small>
+      <strong id="alignmentMetric">—</strong>
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  YOYO TRADE PRO V4.0 © 2026 ·
+  Research only · No automatic execution
+</footer>
+
 <script>
 'use strict';
-const API='https://api.hyperliquid.xyz/info', $=id=>document.getElementById(id), MIN=60000,HOUR=3600000,DAY=86400000;
-const tfMs={'1m':MIN,'5m':5*MIN,'15m':15*MIN,'1h':HOUR,'4h':4*HOUR,'1d':DAY,'1w':7*DAY,'1M':30*DAY};
-const STOCKS='AAPL MSFT NVDA TSLA AMZN GOOGL META AMD AVGO NFLX PLTR COIN MSTR HOOD SOFI INTC MU TSM JPM BAC GS SPY QQQ IWM DIA'.split(' ');
-let marketInfo=new Map([['SOL',{kind:'perp',coin:'SOL',label:'SOL Â· PERP'}]]),markets=['SOL'],marketFilter='all',mode='multi',selected=new Set(['15m','1h']),analysisSeq=0,alertTimer=null,alertBusy=false,lastSnapshot=null;
-const fmt=n=>Number.isFinite(n)?Number(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<1?6:Math.abs(n)<100?4:2}):'â';
-const ny=t=>new Date(t).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function api(body){const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),16000);try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});if(!r.ok)throw Error('Hyperliquid HTTP '+r.status);return await r.json()}finally{clearTimeout(timer)}}
-async function loadMarkets(){const found=new Map(),failures=[];const add=(id,item)=>{if(!found.has(id))found.set(id,item)};const dexes=[''];try{const rows=await api({type:'perpDexs'});for(const row of rows||[]){const name=typeof row==='string'?row:Array.isArray(row)?row[0]:row?.name;if(name&&name!=='default'&&!dexes.includes(name))dexes.push(name)}}catch(e){failures.push('Additional DEX discovery unavailable')}
-for(const dex of dexes){try{const body={type:'meta'};if(dex)body.dex=dex;const data=await api(body);for(const a of data.universe||[]){if(a.isDelisted)continue;const id=(dex?dex+':':'')+a.name;add(id,{kind:'perp',coin:id,label:id+' Â· PERP',dex:dex||'',asset:a.name})}}catch(e){failures.push((dex||'Default')+' perps unavailable')}}
-try{const data=await api({type:'spotMeta'});for(const a of data.universe||[]){const id='SPOT:'+a.name;add(id,{kind:'spot',coin:'@'+a.index,label:a.name+' Â· HL SPOT'})}}catch(e){failures.push('Spot discovery unavailable')}
-for(const ticker of STOCKS)add('STOCK:'+ticker,{kind:'stock',coin:ticker,label:ticker+' Â· STOCK (no live signal)'});
-marketInfo=found;markets=[...found.keys()].sort((a,b)=>a.localeCompare(b));updateMarkets();$('status').textContent=`${[...found.values()].filter(x=>x.kind==='perp').length} perps Â· ${[...found.values()].filter(x=>x.kind==='spot').length} spot Â· ${STOCKS.length} stocks. ${failures.join('; ')}`;if(!found.has('SOL'))$('status').textContent+=' Default SOL not available.'}
-function updateMarkets(){const q=$('search').value.toUpperCase().trim(),previous=$('market').value;const filtered=markets.filter(id=>{const info=marketInfo.get(id);if(marketFilter==='crypto'&&!(info.kind==='perp'&&!id.includes(':')))return false;if(marketFilter==='perp'&&info.kind!=='perp')return false;if(marketFilter==='spot'&&info.kind!=='spot')return false;if(marketFilter==='stock'&&info.kind!=='stock')return false;return id.toUpperCase().includes(q)||info.label.toUpperCase().includes(q)});$('market').replaceChildren();for(const id of filtered){const option=document.createElement('option');option.value=id;option.textContent=marketInfo.get(id).label;$('market').append(option)}if(filtered.includes(previous))$('market').value=previous;else if(filtered.includes('SOL'))$('market').value='SOL';else if(filtered.length)$('market').value=filtered[0]}
-function getDisplayTf(){return selected.has('15m')?'15m':[...selected][0]||'15m'}
-function syncButtons(){for(const b of document.querySelectorAll('[data-tf]'))b.classList.toggle('active',selected.has(b.dataset.tf));$('single').classList.toggle('active',mode==='single');$('multi').classList.toggle('active',mode==='multi');$('chartcaption').textContent=`Display: ${getDisplayTf()} Â· Analysis: 15m + 1H Â· Strategy: ${$('strategy').selectedOptions[0].textContent} Â· Hyperliquid price feed.`}
-function invalidate(){analysisSeq++;lastSnapshot=null;$('manualResult').innerHTML='<div class="signalhead">âª NOT ANALYZED</div><p class="muted">Settings changed. Tap Analyze.</p>';$('confirmedResult').innerHTML='<div class="signalhead">âª WAIT</div><p class="muted">Reanalysis required.</p>';$('confirmedBadge').textContent='WAITING';$('confirmedBadge').className='badge unconfirmed';$('chartLegend').textContent='Tap Analyze to load this market chart.';clearChart()}
-function setMode(m){mode=m;selected=m==='single'?new Set([getDisplayTf()]):new Set(['15m','1h']);syncButtons();invalidate()}
-function ema(v,n){const out=Array(v.length).fill(null);if(v.length<n)return out;let p=v.slice(0,n).reduce((a,b)=>a+b,0)/n;out[n-1]=p;const k=2/(n+1);for(let i=n;i<v.length;i++)out[i]=p=v[i]*k+p*(1-k);return out}
-function atr(c,n=14){if(c.length<n+1)return null;const tr=[];for(let i=1;i<c.length;i++)tr.push(Math.max(c[i].h-c[i].l,Math.abs(c[i].h-c[i-1].c),Math.abs(c[i].l-c[i-1].c)));return tr.slice(-n).reduce((a,b)=>a+b,0)/n}
-function volRatio(c){if(c.length<22)return null;const i=c.length-1,avg=c.slice(i-20,i).reduce((s,x)=>s+x.v,0)/20;return avg>0?c[i].v/avg:null}
-function rsi(v,n=14){if(v.length<n+2)return null;let gain=0,loss=0;for(let i=1;i<=n;i++){const d=v[i]-v[i-1];gain+=Math.max(d,0);loss+=Math.max(-d,0)}gain/=n;loss/=n;for(let i=n+1;i<v.length;i++){const d=v[i]-v[i-1];gain=(gain*(n-1)+Math.max(d,0))/n;loss=(loss*(n-1)+Math.max(-d,0))/n}return loss===0?(gain===0?50:100):100-100/(1+gain/loss)}
-function macdHist(v){const a=ema(v,12),b=ema(v,26),mac=a.map((x,i)=>x===null||b[i]===null?null:x-b[i]);const valid=mac.filter(x=>x!==null),sig=ema(valid,9);return valid.length>=9?valid.at(-1)-sig.at(-1):null}
-function bb(v,n=20){if(v.length<n)return null;const x=v.slice(-n),m=x.reduce((a,b)=>a+b,0)/n,sd=Math.sqrt(x.reduce((a,b)=>a+(b-m)**2,0)/n);return{mid:m,upper:m+2*sd,lower:m-2*sd}}
-async function candles(coin,interval,days){const now=Date.now(),raw=await api({type:'candleSnapshot',req:{coin,interval,startTime:now-days*DAY,endTime:now}});const duration=tfMs[interval];if(!duration)throw Error('Unsupported interval');const map=new Map();for(const x of raw||[]){const a={t:+x.t,o:+x.o,h:+x.h,l:+x.l,c:+x.c,v:+x.v};if([a.t,a.o,a.h,a.l,a.c,a.v].every(Number.isFinite)&&a.t+duration<=Date.now()&&a.h>=a.l&&a.c>0&&a.o>0)map.set(a.t,a)}return [...map.values()].sort((a,b)=>a.t-b.t)}
-function mondayUtc(offset){const now=new Date(),parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(now),p=Object.fromEntries(parts.map(x=>[x.type,x.value])),days={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6},d=new Date(Date.UTC(+p.year,+p.month-1,+p.day-days[p.weekday]-offset*7)),date=d.toISOString().slice(0,10);for(const hr of [4,5]){const t=Date.parse(date+`T${String(hr).padStart(2,'0')}:00:00Z`),q=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',hourCycle:'h23'}).format(new Date(t));if(Number(q)===0)return t}return Date.parse(date+'T04:00:00Z')}
-function evaluate(c,h,strategy,week){if(c.length<110||h.length<95)return{error:'Insufficient completed 15m/1H candles'};const last=c.at(-1),hour=h.at(-1),cv=c.map(x=>x.c),hv=h.map(x=>x.c),n=strategy==='ema9'?9:strategy==='ema13'?13:21,eFast=ema(cv,n),eSlow=ema(cv,89),hFast=ema(hv,n),hSlow=ema(hv,89),e9=ema(cv,9),e21=ema(cv,21),h9=ema(hv,9),h21=ema(hv,21),i=c.length-1,j=h.length-1,a=atr(c),vr=volRatio(c),rs=rsi(cv),mh=macdHist(cv),bands=bb(cv);if(!a||!Number.isFinite(vr)||!Number.isFinite(rs)||!Number.isFinite(mh)||!bands)return{error:'Indicators unavailable'};
-const tfSide=(close,fast,slow)=>close>slow&&fast>slow?'LONG':close<slow&&fast<slow?'SHORT':'MIXED';let shortTf=tfSide(last.c,eFast[i],eSlow[i]),longTf=tfSide(hour.c,hFast[j],hSlow[j]);if(strategy==='cross'){shortTf=tfSide(last.c,e9[i],e21[i]);longTf=tfSide(hour.c,h9[j],h21[j])}
-let rangeNote='';if(strategy==='monday'){const start=mondayUtc(Number(week)),end=start+DAY;const mon=c.filter(x=>x.t>=start&&x.t<end);if(mon.length){const high=Math.max(...mon.map(x=>x.h)),low=Math.min(...mon.map(x=>x.l));rangeNote=`Monday range ${fmt(low)}â${fmt(high)} (${week==='1'?'previous':'current'} week)`;if(last.t>=end){shortTf=last.c>high?'LONG':last.c<low?'SHORT':'MIXED'}else shortTf='MIXED'}else rangeNote='Monday range unavailable'}
-const score=(shortTf==='LONG'?2:shortTf==='SHORT'?-2:0)+(longTf==='LONG'?3:longTf==='SHORT'?-3:0)+(rs>55?1:rs<45?-1:0)+(mh>0?1:mh<0?-1:0)+(last.c>bands.mid?1:last.c<bands.mid?-1:0)+(last.c>last.o?.5:last.c<last.o?-.5:0);
-const side=score>0?'LONG':score<0?'SHORT':'NEUTRAL',aligned=shortTf===longTf&&shortTf!=='MIXED',conflict=shortTf!=='MIXED'&&longTf!=='MIXED'&&shortTf!==longTf,agreement=Math.round(Math.abs(score)/8.5*100);const structure=side==='LONG'?Math.min(...c.slice(-6).map(x=>x.l)):Math.max(...c.slice(-6).map(x=>x.h));const entry=last.c;let stop=null,risk=null,tp1=null,tp2=null,tp3=null;if(side!=='NEUTRAL'){stop=side==='LONG'?Math.min(structure-a*.15,entry-a*1.35):Math.max(structure+a*.15,entry+a*1.35);risk=Math.abs(entry-stop);if(risk>0&&risk/entry<=.07){const sign=side==='LONG'?1:-1;tp1=entry+sign*2*risk;tp2=entry+sign*3*risk;tp3=entry+sign*4*risk}else{stop=null;risk=null}}
-return{side,shortTf,longTf,aligned,conflict,agreement,score,entry,stop,tp1,tp2,tp3,vr,rs,mh,bands,a,time:last.t+15*MIN,candle:last.t,last,rangeNote,eFast,eSlow,fastN:n,reason:conflict?'15m and 1H disagree; no confirmed entry':!aligned?'Trend is mixed; directional bias only':'15m and 1H trend aligned'} }
-function confirmEntry(c,h,p){if(p.error)return{reason:p.error};if(!p.aligned||p.side!==p.shortTf)return{reason:p.reason};if(p.stop===null)return{reason:'Stop loss risk invalid or above 7%'};if(p.vr<1.2)return{reason:'Volume below 1.2Ã'};const age=Date.now()-p.time;if(age<0||age>20*MIN)return{reason:'Last completed 15m candle is stale'};const i=c.length-1,fast=p.eFast,prior=c.slice(-5,-1),isLong=p.side==='LONG';const touch=prior.some((x,k)=>isLong?x.l<=fast[i-4+k]+p.a*.15&&x.h>=fast[i-4+k]-p.a*.15:x.h>=fast[i-4+k]-p.a*.15&&x.l<=fast[i-4+k]+p.a*.15);const breakout=isLong?p.last.c>Math.max(...prior.map(x=>x.h)):p.last.c<Math.min(...prior.map(x=>x.l));const candleOK=isLong?p.last.c>p.last.o&&p.last.c>fast[i]:p.last.c<p.last.o&&p.last.c<fast[i];if(!(touch||breakout)||!candleOK)return{reason:'No completed pullback/reclaim or breakout candle'};return{...p,reason:'CONFIRMED',confirmed:true}}
-function levelGrid(s){return `<div class="grid"><div class="metric"><small>ENTRY Â· reference</small><strong class="gold">${fmt(s.entry)}</strong></div><div class="metric"><small>STOP LOSS</small><strong class="red">${fmt(s.stop)}</strong></div><div class="metric"><small>TP1 Â· 2R</small><strong class="green">${fmt(s.tp1)}</strong></div><div class="metric"><small>TP2 Â· 3R</small><strong class="green">${fmt(s.tp2)}</strong></div><div class="metric"><small>TP3 Â· 4R</small><strong class="green">${fmt(s.tp3)}</strong></div><div class="metric"><small>VOLUME</small><strong>${Number.isFinite(s.vr)?s.vr.toFixed(2)+'Ã':'â'}</strong></div></div>`}
-function renderAnalysis(p,id){if(p.error){$('manualResult').innerHTML=`<div class="signalhead">âª DATA UNAVAILABLE</div><p>${esc(p.error)}</p>`;return}const cls=p.side==='LONG'?'green':p.side==='SHORT'?'red':'gold';$('manualResult').innerHTML=`<div class="signalhead ${cls}">${p.side==='LONG'?'ð¢':p.side==='SHORT'?'ð´':'ð¡'} ${p.side} Â· ${esc(id)}</div><p class="gold"><b>ANYTIME MARKET BIAS Â· NOT CONFIRMED ENTRY</b></p><p class="muted">15m: <b>${p.shortTf}</b> Â· 1H: <b>${p.longTf}</b> Â· Indicator agreement: <b>${p.agreement}%</b> (not win probability)</p><p class="muted mini">${esc(p.reason)}${p.rangeNote?' Â· '+esc(p.rangeNote):''} Â· ${ny(p.time)}</p>${p.stop!==null?levelGrid(p):'<p class="muted">No valid risk-defined entry levels. Do not enter on bias alone.</p>'}<p class="muted mini">RSI ${p.rs.toFixed(1)} Â· MACD histogram ${fmt(p.mh)} Â· BB ${fmt(p.bands.lower)}â${fmt(p.bands.upper)}</p>`}
-function renderConfirmed(s,id){if(!s.confirmed){$('confirmedBadge').textContent='NOT CONFIRMED';$('confirmedBadge').className='badge unconfirmed';$('confirmedResult').innerHTML=`<div class="signalhead">âª WAIT â NO CONFIRMED ENTRY</div><p class="muted">${esc(s.reason)}</p>`;return}$('confirmedBadge').textContent='CONFIRMED';$('confirmedBadge').className='badge confirmed';$('confirmedResult').innerHTML=`<div class="signalhead ${s.side==='LONG'?'green':'red'}">${s.side} Â· ${esc(id)}</div><p class="green"><b>CONFIRMED Â· 15m + 1H</b></p><p class="muted">${ny(s.time)}</p>${levelGrid(s)}<p class="muted mini">Reference levels from completed candle. Live price verified; do not chase.</p>`}
-async function validatePrice(info,s,c){if(info.kind!=='perp')return false;const body={type:'metaAndAssetCtxs'};if(info.dex)body.dex=info.dex;const data=await api(body);if(!Array.isArray(data)||data.length<2)return false;const index=(data[0].universe||[]).findIndex(x=>x.name===info.asset);if(index<0)return false;const ctx=data[1][index]||{},mid=Number(ctx.midPx),mark=Number(ctx.markPx),current=Number.isFinite(mid)&&mid>0?mid:mark;if(!Number.isFinite(current)||current<=0)return false;const drift=Math.min(s.entry*.005,atr(c)*.35);return Math.abs(current-s.entry)<=drift&&(s.side==='LONG'?current>s.stop:current<s.stop)}
-function clearChart(){const canvas=$('priceChart');const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height)}
-function drawChart(c,p,id,tf){const canvas=$('priceChart'),box=canvas.parentElement,ratio=Math.min(window.devicePixelRatio||1,2),w=box.clientWidth,h=box.clientHeight;canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);const ctx=canvas.getContext('2d');ctx.scale(ratio,ratio);ctx.fillStyle='#0b1422';ctx.fillRect(0,0,w,h);const pad={l:10,r:69,t:50,b:34},width=w-pad.l-pad.r,height=h-pad.t-pad.b;const candles=c.slice(-Math.min(90,c.length));if(candles.length<5)return;const closes=c.map(x=>x.c),emaFast=ema(closes,p.fastN),emaSlow=ema(closes,89),start=c.length-candles.length;const extra=[p.entry,p.stop,p.tp1,p.tp2,p.tp3].filter(Number.isFinite);let lo=Math.min(...candles.map(x=>x.l),...extra),hi=Math.max(...candles.map(x=>x.h),...extra);const buffer=Math.max((hi-lo)*.08,hi*.0005);lo-=buffer;hi+=buffer;const y=v=>pad.t+(hi-v)/(hi-lo)*height,x=i=>pad.l+(i+.5)*width/candles.length;ctx.strokeStyle='#22334a';ctx.lineWidth=1;ctx.font='11px system-ui';ctx.fillStyle='#9fb2c9';for(let k=0;k<=5;k++){const v=lo+(hi-lo)*k/5,py=y(v);ctx.beginPath();ctx.moveTo(pad.l,py);ctx.lineTo(w-pad.r,py);ctx.stroke();ctx.fillText(fmt(v),w-pad.r+6,py+4)}const cw=Math.max(2,Math.min(12,width/candles.length*.62));candles.forEach((a,i)=>{const color=a.c>=a.o?'#21d6a5':'#ff637c';ctx.strokeStyle=color;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x(i),y(a.h));ctx.lineTo(x(i),y(a.l));ctx.stroke();const top=y(Math.max(a.o,a.c)),bottom=y(Math.min(a.o,a.c));ctx.fillRect(x(i)-cw/2,top,cw,Math.max(1,bottom-top))});function line(vals,color){ctx.beginPath();let begun=false;for(let i=0;i<candles.length;i++){const v=vals[start+i];if(!Number.isFinite(v))continue;if(!begun){ctx.moveTo(x(i),y(v));begun=true}else ctx.lineTo(x(i),y(v))}ctx.strokeStyle=color;ctx.lineWidth=1.8;ctx.stroke()}line(emaFast,'#dafa4b');line(emaSlow,'#58a6ff');const levels=[['ENTRY',p.entry,'#f6c96b'],['SL',p.stop,'#ff637c'],['TP1',p.tp1,'#21d6a5'],['TP2',p.tp2,'#21d6a5'],['TP3',p.tp3,'#21d6a5']];for(const [name,value,color] of levels){if(!Number.isFinite(value))continue;const py=y(value);ctx.setLineDash([5,4]);ctx.strokeStyle=color;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,py);ctx.lineTo(w-pad.r,py);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=color;ctx.font='bold 10px system-ui';ctx.fillText(name,w-pad.r+6,py-5)}ctx.fillStyle='#9fb2c9';ctx.font='11px system-ui';for(let i=0;i<candles.length;i+=Math.max(1,Math.floor(candles.length/5)))ctx.fillText(new Date(candles[i].t).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}),x(i),h-10);$('chartLegend').innerHTML=`${esc(id)} Â· ${esc(tf)} Â· ${p.side} bias Â· <span style="color:#dafa4b">EMA${p.fastN}</span> / <span style="color:#58a6ff">EMA89</span>`}
-async function analyze(){const id=$('market').value,info=marketInfo.get(id);if(!info)return;const seq=++analysisSeq,btn=$('analyze');btn.disabled=true;$('status').textContent='Loading Hyperliquid completed candles...';try{if(info.kind==='stock'){invalidate();$('status').textContent='Stock chart-only: no matching Hyperliquid feed. No signal generated.';return}const display=getDisplayTf(),days={'1m':2,'5m':5,'15m':13,'1h':17,'4h':45,'1d':180,'1w':700,'1M':1500};const intervals=new Set(['15m','1h',display]);const results=await Promise.all([...intervals].map(async tf=>[tf,await candles(info.coin,tf,days[tf]||13)]));if(seq!==analysisSeq)return;const data=new Map(results),c=data.get('15m'),h=data.get('1h'),p=evaluate(c,h,$('strategy').value,$('week').value);if(p.error){renderAnalysis(p,id);renderConfirmed({reason:p.error},id);$('status').textContent=p.error;clearChart();return}let confirmed=confirmEntry(c,h,p);if(confirmed.confirmed){const valid=await validatePrice(info,confirmed,c).catch(()=>false);if(!valid)confirmed={reason:'Live Hyperliquid price could not be verified; no confirmed entry'}}if(seq!==analysisSeq)return;renderAnalysis(p,id);renderConfirmed(confirmed,id);drawChart(data.get(display),p,id,display);$('strategyMetric').textContent=$('strategy').selectedOptions[0].textContent;$('lastClose').textContent=fmt(p.entry);$('trend').textContent=p.longTf;$('vol').textContent=p.vr.toFixed(2)+'Ã';$('time').textContent=ny(p.time);$('rsiMetric').textContent=p.rs.toFixed(1);$('macdMetric').textContent=fmt(p.mh);$('bbMetric').textContent=fmt(p.bands.lower)+'â'+fmt(p.bands.upper);$('feedMetric').textContent='Hyperliquid '+(info.kind==='perp'?'PERP':'SPOT');$('alignmentMetric').textContent=p.aligned?'15m + 1H aligned':p.conflict?'TIMEFRAME CONFLICT':'MIXED';$('status').textContent=`Analysis complete Â· ${c.length} 15m Â· ${h.length} 1H Â· chart ${display} (${data.get(display).length} candles)`;lastSnapshot={c:data.get(display),p,id,tf:display}}catch(e){if(seq===analysisSeq){$('status').textContent='Data error: '+e.message;$('manualResult').innerHTML='<div class="signalhead">âª DATA ERROR</div><p>'+esc(e.message)+'</p>';renderConfirmed({reason:'Data unavailable'},id);clearChart()}}finally{if(seq===analysisSeq)btn.disabled=false}}
-async function checkAlert(){if(alertBusy||document.hidden)return;const id=$('market').value,info=marketInfo.get(id);if(!info||info.kind!=='perp')return;alertBusy=true;try{const [c,h]=await Promise.all([candles(info.coin,'15m',13),candles(info.coin,'1h',17)]),p=evaluate(c,h,$('strategy').value,$('week').value),s=confirmEntry(c,h,p);if(!s.confirmed)return;if(!await validatePrice(info,s,c).catch(()=>false))return;const key='yoyo-v39:'+id+':'+$('strategy').value+':'+s.side+':'+s.candle;if(localStorage.getItem(key))return;localStorage.setItem(key,'1');const body=`${id} ${s.side} | ENTRY ${fmt(s.entry)} | SL ${fmt(s.stop)} | TP1 ${fmt(s.tp1)} | TP2 ${fmt(s.tp2)} | TP3 ${fmt(s.tp3)} | VOL ${s.vr.toFixed(2)}Ã`;$('alertsStatus').textContent='Confirmed: '+body;if('Notification'in window&&Notification.permission==='granted')new Notification('YOYO Â· CONFIRMED ENTRY',{body,tag:key})}catch(e){$('alertsStatus').textContent='Alert check failed: '+e.message}finally{alertBusy=false}}
-$('alertsToggle').onclick=async()=>{if(alertTimer){clearInterval(alertTimer);alertTimer=null;$('alertsToggle').textContent='ENABLE SIGNAL NOTIFICATIONS';$('alertsStatus').textContent='Alerts off.';return}if('Notification'in window&&Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}alertTimer=setInterval(checkAlert,60000);$('alertsToggle').textContent='STOP SIGNAL MONITORING';$('alertsStatus').textContent='Monitoring selected Hyperliquid PERP while page is open.';checkAlert()};
-$('marketTabs').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;marketFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));updateMarkets();invalidate()});$('search').addEventListener('input',()=>{updateMarkets();invalidate()});$('market').addEventListener('change',invalidate);$('strategy').addEventListener('change',()=>{syncButtons();invalidate()});$('week').addEventListener('change',invalidate);$('single').onclick=()=>setMode('single');$('multi').onclick=()=>setMode('multi');$('times').addEventListener('click',e=>{const b=e.target.closest('[data-tf]');if(!b)return;const tf=b.dataset.tf;if(mode==='single')selected=new Set([tf]);else if(selected.has(tf)&&selected.size>1)selected.delete(tf);else selected.add(tf);syncButtons();invalidate()});$('analyze').onclick=analyze;window.addEventListener('resize',()=>{if(lastSnapshot)drawChart(lastSnapshot.c,lastSnapshot.p,lastSnapshot.id,lastSnapshot.tf)});syncButtons();loadMarkets().catch(e=>{$('status').textContent='Market discovery failed: '+e.message});
-</script></body></html>
+
+const API = 'https://api.hyperliquid.xyz/info';
+
+const $ = id =>
+  document.getElementById(id);
+
+const MIN = 60000;
+const HOUR = 3600000;
+const DAY = 86400000;
+
+const tfMs = {
+  '1m':MIN,
+  '5m':5*MIN,
+  '15m':15*MIN,
+  '1h':HOUR,
+  '4h':4*HOUR,
+  '1d':DAY,
+  '1w':7*DAY,
+  '1M':30*DAY
+};
+
+const STOCKS = [
+  'AAPL',
+  'MSFT',
+  'NVDA',
+  'TSLA',
+  'AMZN',
+  'GOOGL',
+  'META',
+  'AMD',
+  'AVGO',
+  'NFLX',
+  'PLTR',
+  'COIN',
+  'MSTR',
+  'HOOD',
+  'SOFI',
+  'SPY',
+  'QQQ'
+];
+
+const WATCHLIST_KEY =
+  'yoyo-v40-watchlist';
+
+const HISTORY_KEY =
+  'yoyo-v40-confirmed-history';
+
+let marketInfo = new Map([
+  [
+    'SOL',
+    {
+      kind:'perp',
+      coin:'SOL',
+      asset:'SOL',
+      label:'SOL · PERP'
+    }
+  ]
+]);
+
+let markets = ['SOL'];
+let marketRows = [];
+let marketFilter = 'all';
+let moverFilter = 'all';
+let mode = 'multi';
+
+let selected =
+  new Set(['15m','1h']);
+
+let analysisSeq = 0;
+let alertTimer = null;
+let alertBusy = false;
+let lastSnapshot = null;
+
+function storedList(key){
+
+  try{
+
+    const value = JSON.parse(
+      localStorage.getItem(key) || '[]'
+    );
+
+    return Array.isArray(value)
+      ? value
+      : [];
+
+  }catch{
+
+    return [];
+
+  }
+
+}
+
+let watchlist =
+  new Set(storedList(WATCHLIST_KEY));
+
+const fmt = number => {
+
+  if(!Number.isFinite(number)){
+    return '—';
+  }
+
+  return Number(number).toLocaleString(
+    'en-US',
+    {
+      maximumFractionDigits:
+        Math.abs(number)<1
+          ? 6
+          : Math.abs(number)<100
+            ? 4
+            : 2
+    }
+  );
+
+};
+
+const compact = number => {
+
+  if(!Number.isFinite(number)){
+    return '—';
+  }
+
+  return new Intl.NumberFormat(
+    'en-US',
+    {
+      notation:'compact',
+      maximumFractionDigits:2
+    }
+  ).format(number);
+
+};
+
+const ny = time =>
+  new Date(time).toLocaleString(
+    'en-US',
+    {
+      timeZone:'America/New_York',
+      month:'short',
+      day:'numeric',
+      hour:'numeric',
+      minute:'2-digit',
+      timeZoneName:'short'
+    }
+  );
+
+const esc = value =>
+  String(value).replace(
+    /[&<>"']/g,
+    character => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    })[character]
+  );
+
+async function api(body){
+
+  const controller =
+    new AbortController();
+
+  const timer = setTimeout(
+    () => controller.abort(),
+    16000
+  );
+
+  try{
+
+    const response = await fetch(
+      API,
+      {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify(body),
+        signal:controller.signal
+      }
+    );
+
+    if(!response.ok){
+
+      throw Error(
+        'Hyperliquid HTTP ' +
+        response.status
+      );
+
+    }
+
+    return await response.json();
+
+  }finally{
+
+    clearTimeout(timer);
+
+  }
+
+} 
+async function loadMarkets(){
+
+  const found = new Map();
+  const failures = [];
+  const dexes = [''];
+
+  const add = (id,item) => {
+
+    if(!found.has(id)){
+      found.set(id,item);
+    }
+
+  };
+
+  try{
+
+    const rows = await api({
+      type:'perpDexs'
+    });
+
+    for(const row of rows || []){
+
+      const name =
+        typeof row === 'string'
+          ? row
+          : Array.isArray(row)
+            ? row[0]
+            : row?.name;
+
+      if(
+        name &&
+        name !== 'default' &&
+        !dexes.includes(name)
+      ){
+        dexes.push(name);
+      }
+
+    }
+
+  }catch{
+
+    failures.push(
+      'Additional DEX discovery unavailable'
+    );
+
+  }
+
+  for(const dex of dexes){
+
+    try{
+
+      const body = {
+        type:'metaAndAssetCtxs'
+      };
+
+      if(dex){
+        body.dex = dex;
+      }
+
+      const data = await api(body);
+
+      const universe =
+        data?.[0]?.universe || [];
+
+      const contexts =
+        data?.[1] || [];
+
+      for(
+        let index=0;
+        index<universe.length;
+        index++
+      ){
+
+        const asset =
+          universe[index];
+
+        if(
+          asset.isDelisted ||
+          asset.name === 'BTC'
+        ){
+          continue;
+        }
+
+        const id =
+          (dex ? dex+':' : '') +
+          asset.name;
+
+        const context =
+          contexts[index] || {};
+
+        const price = Number(
+          context.midPx ||
+          context.markPx
+        );
+
+        const previous = Number(
+          context.prevDayPx
+        );
+
+        const change =
+          Number.isFinite(price) &&
+          Number.isFinite(previous) &&
+          previous > 0
+            ? (price-previous) /
+              previous * 100
+            : null;
+
+        const openInterest = Number(
+          context.openInterest
+        );
+
+        add(
+          id,
+          {
+            kind:'perp',
+            coin:id,
+            label:id+' · PERP',
+            dex:dex || '',
+            asset:asset.name,
+            price,
+            change,
+            notional:Number(
+              context.dayNtlVlm
+            ),
+            openInterest:
+              Number.isFinite(openInterest) &&
+              Number.isFinite(price)
+                ? openInterest*price
+                : null,
+            funding:Number(
+              context.funding
+            )
+          }
+        );
+
+      }
+
+    }catch{
+
+      failures.push(
+        (dex || 'Default') +
+        ' perps unavailable'
+      );
+
+    }
+
+  }
+
+  try{
+
+    const data = await api({
+      type:'spotMeta'
+    });
+
+    for(const asset of data.universe || []){
+
+      const id =
+        'SPOT:' + asset.name;
+
+      add(
+        id,
+        {
+          kind:'spot',
+          coin:'@'+asset.index,
+          label:
+            asset.name+
+            ' · HL SPOT'
+        }
+      );
+
+    }
+
+  }catch{
+
+    failures.push(
+      'Spot discovery unavailable'
+    );
+
+  }
+
+  for(const ticker of STOCKS){
+
+    add(
+      'STOCK:'+ticker,
+      {
+        kind:'stock',
+        coin:ticker,
+        label:
+          ticker+
+          ' · STOCK WATCHLIST'
+      }
+    );
+
+  }
+
+  marketInfo = found;
+
+  markets = [...found.keys()]
+    .sort(
+      (a,b) => a.localeCompare(b)
+    );
+
+  marketRows = [...found.entries()]
+    .filter(
+      ([,item]) =>
+        item.kind === 'perp' &&
+        Number.isFinite(item.price)
+    )
+    .map(
+      ([id,item]) => ({
+        id,
+        ...item
+      })
+    );
+
+  updateMarkets();
+  renderCryptoMarket();
+
+  const spotCount =
+    [...found.values()]
+      .filter(
+        item => item.kind === 'spot'
+      )
+      .length;
+
+  $('status').textContent =
+    `${marketRows.length} perps · ` +
+    `${spotCount} spot · ` +
+    `${STOCKS.length} stocks. ` +
+    failures.join('; ');
+
+}
+
+function updateMarkets(){
+
+  const query =
+    $('search').value
+      .toUpperCase()
+      .trim();
+
+  const previous =
+    $('market').value;
+
+  const filtered =
+    markets.filter(id => {
+
+      const info =
+        marketInfo.get(id);
+
+      if(
+        marketFilter === 'crypto' &&
+        info.kind !== 'perp' &&
+        info.kind !== 'spot'
+      ){
+        return false;
+      }
+
+      if(
+        marketFilter === 'perp' &&
+        info.kind !== 'perp'
+      ){
+        return false;
+      }
+
+      if(
+        marketFilter === 'spot' &&
+        info.kind !== 'spot'
+      ){
+        return false;
+      }
+
+      if(
+        marketFilter === 'stock' &&
+        info.kind !== 'stock'
+      ){
+        return false;
+      }
+
+      return(
+        id.toUpperCase().includes(query) ||
+        info.label
+          .toUpperCase()
+          .includes(query)
+      );
+
+    });
+
+  $('market').replaceChildren();
+
+  for(const id of filtered){
+
+    const option =
+      document.createElement('option');
+
+    option.value = id;
+
+    option.textContent =
+      marketInfo.get(id).label;
+
+    $('market').append(option);
+
+  }
+
+  if(filtered.includes(previous)){
+
+    $('market').value = previous;
+
+  }else if(filtered.includes('SOL')){
+
+    $('market').value = 'SOL';
+
+  }else if(filtered.length){
+
+    $('market').value = filtered[0];
+
+  }
+
+}
+
+function renderCryptoMarket(){
+
+  const query =
+    $('cryptoSearch').value
+      .toUpperCase()
+      .trim();
+
+  const rising =
+    marketRows.filter(
+      item => item.change > 0
+    ).length;
+
+  const falling =
+    marketRows.filter(
+      item => item.change < 0
+    ).length;
+
+  const total =
+    marketRows.reduce(
+      (sum,item) =>
+        sum +
+        (
+          Number.isFinite(item.notional)
+            ? item.notional
+            : 0
+        ),
+      0
+    );
+
+  $('perpCount').textContent =
+    marketRows.length || '—';
+
+  $('risingCount').textContent =
+    rising;
+
+  $('fallingCount').textContent =
+    falling;
+
+  $('marketNotional').textContent =
+    '$'+compact(total);
+
+  let rows =
+    marketRows.filter(item =>
+      (
+        item.id+' '+item.asset
+      )
+      .toUpperCase()
+      .includes(query)
+    );
+
+  if(moverFilter === 'gainers'){
+
+    rows = rows
+      .filter(
+        item => item.change > 0
+      )
+      .sort(
+        (a,b) =>
+          b.change-a.change
+      );
+
+  }else if(moverFilter === 'losers'){
+
+    rows = rows
+      .filter(
+        item => item.change < 0
+      )
+      .sort(
+        (a,b) =>
+          a.change-b.change
+      );
+
+  }else if(moverFilter === 'watchlist'){
+
+    rows = rows
+      .filter(
+        item =>
+          watchlist.has(item.id)
+      )
+      .sort(
+        (a,b) =>
+          (b.notional || 0) -
+          (a.notional || 0)
+      );
+
+  }else{
+
+    rows.sort(
+      (a,b) =>
+        (b.notional || 0) -
+        (a.notional || 0)
+    );
+
+  }
+
+  rows = rows.slice(0,30);
+
+  $('marketListStatus').textContent =
+    `Showing ${rows.length} of ` +
+    `${marketRows.length} live markets.`;
+
+  if(!rows.length){
+
+    $('cryptoMarketList').innerHTML = `
+      <div class="empty-state">
+        No markets match this filter.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  $('cryptoMarketList').innerHTML =
+    rows.map(item => `
+
+      <div
+        class="market-row"
+        data-market-id="${esc(item.id)}"
+      >
+
+        <button
+          class="star ${
+            watchlist.has(item.id)
+              ? 'saved'
+              : ''
+          }"
+          data-watch-id="${esc(item.id)}"
+        >
+          ★
+        </button>
+
+        <div>
+
+          <div class="market-symbol">
+            ${esc(item.id)}
+          </div>
+
+          <div class="market-sub">
+
+            24h $${compact(item.notional)}
+
+            ${
+              Number.isFinite(item.funding)
+                ? ' · funding ' +
+                  (
+                    item.funding*100
+                  ).toFixed(4) +
+                  '%'
+                : ''
+            }
+
+          </div>
+
+        </div>
+
+        <div class="market-price">
+          $${fmt(item.price)}
+        </div>
+
+        <div
+          class="market-change ${
+            item.change >= 0
+              ? 'up'
+              : 'down'
+          }"
+        >
+
+          ${
+            item.change >= 0
+              ? '+'
+              : ''
+          }
+
+          ${
+            Number.isFinite(item.change)
+              ? item.change.toFixed(2)
+              : '—'
+          }%
+
+        </div>
+
+      </div>
+
+    `).join('');
+
+}
+
+function showCryptoDetail(id){
+
+  const info =
+    marketInfo.get(id);
+
+  if(
+    !info ||
+    info.kind !== 'perp'
+  ){
+    return;
+  }
+
+  const detail =
+    $('cryptoDetail');
+
+  detail.classList.remove('hidden');
+
+  detail.innerHTML = `
+
+    <div class="detail-head">
+
+      <div>
+
+        <div class="muted mini">
+          HYPERLIQUID PERPETUAL
+        </div>
+
+        <div
+          class="signalhead"
+          style="margin-top:4px"
+        >
+          ${esc(id)}
+        </div>
+
+      </div>
+
+      <div style="text-align:right">
+
+        <strong style="font-size:22px">
+          $${fmt(info.price)}
+        </strong>
+
+        <div
+          class="${
+            info.change >= 0
+              ? 'green'
+              : 'red'
+          }"
+        >
+
+          ${
+            info.change >= 0
+              ? '+'
+              : ''
+          }
+
+          ${
+            Number.isFinite(info.change)
+              ? info.change.toFixed(2)
+              : '—'
+          }%
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="grid">
+
+      <div class="metric">
+        <small>24h notional</small>
+        <strong>
+          $${compact(info.notional)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>Open interest</small>
+        <strong>
+          $${compact(info.openInterest)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>Funding</small>
+        <strong>
+          ${
+            Number.isFinite(info.funding)
+              ? (
+                  info.funding*100
+                ).toFixed(4)+'%'
+              : '—'
+          }
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>DEX</small>
+        <strong>
+          ${esc(info.dex || 'Default')}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>Watchlist</small>
+        <strong>
+          ${
+            watchlist.has(id)
+              ? 'SAVED'
+              : 'NOT SAVED'
+          }
+        </strong>
+      </div>
+
+    </div>
+
+    <div class="detail-actions">
+
+      <button
+        id="detailAnalyze"
+        class="primary"
+        style="margin-top:0"
+      >
+        ANALYZE ${esc(id)} →
+      </button>
+
+      <button id="detailWatch">
+        ${
+          watchlist.has(id)
+            ? 'REMOVE FROM'
+            : 'ADD TO'
+        }
+        WATCHLIST
+      </button>
+
+    </div>
+
+  `;
+
+  $('detailAnalyze').onclick =
+    () => selectCryptoMarket(
+      id,
+      true
+    );
+
+  $('detailWatch').onclick =
+    () => toggleWatch(
+      id,
+      true
+    );
+
+}
+
+function selectCryptoMarket(
+  id,
+  run=false
+){
+
+  if(!marketInfo.has(id)){
+    return;
+  }
+
+  marketFilter = 'all';
+
+  document
+    .querySelectorAll('[data-filter]')
+    .forEach(button => {
+
+      button.classList.toggle(
+        'active',
+        button.dataset.filter === 'all'
+      );
+
+    });
+
+  $('search').value = '';
+
+  updateMarkets();
+
+  $('market').value = id;
+
+  invalidate();
+
+  if(run){
+    analyze();
+  }
+
+}
+
+function toggleWatch(
+  id,
+  refreshDetail=false
+){
+
+  if(watchlist.has(id)){
+
+    watchlist.delete(id);
+
+  }else{
+
+    watchlist.add(id);
+
+  }
+
+  localStorage.setItem(
+    WATCHLIST_KEY,
+    JSON.stringify([...watchlist])
+  );
+
+  renderCryptoMarket();
+
+  if(refreshDetail){
+    showCryptoDetail(id);
+  }
+
+}
+
+function getDisplayTf(){
+
+  return selected.has('15m')
+    ? '15m'
+    : [...selected][0] || '15m';
+
+}
+
+function syncButtons(){
+
+  for(
+    const button of
+    document.querySelectorAll('[data-tf]')
+  ){
+
+    button.classList.toggle(
+      'active',
+      selected.has(button.dataset.tf)
+    );
+
+  }
+
+  $('single').classList.toggle(
+    'active',
+    mode === 'single'
+  );
+
+  $('multi').classList.toggle(
+    'active',
+    mode === 'multi'
+  );
+
+  $('chartcaption').textContent =
+    `Display: ${getDisplayTf()} · ` +
+    `Analysis: 15m + 1H · ` +
+    `Strategy: ${
+      $('strategy')
+        .selectedOptions[0]
+        .textContent
+    }`;
+
+}
+
+function clearChart(){
+
+  const canvas =
+    $('priceChart');
+
+  const context =
+    canvas.getContext('2d');
+
+  context.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+}
+
+function resetOutputs(
+  message='Settings changed. Tap Analyze.'
+){
+
+  lastSnapshot = null;
+
+  $('manualResult').innerHTML = `
+
+    <div class="signalhead">
+      ⚪ NOT ANALYZED
+    </div>
+
+    <p class="muted">
+      ${esc(message)}
+    </p>
+
+  `;
+
+  $('confirmedResult').innerHTML = `
+
+    <div class="signalhead">
+      ⚪ WAIT
+    </div>
+
+    <p class="muted">
+      Reanalysis required.
+    </p>
+
+  `;
+
+  $('confirmedBadge').textContent =
+    'WAITING';
+
+  $('confirmedBadge').className =
+    'badge unconfirmed';
+
+  $('chartLegend').textContent =
+    'Tap Analyze to load the chart.';
+
+  for(const id of [
+    'strategyMetric',
+    'lastClose',
+    'trend',
+    'vol',
+    'time',
+    'rsiMetric',
+    'macdMetric',
+    'bbMetric',
+    'feedMetric',
+    'alignmentMetric'
+  ]){
+
+    $(id).textContent = '—';
+
+  }
+
+  clearChart();
+
+}
+
+function invalidate(){
+
+  analysisSeq++;
+  resetOutputs();
+
+}
+
+function setMode(newMode){
+
+  mode = newMode;
+
+  selected =
+    mode === 'single'
+      ? new Set([getDisplayTf()])
+      : new Set(['15m','1h']);
+
+  syncButtons();
+  invalidate();
+
+}
+
+function getHistory(){
+
+  return storedList(HISTORY_KEY);
+
+}
+
+function renderHistory(){
+
+  const rows = getHistory();
+
+  if(!rows.length){
+
+    $('signalHistory').innerHTML = `
+      <div class="empty-state">
+        No confirmed signals saved.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  $('signalHistory').innerHTML =
+    rows.map(item => `
+
+      <div class="history-row">
+
+        <div>
+
+          <b
+            class="${
+              item.side === 'LONG'
+                ? 'green'
+                : 'red'
+            }"
+          >
+            ${esc(item.id)} ·
+            ${item.side}
+          </b>
+
+          <div class="muted mini">
+
+            ENTRY ${fmt(item.entry)} ·
+            SL ${fmt(item.stop)} ·
+            TP1 ${fmt(item.tp1)} ·
+            VOL ${Number(item.vr).toFixed(2)}×
+
+          </div>
+
+        </div>
+
+        <div class="muted mini">
+          ${ny(item.time)}
+        </div>
+
+      </div>
+
+    `).join('');
+
+}
+
+function recordSignal(signal,id){
+
+  if(!signal?.confirmed){
+    return;
+  }
+
+  const rows = getHistory();
+
+  const key =
+    id + ':' +
+    signal.side + ':' +
+    signal.candle;
+
+  if(
+    rows.some(
+      item => item.key === key
+    )
+  ){
+    return;
+  }
+
+  rows.unshift({
+    key,
+    id,
+    side:signal.side,
+    candle:signal.candle,
+    time:signal.time,
+    entry:signal.entry,
+    stop:signal.stop,
+    tp1:signal.tp1,
+    tp2:signal.tp2,
+    tp3:signal.tp3,
+    vr:signal.vr
+  });
+
+  localStorage.setItem(
+    HISTORY_KEY,
+    JSON.stringify(
+      rows.slice(0,50)
+    )
+  );
+
+  renderHistory();
+
+}
+
+function ema(values,period){
+
+  const output =
+    Array(values.length).fill(null);
+
+  if(values.length < period){
+    return output;
+  }
+
+  let previous =
+    values
+      .slice(0,period)
+      .reduce(
+        (a,b) => a+b,
+        0
+      ) / period;
+
+  output[period-1] = previous;
+
+  const multiplier =
+    2/(period+1);
+
+  for(
+    let index=period;
+    index<values.length;
+    index++
+  ){
+
+    previous =
+      values[index]*multiplier +
+      previous*(1-multiplier);
+
+    output[index] = previous;
+
+  }
+
+  return output;
+
+}
+
+function atr(candles,period=14){
+
+  if(candles.length < period+1){
+    return null;
+  }
+
+  const ranges = [];
+
+  for(
+    let index=1;
+    index<candles.length;
+    index++
+  ){
+
+    ranges.push(
+      Math.max(
+        candles[index].h -
+        candles[index].l,
+
+        Math.abs(
+          candles[index].h -
+          candles[index-1].c
+        ),
+
+        Math.abs(
+          candles[index].l -
+          candles[index-1].c
+        )
+      )
+    );
+
+  }
+
+  return ranges
+    .slice(-period)
+    .reduce(
+      (a,b) => a+b,
+      0
+    ) / period;
+
+}
+
+function volumeRatio(candles){
+
+  if(candles.length < 22){
+    return null;
+  }
+
+  const index =
+    candles.length-1;
+
+  const average =
+    candles
+      .slice(index-20,index)
+      .reduce(
+        (sum,item) =>
+          sum+item.v,
+        0
+      ) / 20;
+
+  return average > 0
+    ? candles[index].v/average
+    : null;
+
+}
+
+function rsi(values,period=14){
+
+  if(values.length < period+2){
+    return null;
+  }
+
+  let gain = 0;
+  let loss = 0;
+
+  for(
+    let index=1;
+    index<=period;
+    index++
+  ){
+
+    const difference =
+      values[index] -
+      values[index-1];
+
+    gain +=
+      Math.max(difference,0);
+
+    loss +=
+      Math.max(-difference,0);
+
+  }
+
+  gain /= period;
+  loss /= period;
+
+  for(
+    let index=period+1;
+    index<values.length;
+    index++
+  ){
+
+    const difference =
+      values[index] -
+      values[index-1];
+
+    gain = (
+      gain*(period-1) +
+      Math.max(difference,0)
+    ) / period;
+
+    loss = (
+      loss*(period-1) +
+      Math.max(-difference,0)
+    ) / period;
+
+  }
+
+  if(loss === 0){
+
+    return gain === 0
+      ? 50
+      : 100;
+
+  }
+
+  return 100 -
+    100/(1+gain/loss);
+
+}
+
+function macdHistogram(values){
+
+  const fast = ema(values,12);
+  const slow = ema(values,26);
+
+  const macd =
+    fast.map(
+      (value,index) =>
+        value === null ||
+        slow[index] === null
+          ? null
+          : value-slow[index]
+    );
+
+  const valid =
+    macd.filter(
+      value => value !== null
+    );
+
+  const signal =
+    ema(valid,9);
+
+  return valid.length >= 9
+    ? valid.at(-1)-signal.at(-1)
+    : null;
+
+}
+
+function bollingerBands(
+  values,
+  period=20
+){
+
+  if(values.length < period){
+    return null;
+  }
+
+  const recent =
+    values.slice(-period);
+
+  const middle =
+    recent.reduce(
+      (a,b) => a+b,
+      0
+    ) / period;
+
+  const deviation =
+    Math.sqrt(
+      recent.reduce(
+        (sum,value) =>
+          sum+(value-middle)**2,
+        0
+      ) / period
+    );
+
+  return{
+    mid:middle,
+    upper:middle+2*deviation,
+    lower:middle-2*deviation
+  };
+
+}
+
+async function candles(
+  coin,
+  interval,
+  days
+){
+
+  const now = Date.now();
+
+  const raw = await api({
+
+    type:'candleSnapshot',
+
+    req:{
+      coin,
+      interval,
+      startTime:now-days*DAY,
+      endTime:now
+    }
+
+  });
+
+  const duration =
+    tfMs[interval];
+
+  if(!duration){
+
+    throw Error(
+      'Unsupported interval'
+    );
+
+  }
+
+  const unique =
+    new Map();
+
+  for(const item of raw || []){
+
+    const candle = {
+      t:+item.t,
+      o:+item.o,
+      h:+item.h,
+      l:+item.l,
+      c:+item.c,
+      v:+item.v
+    };
+
+    const valid = [
+      candle.t,
+      candle.o,
+      candle.h,
+      candle.l,
+      candle.c,
+      candle.v
+    ].every(Number.isFinite);
+
+    if(
+      valid &&
+      candle.t+duration <= Date.now() &&
+      candle.h >= candle.l &&
+      candle.c > 0 &&
+      candle.o > 0
+    ){
+
+      unique.set(
+        candle.t,
+        candle
+      );
+
+    }
+
+  }
+
+  return [...unique.values()]
+    .sort(
+      (a,b) => a.t-b.t
+    );
+
+}
+function evaluate(candles15,candles1h,strategy){
+
+  if(
+    candles15.length < 110 ||
+    candles1h.length < 95
+  ){
+    return{
+      error:'Insufficient completed 15m/1H candles'
+    };
+  }
+
+  const last = candles15.at(-1);
+  const hour = candles1h.at(-1);
+
+  const close15 =
+    candles15.map(item=>item.c);
+
+  const close1h =
+    candles1h.map(item=>item.c);
+
+  let fastPeriod =
+    strategy === 'ema9'
+      ? 9
+      : strategy === 'ema13'
+        ? 13
+        : 21;
+
+  let slowPeriod = 89;
+
+  if(strategy === 'cross'){
+    fastPeriod = 9;
+    slowPeriod = 21;
+  }
+
+  const fast15 =
+    ema(close15,fastPeriod);
+
+  const slow15 =
+    ema(close15,slowPeriod);
+
+  const fast1h =
+    ema(close1h,fastPeriod);
+
+  const slow1h =
+    ema(close1h,slowPeriod);
+
+  const index15 =
+    candles15.length-1;
+
+  const index1h =
+    candles1h.length-1;
+
+  const averageRange =
+    atr(candles15);
+
+  const vr =
+    volumeRatio(candles15);
+
+  const rs =
+    rsi(close15);
+
+  const mh =
+    macdHistogram(close15);
+
+  const bands =
+    bollingerBands(close15);
+
+  if(
+    !averageRange ||
+    !Number.isFinite(vr) ||
+    !Number.isFinite(rs) ||
+    !Number.isFinite(mh) ||
+    !bands
+  ){
+    return{
+      error:'Indicators unavailable'
+    };
+  }
+
+  const timeframeSide = (
+    close,
+    fast,
+    slow
+  ) => {
+
+    if(
+      close > slow &&
+      fast > slow
+    ){
+      return 'LONG';
+    }
+
+    if(
+      close < slow &&
+      fast < slow
+    ){
+      return 'SHORT';
+    }
+
+    return 'MIXED';
+
+  };
+
+  const shortTf =
+    timeframeSide(
+      last.c,
+      fast15[index15],
+      slow15[index15]
+    );
+
+  const longTf =
+    timeframeSide(
+      hour.c,
+      fast1h[index1h],
+      slow1h[index1h]
+    );
+
+  const candleScore =
+    last.c > last.o
+      ? 0.5
+      : last.c < last.o
+        ? -0.5
+        : 0;
+
+  const score =
+    (
+      shortTf === 'LONG'
+        ? 2
+        : shortTf === 'SHORT'
+          ? -2
+          : 0
+    ) +
+    (
+      longTf === 'LONG'
+        ? 3
+        : longTf === 'SHORT'
+          ? -3
+          : 0
+    ) +
+    (
+      rs > 55
+        ? 1
+        : rs < 45
+          ? -1
+          : 0
+    ) +
+    (
+      mh > 0
+        ? 1
+        : mh < 0
+          ? -1
+          : 0
+    ) +
+    (
+      last.c > bands.mid
+        ? 1
+        : last.c < bands.mid
+          ? -1
+          : 0
+    ) +
+    candleScore;
+
+  const side =
+    score > 0
+      ? 'LONG'
+      : score < 0
+        ? 'SHORT'
+        : 'NEUTRAL';
+
+  const aligned =
+    shortTf === longTf &&
+    shortTf !== 'MIXED';
+
+  const conflict =
+    shortTf !== 'MIXED' &&
+    longTf !== 'MIXED' &&
+    shortTf !== longTf;
+
+  const agreement =
+    Math.round(
+      Math.abs(score)/8.5*100
+    );
+
+  const structure =
+    side === 'LONG'
+      ? Math.min(
+          ...candles15
+            .slice(-6)
+            .map(item=>item.l)
+        )
+      : Math.max(
+          ...candles15
+            .slice(-6)
+            .map(item=>item.h)
+        );
+
+  const entry = last.c;
+
+  let stop = null;
+  let tp1 = null;
+  let tp2 = null;
+  let tp3 = null;
+
+  if(side !== 'NEUTRAL'){
+
+    stop =
+      side === 'LONG'
+        ? Math.min(
+            structure-averageRange*0.15,
+            entry-averageRange*1.35
+          )
+        : Math.max(
+            structure+averageRange*0.15,
+            entry+averageRange*1.35
+          );
+
+    const risk =
+      Math.abs(entry-stop);
+
+    if(
+      risk > 0 &&
+      risk/entry <= 0.07
+    ){
+
+      const direction =
+        side === 'LONG'
+          ? 1
+          : -1;
+
+      tp1 =
+        entry+direction*2*risk;
+
+      tp2 =
+        entry+direction*3*risk;
+
+      tp3 =
+        entry+direction*4*risk;
+
+    }else{
+
+      stop = null;
+
+    }
+
+  }
+
+  return{
+    side,
+    shortTf,
+    longTf,
+    aligned,
+    conflict,
+    agreement,
+    entry,
+    stop,
+    tp1,
+    tp2,
+    tp3,
+    vr,
+    rs,
+    mh,
+    bands,
+    a:averageRange,
+    time:last.t+15*MIN,
+    candle:last.t,
+    last,
+    eFast:fast15,
+    fastN:fastPeriod,
+    slowN:slowPeriod,
+    reason:
+      conflict
+        ? '15m and 1H disagree; no confirmed entry'
+        : !aligned
+          ? 'Trend is mixed; directional bias only'
+          : '15m and 1H trend aligned'
+  };
+
+}
+
+function confirmEntry(
+  candles15,
+  analysis
+){
+
+  if(analysis.error){
+
+    return{
+      reason:analysis.error
+    };
+
+  }
+
+  if(
+    !analysis.aligned ||
+    analysis.side !== analysis.shortTf
+  ){
+
+    return{
+      reason:analysis.reason
+    };
+
+  }
+
+  if(analysis.stop === null){
+
+    return{
+      reason:'Stop-loss risk is invalid or above 7%'
+    };
+
+  }
+
+  if(analysis.vr < 1.2){
+
+    return{
+      reason:'Volume is below 1.2×'
+    };
+
+  }
+
+  const age =
+    Date.now()-analysis.time;
+
+  if(
+    age < 0 ||
+    age > 20*MIN
+  ){
+
+    return{
+      reason:'Last completed 15m candle is stale'
+    };
+
+  }
+
+  const index =
+    candles15.length-1;
+
+  const fast =
+    analysis.eFast;
+
+  const previous =
+    candles15.slice(-5,-1);
+
+  const isLong =
+    analysis.side === 'LONG';
+
+  const touch =
+    previous.some(
+      (candle,offset) => {
+
+        const fastValue =
+          fast[index-4+offset];
+
+        return isLong
+          ? candle.l <=
+              fastValue+analysis.a*0.15 &&
+            candle.h >=
+              fastValue-analysis.a*0.15
+
+          : candle.h >=
+              fastValue-analysis.a*0.15 &&
+            candle.l <=
+              fastValue+analysis.a*0.15;
+
+      }
+    );
+
+  const breakout =
+    isLong
+      ? analysis.last.c >
+        Math.max(
+          ...previous.map(item=>item.h)
+        )
+      : analysis.last.c <
+        Math.min(
+          ...previous.map(item=>item.l)
+        );
+
+  const candleOK =
+    isLong
+      ? analysis.last.c >
+          analysis.last.o &&
+        analysis.last.c >
+          fast[index]
+      : analysis.last.c <
+          analysis.last.o &&
+        analysis.last.c <
+          fast[index];
+
+  if(
+    !(touch || breakout) ||
+    !candleOK
+  ){
+
+    return{
+      reason:
+        'No completed pullback/reclaim or breakout candle'
+    };
+
+  }
+
+  return{
+    ...analysis,
+    reason:'CONFIRMED',
+    confirmed:true
+  };
+
+}
+
+function levelGrid(signal){
+
+  return`
+
+    <div class="grid">
+
+      <div class="metric">
+        <small>ENTRY</small>
+        <strong class="gold">
+          ${fmt(signal.entry)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>STOP LOSS</small>
+        <strong class="red">
+          ${fmt(signal.stop)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>TP1 · 2R</small>
+        <strong class="green">
+          ${fmt(signal.tp1)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>TP2 · 3R</small>
+        <strong class="green">
+          ${fmt(signal.tp2)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>TP3 · 4R</small>
+        <strong class="green">
+          ${fmt(signal.tp3)}
+        </strong>
+      </div>
+
+      <div class="metric">
+        <small>VOLUME</small>
+        <strong>
+          ${signal.vr.toFixed(2)}×
+        </strong>
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function renderAnalysis(
+  analysis,
+  id
+){
+
+  if(analysis.error){
+
+    $('manualResult').innerHTML=`
+
+      <div class="signalhead">
+        ⚪ DATA UNAVAILABLE
+      </div>
+
+      <p>
+        ${esc(analysis.error)}
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+  const color =
+    analysis.side === 'LONG'
+      ? 'green'
+      : analysis.side === 'SHORT'
+        ? 'red'
+        : 'gold';
+
+  const icon =
+    analysis.side === 'LONG'
+      ? '🟢'
+      : analysis.side === 'SHORT'
+        ? '🔴'
+        : '🟡';
+
+  $('manualResult').innerHTML=`
+
+    <div class="signalhead ${color}">
+      ${icon} ${analysis.side} · ${esc(id)}
+    </div>
+
+    <p class="gold">
+      <b>
+        ANYTIME MARKET DIRECTION ·
+        NOT CONFIRMED ENTRY
+      </b>
+    </p>
+
+    <p class="muted">
+
+      15m:
+      <b>${analysis.shortTf}</b> ·
+
+      1H:
+      <b>${analysis.longTf}</b> ·
+
+      Agreement:
+      <b>${analysis.agreement}%</b>
+
+    </p>
+
+    <p class="muted mini">
+      ${esc(analysis.reason)} ·
+      ${ny(analysis.time)}
+    </p>
+
+    <p class="muted mini">
+
+      RSI ${analysis.rs.toFixed(1)} ·
+
+      MACD ${fmt(analysis.mh)} ·
+
+      BB
+      ${fmt(analysis.bands.lower)}
+      –
+      ${fmt(analysis.bands.upper)}
+
+    </p>
+
+  `;
+
+}
+
+function renderConfirmed(
+  signal,
+  id
+){
+
+  if(!signal.confirmed){
+
+    $('confirmedBadge').textContent =
+      'NOT CONFIRMED';
+
+    $('confirmedBadge').className =
+      'badge unconfirmed';
+
+    $('confirmedResult').innerHTML=`
+
+      <div class="signalhead">
+        ⚪ WAIT — NO CONFIRMED ENTRY
+      </div>
+
+      <p class="muted">
+        ${esc(signal.reason)}
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+  $('confirmedBadge').textContent =
+    'CONFIRMED';
+
+  $('confirmedBadge').className =
+    'badge confirmed';
+
+  $('confirmedResult').innerHTML=`
+
+    <div
+      class="signalhead ${
+        signal.side === 'LONG'
+          ? 'green'
+          : 'red'
+      }"
+    >
+      ${signal.side} · ${esc(id)}
+    </div>
+
+    <p class="green">
+      <b>CONFIRMED · 15m + 1H</b>
+    </p>
+
+    <p class="muted">
+      ${ny(signal.time)}
+    </p>
+
+    ${levelGrid(signal)}
+
+    <p class="muted mini">
+      Completed-candle reference levels.
+      Do not chase.
+    </p>
+
+  `;
+
+}
+
+async function validatePrice(
+  info,
+  signal,
+  candles15
+){
+
+  if(info.kind !== 'perp'){
+    return false;
+  }
+
+  const body = {
+    type:'metaAndAssetCtxs'
+  };
+
+  if(info.dex){
+    body.dex = info.dex;
+  }
+
+  const data = await api(body);
+
+  if(
+    !Array.isArray(data) ||
+    data.length < 2
+  ){
+    return false;
+  }
+
+  const index =
+    (data[0].universe || [])
+      .findIndex(
+        item =>
+          item.name === info.asset
+      );
+
+  if(index < 0){
+    return false;
+  }
+
+  const context =
+    data[1][index] || {};
+
+  const middle =
+    Number(context.midPx);
+
+  const mark =
+    Number(context.markPx);
+
+  const current =
+    Number.isFinite(middle) &&
+    middle > 0
+      ? middle
+      : mark;
+
+  if(
+    !Number.isFinite(current) ||
+    current <= 0
+  ){
+    return false;
+  }
+
+  const drift =
+    Math.min(
+      signal.entry*0.005,
+      atr(candles15)*0.35
+    );
+
+  return(
+    Math.abs(
+      current-signal.entry
+    ) <= drift &&
+    (
+      signal.side === 'LONG'
+        ? current > signal.stop
+        : current < signal.stop
+    )
+  );
+
+}
+
+function drawChart(
+  candleData,
+  analysis,
+  id,
+  timeframe,
+  confirmed=null
+){
+
+  const canvas =
+    $('priceChart');
+
+  const box =
+    canvas.parentElement;
+
+  const ratio =
+    Math.min(
+      window.devicePixelRatio || 1,
+      2
+    );
+
+  const width =
+    box.clientWidth;
+
+  const height =
+    box.clientHeight;
+
+  canvas.width =
+    Math.round(width*ratio);
+
+  canvas.height =
+    Math.round(height*ratio);
+
+  const context =
+    canvas.getContext('2d');
+
+  context.scale(ratio,ratio);
+
+  context.fillStyle =
+    '#0b1422';
+
+  context.fillRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  const padding = {
+    l:10,
+    r:69,
+    t:50,
+    b:34
+  };
+
+  const chartWidth =
+    width-padding.l-padding.r;
+
+  const chartHeight =
+    height-padding.t-padding.b;
+
+  const displayed =
+    candleData.slice(
+      -Math.min(
+        90,
+        candleData.length
+      )
+    );
+
+  if(displayed.length < 5){
+    return;
+  }
+
+  const closes =
+    candleData.map(item=>item.c);
+
+  const fast =
+    ema(closes,analysis.fastN);
+
+  const slow =
+    ema(closes,analysis.slowN);
+
+  const start =
+    candleData.length-
+    displayed.length;
+
+  const plan =
+    confirmed?.confirmed
+      ? confirmed
+      : null;
+
+  const levelValues =
+    plan
+      ? [
+          plan.entry,
+          plan.stop,
+          plan.tp1,
+          plan.tp2,
+          plan.tp3
+        ].filter(Number.isFinite)
+      : [];
+
+  let low =
+    Math.min(
+      ...displayed.map(item=>item.l),
+      ...levelValues
+    );
+
+  let high =
+    Math.max(
+      ...displayed.map(item=>item.h),
+      ...levelValues
+    );
+
+  const buffer =
+    Math.max(
+      (high-low)*0.08,
+      high*0.0005
+    );
+
+  low -= buffer;
+  high += buffer;
+
+  const y = value =>
+    padding.t +
+    (high-value)/
+    (high-low)*
+    chartHeight;
+
+  const x = index =>
+    padding.l +
+    (index+0.5)*
+    chartWidth/
+    displayed.length;
+
+  context.strokeStyle =
+    '#22334a';
+
+  context.lineWidth = 1;
+  context.font = '11px system-ui';
+  context.fillStyle = '#9fb2c9';
+
+  for(let line=0;line<=5;line++){
+
+    const value =
+      low+(high-low)*line/5;
+
+    const positionY =
+      y(value);
+
+    context.beginPath();
+
+    context.moveTo(
+      padding.l,
+      positionY
+    );
+
+    context.lineTo(
+      width-padding.r,
+      positionY
+    );
+
+    context.stroke();
+
+    context.fillText(
+      fmt(value),
+      width-padding.r+6,
+      positionY+4
+    );
+
+  }
+
+  const candleWidth =
+    Math.max(
+      2,
+      Math.min(
+        12,
+        chartWidth/
+        displayed.length*
+        0.62
+      )
+    );
+
+  displayed.forEach(
+    (item,index) => {
+
+      const color =
+        item.c >= item.o
+          ? '#21d6a5'
+          : '#ff637c';
+
+      context.strokeStyle = color;
+      context.fillStyle = color;
+
+      context.beginPath();
+
+      context.moveTo(
+        x(index),
+        y(item.h)
+      );
+
+      context.lineTo(
+        x(index),
+        y(item.l)
+      );
+
+      context.stroke();
+
+      const top =
+        y(Math.max(item.o,item.c));
+
+      const bottom =
+        y(Math.min(item.o,item.c));
+
+      context.fillRect(
+        x(index)-candleWidth/2,
+        top,
+        candleWidth,
+        Math.max(
+          1,
+          bottom-top
+        )
+      );
+
+    }
+  );
+
+  function drawLine(
+    values,
+    color
+  ){
+
+    context.beginPath();
+
+    let started = false;
+
+    for(
+      let index=0;
+      index<displayed.length;
+      index++
+    ){
+
+      const value =
+        values[start+index];
+
+      if(!Number.isFinite(value)){
+        continue;
+      }
+
+      if(!started){
+
+        context.moveTo(
+          x(index),
+          y(value)
+        );
+
+        started = true;
+
+      }else{
+
+        context.lineTo(
+          x(index),
+          y(value)
+        );
+
+      }
+
+    }
+
+    context.strokeStyle = color;
+    context.lineWidth = 1.8;
+    context.stroke();
+
+  }
+
+  drawLine(fast,'#dafa4b');
+  drawLine(slow,'#58a6ff');
+
+  const planLevels =
+    plan
+      ? [
+          ['ENTRY',plan.entry,'#f6c96b'],
+          ['SL',plan.stop,'#ff637c'],
+          ['TP1',plan.tp1,'#21d6a5'],
+          ['TP2',plan.tp2,'#21d6a5'],
+          ['TP3',plan.tp3,'#21d6a5']
+        ]
+      : [];
+
+  for(
+    const[
+      name,
+      value,
+      color
+    ]of planLevels
+  ){
+
+    if(!Number.isFinite(value)){
+      continue;
+    }
+
+    const positionY =
+      y(value);
+
+    context.setLineDash([5,4]);
+    context.strokeStyle = color;
+    context.lineWidth = 1;
+    context.beginPath();
+
+    context.moveTo(
+      padding.l,
+      positionY
+    );
+
+    context.lineTo(
+      width-padding.r,
+      positionY
+    );
+
+    context.stroke();
+    context.setLineDash([]);
+
+    context.fillStyle = color;
+    context.font =
+      'bold 10px system-ui';
+
+    context.fillText(
+      name,
+      width-padding.r+6,
+      positionY-5
+    );
+
+  }
+
+  $('chartLegend').innerHTML =
+    `${esc(id)} · `+
+    `${esc(timeframe)} · `+
+    `${analysis.side} · `+
+    `<span style="color:#dafa4b">`+
+    `EMA${analysis.fastN}`+
+    `</span> / `+
+    `<span style="color:#58a6ff">`+
+    `EMA${analysis.slowN}`+
+    `</span>`+
+    (
+      plan
+        ? ' · CONFIRMED LEVELS'
+        : ' · NO CONFIRMED LEVELS'
+    );
+
+}
+
+async function analyze(){
+
+  const id =
+    $('market').value;
+
+  const info =
+    marketInfo.get(id);
+
+  if(!info){
+    return;
+  }
+
+  const sequence =
+    ++analysisSeq;
+
+  const button =
+    $('analyze');
+
+  button.disabled = true;
+
+  $('status').textContent =
+    'Loading completed candles...';
+
+  try{
+
+    if(info.kind === 'stock'){
+
+      resetOutputs(
+        'Stocks are watchlist-only. No Hyperliquid signal is generated.'
+      );
+
+      $('status').textContent =
+        'Stock watchlist only: no Hyperliquid price feed.';
+
+      return;
+
+    }
+
+    const display =
+      getDisplayTf();
+
+    const days = {
+      '1m':2,
+      '5m':5,
+      '15m':13,
+      '1h':17,
+      '4h':45,
+      '1d':180,
+      '1w':700,
+      '1M':1500
+    };
+
+    const intervals =
+      new Set([
+        '15m',
+        '1h',
+        display
+      ]);
+
+    const results =
+      await Promise.all(
+        [...intervals].map(
+          async timeframe => [
+            timeframe,
+            await candles(
+              info.coin,
+              timeframe,
+              days[timeframe] || 13
+            )
+          ]
+        )
+      );
+
+    if(sequence !== analysisSeq){
+      return;
+    }
+
+    const data =
+      new Map(results);
+
+    const candles15 =
+      data.get('15m');
+
+    const candles1h =
+      data.get('1h');
+
+    const analysis =
+      evaluate(
+        candles15,
+        candles1h,
+        $('strategy').value
+      );
+
+    if(analysis.error){
+
+      renderAnalysis(
+        analysis,
+        id
+      );
+
+      renderConfirmed(
+        {
+          reason:analysis.error
+        },
+        id
+      );
+
+      $('status').textContent =
+        analysis.error;
+
+      clearChart();
+      return;
+
+    }
+
+    let confirmed =
+      confirmEntry(
+        candles15,
+        analysis
+      );
+
+    if(confirmed.confirmed){
+
+      const valid =
+        await validatePrice(
+          info,
+          confirmed,
+          candles15
+        ).catch(()=>false);
+
+      if(!valid){
+
+        confirmed = {
+          reason:
+            'Live price could not be verified; no confirmed entry'
+        };
+
+      }
+
+    }
+
+    if(sequence !== analysisSeq){
+      return;
+    }
+
+    renderAnalysis(
+      analysis,
+      id
+    );
+
+    renderConfirmed(
+      confirmed,
+      id
+    );
+
+    drawChart(
+      data.get(display),
+      analysis,
+      id,
+      display,
+      confirmed
+    );
+
+    recordSignal(
+      confirmed,
+      id
+    );
+
+    $('strategyMetric').textContent =
+      $('strategy')
+        .selectedOptions[0]
+        .textContent;
+
+    $('lastClose').textContent =
+      fmt(analysis.entry);
+
+    $('trend').textContent =
+      analysis.longTf;
+
+    $('vol').textContent =
+      analysis.vr.toFixed(2)+'×';
+
+    $('time').textContent =
+      ny(analysis.time);
+
+    $('rsiMetric').textContent =
+      analysis.rs.toFixed(1);
+
+    $('macdMetric').textContent =
+      fmt(analysis.mh);
+
+    $('bbMetric').textContent =
+      fmt(analysis.bands.lower)+
+      '–'+
+      fmt(analysis.bands.upper);
+
+    $('feedMetric').textContent =
+      'Hyperliquid '+
+      (
+        info.kind === 'perp'
+          ? 'PERP'
+          : 'SPOT'
+      );
+
+    $('alignmentMetric').textContent =
+      analysis.aligned
+        ? '15m + 1H aligned'
+        : analysis.conflict
+          ? 'TIMEFRAME CONFLICT'
+          : 'MIXED';
+
+    $('status').textContent =
+      `Analysis complete · `+
+      `${candles15.length} 15m · `+
+      `${candles1h.length} 1H · `+
+      `chart ${display}`;
+
+    lastSnapshot = {
+      candles:data.get(display),
+      analysis,
+      id,
+      timeframe:display,
+      confirmed
+    };
+
+  }catch(error){
+
+    if(sequence === analysisSeq){
+
+      $('status').textContent =
+        'Data error: '+
+        error.message;
+
+      $('manualResult').innerHTML = `
+
+        <div class="signalhead">
+          ⚪ DATA ERROR
+        </div>
+
+        <p>
+          ${esc(error.message)}
+        </p>
+
+      `;
+
+      renderConfirmed(
+        {
+          reason:'Data unavailable'
+        },
+        id
+      );
+
+      clearChart();
+
+    }
+
+  }finally{
+
+    if(sequence === analysisSeq){
+      button.disabled = false;
+    }
+
+  }
+
+}
+
+async function checkAlert(){
+
+  if(
+    alertBusy ||
+    document.hidden
+  ){
+    return;
+  }
+
+  const id =
+    $('market').value;
+
+  const info =
+    marketInfo.get(id);
+
+  if(
+    !info ||
+    info.kind !== 'perp'
+  ){
+    return;
+  }
+
+  alertBusy = true;
+
+  try{
+
+    const[
+      candles15,
+      candles1h
+    ]=await Promise.all([
+      candles(
+        info.coin,
+        '15m',
+        13
+      ),
+      candles(
+        info.coin,
+        '1h',
+        17
+      )
+    ]);
+
+    const analysis =
+      evaluate(
+        candles15,
+        candles1h,
+        $('strategy').value
+      );
+
+    const signal =
+      confirmEntry(
+        candles15,
+        analysis
+      );
+
+    if(!signal.confirmed){
+      return;
+    }
+
+    const valid =
+      await validatePrice(
+        info,
+        signal,
+        candles15
+      ).catch(()=>false);
+
+    if(!valid){
+      return;
+    }
+
+    recordSignal(
+      signal,
+      id
+    );
+
+    const key =
+      'yoyo-v40:'+
+      id+':'+
+      $('strategy').value+':'+
+      signal.side+':'+
+      signal.candle;
+
+    if(localStorage.getItem(key)){
+      return;
+    }
+
+    localStorage.setItem(
+      key,
+      '1'
+    );
+
+    const body =
+      `${id} ${signal.side} | `+
+      `ENTRY ${fmt(signal.entry)} | `+
+      `SL ${fmt(signal.stop)} | `+
+      `TP1 ${fmt(signal.tp1)} | `+
+      `TP2 ${fmt(signal.tp2)} | `+
+      `TP3 ${fmt(signal.tp3)} | `+
+      `VOL ${signal.vr.toFixed(2)}×`;
+
+    $('alertsStatus').textContent =
+      'Confirmed: '+body;
+
+    if(
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ){
+
+      new Notification(
+        'YOYO · CONFIRMED ENTRY',
+        {
+          body,
+          tag:key
+        }
+      );
+
+    }
+
+  }catch(error){
+
+    $('alertsStatus').textContent =
+      'Alert check failed: '+
+      error.message;
+
+  }finally{
+
+    alertBusy = false;
+
+  }
+
+}
+
+$('alertsToggle').onclick =
+async()=>{
+
+  if(alertTimer){
+
+    clearInterval(alertTimer);
+
+    alertTimer = null;
+
+    $('alertsToggle').textContent =
+      'ENABLE SIGNAL NOTIFICATIONS';
+
+    $('alertsStatus').textContent =
+      'Alerts off.';
+
+    return;
+
+  }
+
+  if(
+    'Notification' in window &&
+    Notification.permission === 'default'
+  ){
+
+    try{
+
+      await Notification
+        .requestPermission();
+
+    }catch{}
+
+  }
+
+  alertTimer =
+    setInterval(
+      checkAlert,
+      60000
+    );
+
+  $('alertsToggle').textContent =
+    'STOP SIGNAL MONITORING';
+
+  $('alertsStatus').textContent =
+    'Monitoring selected Hyperliquid PERP while page is open.';
+
+  checkAlert();
+
+};
+
+$('marketTabs')
+.addEventListener(
+  'click',
+  event=>{
+
+    const button =
+      event.target.closest(
+        '[data-filter]'
+      );
+
+    if(!button){
+      return;
+    }
+
+    marketFilter =
+      button.dataset.filter;
+
+    document
+      .querySelectorAll(
+        '[data-filter]'
+      )
+      .forEach(item=>
+        item.classList.toggle(
+          'active',
+          item === button
+        )
+      );
+
+    updateMarkets();
+    invalidate();
+
+  }
+);
+
+$('moverTabs')
+.addEventListener(
+  'click',
+  event=>{
+
+    const button =
+      event.target.closest(
+        '[data-mover]'
+      );
+
+    if(!button){
+      return;
+    }
+
+    moverFilter =
+      button.dataset.mover;
+
+    document
+      .querySelectorAll(
+        '[data-mover]'
+      )
+      .forEach(item=>
+        item.classList.toggle(
+          'active',
+          item === button
+        )
+      );
+
+    renderCryptoMarket();
+
+  }
+);
+
+$('cryptoSearch')
+.addEventListener(
+  'input',
+  renderCryptoMarket
+);
+
+$('cryptoMarketList')
+.addEventListener(
+  'click',
+  event=>{
+
+    const star =
+      event.target.closest(
+        '[data-watch-id]'
+      );
+
+    if(star){
+
+      event.stopPropagation();
+
+      toggleWatch(
+        star.dataset.watchId
+      );
+
+      return;
+
+    }
+
+    const row =
+      event.target.closest(
+        '[data-market-id]'
+      );
+
+    if(row){
+
+      showCryptoDetail(
+        row.dataset.marketId
+      );
+
+    }
+
+  }
+);
+
+$('search')
+.addEventListener(
+  'input',
+  ()=>{
+
+    updateMarkets();
+    invalidate();
+
+  }
+);
+
+$('market')
+.addEventListener(
+  'change',
+  ()=>{
+
+    invalidate();
+
+    const info =
+      marketInfo.get(
+        $('market').value
+      );
+
+    if(info?.kind === 'perp'){
+
+      showCryptoDetail(
+        $('market').value
+      );
+
+    }
+
+  }
+);
+
+$('strategy')
+.addEventListener(
+  'change',
+  ()=>{
+
+    syncButtons();
+    invalidate();
+
+  }
+);
+
+$('single').onclick =
+()=>setMode('single');
+
+$('multi').onclick =
+()=>setMode('multi');
+
+$('times')
+.addEventListener(
+  'click',
+  event=>{
+
+    const button =
+      event.target.closest(
+        '[data-tf]'
+      );
+
+    if(!button){
+      return;
+    }
+
+    const timeframe =
+      button.dataset.tf;
+
+    if(mode === 'single'){
+
+      selected =
+        new Set([timeframe]);
+
+    }else if(
+      selected.has(timeframe) &&
+      selected.size > 1
+    ){
+
+      selected.delete(timeframe);
+
+    }else{
+
+      selected.add(timeframe);
+
+    }
+
+    syncButtons();
+    invalidate();
+
+  }
+);
+
+$('clearHistory').onclick =
+()=>{
+
+  localStorage.removeItem(
+    HISTORY_KEY
+  );
+
+  renderHistory();
+
+};
+
+$('analyze').onclick =
+analyze;
+
+window.addEventListener(
+  'resize',
+  ()=>{
+
+    if(lastSnapshot){
+
+      drawChart(
+        lastSnapshot.candles,
+        lastSnapshot.analysis,
+        lastSnapshot.id,
+        lastSnapshot.timeframe,
+        lastSnapshot.confirmed
+      );
+
+    }
+
+  }
+);
+
+syncButtons();
+renderHistory();
+
+loadMarkets()
+.catch(error=>{
+
+  $('status').textContent =
+    'Market discovery failed: '+
+    error.message;
+
+  $('marketListStatus').textContent =
+    'Live market data unavailable: '+
+    error.message;
+
+});
+
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
