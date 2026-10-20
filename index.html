@@ -2878,6 +2878,10 @@ function renderAnalysis(
       ${esc(analysis.reason)} ·
       ${ny(analysis.time)}
     </p>
+    ${analysis.stop !== null
+  ? levelGrid(analysis)
+  : '<p class="muted">No valid ENTRY / SL / TP levels right now.</p>'
+}
 
     <p class="muted mini">
 
