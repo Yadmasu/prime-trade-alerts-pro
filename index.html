@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080d18">
 
-<title>YOYO TRADE PRO V4.0</title>
+<title>YOYO TRADE PRO V4.1</title>
 
 <style>
 :root{
@@ -18,92 +18,205 @@
   --green:#21d6a5;
   --red:#ff637c;
   --blue:#58a6ff;
+  --gold:#f6c96b;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
 
 body{
   margin:0;
-  background:var(--bg);
+  min-height:100vh;
   color:var(--fg);
   font:15px system-ui,-apple-system,sans-serif;
+  background:
+    radial-gradient(circle at 8% -5%,rgba(31,111,235,.25),transparent 34%),
+    radial-gradient(circle at 92% 4%,rgba(33,214,165,.14),transparent 30%),
+    linear-gradient(180deg,#07101e 0%,#080d18 45%,#07101b 100%);
+  background-attachment:fixed;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(88,166,255,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(88,166,255,.08) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(to bottom,#000,transparent 78%);
 }
 
 header{
-  padding:18px 4%;
-  background:#0d1727;
-  border-bottom:1px solid var(--edge);
+  position:sticky;
+  top:0;
+  z-index:30;
+  padding:13px max(15px,4%);
   display:flex;
   justify-content:space-between;
   align-items:center;
+  background:rgba(7,16,30,.86);
+  border-bottom:1px solid rgba(88,166,255,.28);
+  box-shadow:0 12px 30px rgba(0,0,0,.28);
+  backdrop-filter:blur(18px);
+}
+
+.brand-lockup{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-width:0;
+}
+
+.brand-mark{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  border:1px solid rgba(88,166,255,.45);
+  border-radius:12px;
+  background:linear-gradient(145deg,#173d70,#0b1b32);
+  box-shadow:inset 0 1px rgba(255,255,255,.1),0 8px 22px rgba(0,0,0,.28);
+  color:var(--lime);
+  font-weight:950;
 }
 
 .brand{
   font-weight:900;
   font-size:21px;
+  letter-spacing:.2px;
 }
 
-.brand b{
-  color:var(--green);
-}
+.brand b{color:var(--green)}
 
 .tag{
-  color:var(--lime);
+  margin-top:2px;
+  color:#91a8c1;
   font-size:12px;
+  letter-spacing:.08em;
+}
+
+.top-status{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  width:auto;
+  padding:8px 10px;
+  border:1px solid rgba(88,166,255,.28);
+  border-radius:999px;
+  background:rgba(11,28,50,.78);
+  color:#9fb4cb;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.status-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#70849a;
+}
+
+.top-status.live{
+  color:var(--green);
+  border-color:rgba(33,214,165,.35);
+}
+
+.top-status.live .status-dot{
+  background:var(--green);
+  box-shadow:0 0 12px var(--green);
 }
 
 main{
   max-width:1200px;
   margin:auto;
-  padding:15px;
+  padding:18px 14px 34px;
 }
 
 .panel{
-  border:1px solid var(--edge);
-  background:linear-gradient(140deg,#14243a,#0d1727);
-  border-radius:17px;
+  position:relative;
+  overflow:hidden;
   padding:18px;
   margin-bottom:15px;
+  border:1px solid rgba(91,132,178,.35);
+  border-radius:17px;
+  background:linear-gradient(145deg,rgba(20,36,58,.94),rgba(10,21,38,.96));
+  box-shadow:0 18px 45px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.035);
+}
+
+.panel::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(88,166,255,.55),transparent);
+  pointer-events:none;
+}
+
+.hero-panel{
+  padding:22px;
+  background:linear-gradient(135deg,rgba(18,51,86,.96),rgba(10,24,43,.96));
+}
+
+.eyebrow{
+  margin-bottom:8px;
+  color:var(--green);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
 }
 
 h1{
-  font-size:24px;
   margin:0 0 6px;
+  font-size:clamp(25px,5vw,38px);
+  letter-spacing:-.035em;
 }
 
 h2{
-  font-size:19px;
   margin:0 0 14px;
+  font-size:19px;
+  letter-spacing:-.015em;
 }
 
-.muted{
-  color:var(--muted);
-}
-
-.green{
-  color:var(--green);
-}
-
-.red{
-  color:var(--red);
-}
-
-.gold{
-  color:#f6c96b;
-}
-
-.hidden{
-  display:none!important;
-}
+.muted{color:var(--muted)}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.gold{color:var(--gold)}
+.hidden{display:none!important}
 
 .notice{
-  background:#142b3c;
-  border-left:3px solid var(--green);
-  padding:12px;
-  border-radius:9px;
   margin:12px 0;
+  padding:12px;
+  border-left:3px solid var(--green);
+  border-radius:9px;
+  background:#142b3c;
+}
+
+.hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.hero-chip{
+  width:auto;
+  padding:8px 10px;
+  border:1px solid rgba(88,166,255,.25);
+  border-radius:999px;
+  background:rgba(8,17,31,.62);
+  color:#b8cadc;
+  font-size:11px;
+  font-weight:800;
 }
 
 .controls{
@@ -114,36 +227,43 @@ h2{
 
 label{
   display:block;
-  color:var(--muted);
   margin-bottom:7px;
+  color:var(--muted);
 }
 
 select,
 input,
 button{
   width:100%;
+  min-height:44px;
   padding:12px;
-  font:inherit;
-  color:var(--fg);
   border:1px solid #405672;
-  background:#0b1627;
   border-radius:10px;
+  background:#0b1627;
+  color:var(--fg);
+  font:inherit;
+  transition:border-color .2s,background .2s,transform .2s,box-shadow .2s;
 }
 
-button{
-  cursor:pointer;
+select:focus,
+input:focus,
+button:focus-visible{
+  outline:2px solid rgba(88,166,255,.48);
+  outline-offset:2px;
 }
 
-button:disabled{
-  opacity:.5;
-}
+button{cursor:pointer}
+button:disabled{opacity:.5}
+button:active{transform:translateY(1px)}
 
 .primary{
+  min-height:50px;
   margin-top:14px;
-  background:var(--lime);
+  border:1px solid rgba(218,250,75,.38);
+  background:linear-gradient(135deg,#e6ff62,#bcd832);
   color:#101600;
   font-weight:900;
-  border:0;
+  box-shadow:0 10px 28px rgba(218,250,75,.13);
 }
 
 .tabs,
@@ -157,17 +277,15 @@ button:disabled{
   margin:14px 0;
 }
 
-.timegrid{
-  grid-template-columns:repeat(4,1fr);
-}
+.timegrid{grid-template-columns:repeat(4,1fr)}
 
 .tabs button.active,
 .timegrid button.active,
 .market-tabs button.active,
 .mover-tabs button.active{
   border-color:var(--lime);
-  color:var(--lime);
   background:#2a301a;
+  color:var(--lime);
 }
 
 .market-tabs{
@@ -196,10 +314,10 @@ button:disabled{
 .badge{
   display:inline-block;
   padding:6px 10px;
-  border-radius:7px;
-  font-weight:800;
-  font-size:12px;
   margin-bottom:12px;
+  border-radius:7px;
+  font-size:12px;
+  font-weight:800;
 }
 
 .badge.confirmed{
@@ -213,9 +331,9 @@ button:disabled{
 }
 
 .signalhead{
+  margin:0 0 10px;
   font-size:25px;
   font-weight:900;
-  margin:0 0 10px;
 }
 
 .grid{
@@ -225,22 +343,20 @@ button:disabled{
 }
 
 .metric{
-  background:#18283e;
-  border:1px solid var(--edge);
-  border-radius:10px;
   padding:12px;
   overflow-wrap:anywhere;
+  border:1px solid var(--edge);
+  border-radius:10px;
+  background:#18283e;
 }
 
 .metric small{
   display:block;
-  color:var(--muted);
   margin-bottom:7px;
+  color:var(--muted);
 }
 
-.metric strong{
-  font-size:18px;
-}
+.metric strong{font-size:18px}
 
 .section-title{
   display:flex;
@@ -274,6 +390,10 @@ button:disabled{
   margin:14px 0;
 }
 
+.market-summary .metric{
+  background:linear-gradient(145deg,rgba(28,48,75,.95),rgba(16,31,51,.95));
+}
+
 .mover-tabs{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -293,23 +413,24 @@ button:disabled{
   align-items:center;
   gap:10px;
   padding:12px;
-  background:#0c1829;
-  border:1px solid var(--edge);
+  border:1px solid rgba(69,99,134,.55);
   border-radius:12px;
+  background:#0c1829;
+  transition:transform .2s,border-color .2s,background .2s;
 }
 
 .market-row:hover{
+  transform:translateY(-1px);
   border-color:#56708f;
+  background:#10223a;
 }
 
-.market-symbol{
-  font-weight:900;
-}
+.market-symbol{font-weight:900}
 
 .market-sub{
-  font-size:11px;
-  color:var(--muted);
   margin-top:3px;
+  color:var(--muted);
+  font-size:11px;
 }
 
 .market-price{
@@ -319,40 +440,38 @@ button:disabled{
 
 .market-change{
   min-width:76px;
-  text-align:center;
   padding:7px 6px;
   border-radius:8px;
+  text-align:center;
   font-weight:900;
 }
 
 .market-change.up{
-  color:var(--green);
   background:#123d35;
+  color:var(--green);
 }
 
 .market-change.down{
-  color:var(--red);
   background:#3b2029;
+  color:var(--red);
 }
 
 .star{
+  padding:4px;
   border:0;
   background:transparent;
-  padding:4px;
   color:#71839a;
   font-size:21px;
 }
 
-.star.saved{
-  color:var(--lime);
-}
+.star.saved{color:var(--lime)}
 
 .crypto-detail{
   margin-top:14px;
   padding:15px;
-  background:#0b1627;
   border:1px solid var(--edge);
   border-radius:13px;
+  background:#0b1627;
 }
 
 .detail-head{
@@ -370,41 +489,111 @@ button:disabled{
 }
 
 .empty-state{
-  text-align:center;
-  color:var(--muted);
   padding:22px;
+  color:var(--muted);
+  text-align:center;
 }
 
 .chartwrap{
-  height:480px;
-  border:1px solid var(--edge);
-  border-radius:12px;
-  overflow:hidden;
-  background:#0b1422;
   position:relative;
+  height:480px;
+  overflow:hidden;
+  border:1px solid rgba(88,166,255,.36);
+  border-radius:12px;
+  background:#0b1422;
+  box-shadow:inset 0 0 38px rgba(0,0,0,.22);
 }
 
-#tvchart{
-  width:100%;
-  height:100%;
-}
-
+#tvchart,
 #priceChart{
-  display:block;
   width:100%;
   height:100%;
 }
+
+#priceChart{display:block}
 
 #chartLegend{
   position:absolute;
   left:12px;
   top:10px;
   z-index:2;
-  font-size:12px;
-  background:#080d18cf;
   padding:7px 9px;
   border-radius:8px;
+  background:#080d18cf;
+  font-size:12px;
   pointer-events:none;
+}
+
+.signal-panel{border-color:rgba(88,166,255,.42)}
+.confirmed-panel{border-color:rgba(33,214,165,.35)}
+
+.level-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  margin-top:13px;
+}
+
+.level-card{
+  position:relative;
+  padding-top:15px;
+  background:linear-gradient(145deg,#182b45,#101d30);
+}
+
+.level-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:3px;
+  border-radius:10px 10px 0 0;
+  background:#70849a;
+}
+
+.level-entry::before{background:var(--gold)}
+.level-stop::before{background:var(--red)}
+.level-target::before{background:var(--green)}
+.level-volume::before{background:var(--blue)}
+.level-card strong{font-size:20px}
+
+.notification-card{
+  margin-top:16px;
+  padding:15px;
+  border:1px solid rgba(88,166,255,.3);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(17,44,73,.9),rgba(10,28,48,.9));
+}
+
+.notification-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:7px;
+}
+
+.notification-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:900;
+}
+
+.notification-icon{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:rgba(88,166,255,.15);
+  color:var(--blue);
+}
+
+#alertsToggle{
+  margin-top:8px;
+  border-color:rgba(88,166,255,.5);
+  background:linear-gradient(135deg,#1768ad,#12477a);
+  font-weight:900;
+  box-shadow:0 9px 24px rgba(0,82,160,.18);
 }
 
 .history-list{
@@ -417,9 +606,9 @@ button:disabled{
   grid-template-columns:minmax(0,1fr) auto;
   gap:10px;
   padding:12px;
-  background:#0c1829;
   border:1px solid var(--edge);
   border-radius:11px;
+  background:#0c1829;
 }
 
 .compact-button{
@@ -427,65 +616,77 @@ button:disabled{
   padding:8px 12px;
 }
 
+.signal-toast{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  z-index:60;
+  width:min(92%,540px);
+  padding:14px 15px;
+  opacity:0;
+  transform:translate(-50%,18px);
+  pointer-events:none;
+  border:1px solid rgba(33,214,165,.5);
+  border-radius:14px;
+  background:rgba(8,23,37,.96);
+  box-shadow:0 20px 55px rgba(0,0,0,.48);
+  backdrop-filter:blur(16px);
+  transition:opacity .24s,transform .24s;
+}
+
+.signal-toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.signal-toast.short{
+  border-color:rgba(255,99,124,.58);
+}
+
+.signal-toast strong{
+  display:block;
+  margin-bottom:4px;
+}
+
 footer{
-  text-align:center;
   padding:25px;
   color:var(--muted);
+  text-align:center;
 }
 
 @media(min-width:750px){
-  .controls{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .grid{
-    grid-template-columns:repeat(5,1fr);
-  }
-
-  .market-summary{
-    grid-template-columns:repeat(4,1fr);
-  }
-
-  .market-row{
-    grid-template-columns:42px minmax(0,1fr) 130px 100px;
-  }
-
-  .chartwrap{
-    height:630px;
-  }
+  .controls{grid-template-columns:repeat(3,1fr)}
+  .grid{grid-template-columns:repeat(5,1fr)}
+  .level-grid{grid-template-columns:repeat(6,1fr)}
+  .market-summary{grid-template-columns:repeat(4,1fr)}
+  .market-row{grid-template-columns:42px minmax(0,1fr) 130px 100px}
+  .chartwrap{height:630px}
 }
 
 @media(max-width:540px){
-  .mover-tabs{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .market-row{
-    grid-template-columns:32px minmax(0,1fr) auto;
-  }
-
+  header{align-items:center}
+  .brand{font-size:17px}
+  .tag{font-size:9px}
+  .top-status{padding:7px 9px;font-size:10px}
+  .panel{padding:15px;border-radius:15px}
+  .hero-panel{padding:19px}
+  .mover-tabs{grid-template-columns:repeat(2,1fr)}
+  .market-row{grid-template-columns:32px minmax(0,1fr) auto}
   .market-change,
-  .market-price{
-    grid-column:3;
-  }
-
-  .detail-actions{
-    grid-template-columns:1fr;
-  }
+  .market-price{grid-column:3}
+  .detail-actions{grid-template-columns:1fr}
 }
 
 @media(max-width:420px){
-  .chartwrap{
-    height:410px;
-  }
+  .chartwrap{height:410px}
+  .market-tabs button{font-size:11px;padding:11px 2px}
+  .timegrid button{padding:12px 5px}
+}
 
-  .market-tabs button{
-    font-size:11px;
-    padding:11px 2px;
-  }
-
-  .timegrid button{
-    padding:12px 5px;
+@media(prefers-reduced-motion:reduce){
+  *{
+    scroll-behavior:auto!important;
+    transition:none!important;
   }
 }
 </style>
@@ -494,13 +695,24 @@ footer{
 <body>
 
 <header>
-  <div class="brand">YOYO <b>TRADE PRO</b></div>
-  <div class="tag">V4.0 · LIVE MARKET + ALERTS</div>
+  <div class="brand-lockup">
+    <div class="brand-mark">Y</div>
+    <div>
+      <div class="brand">YOYO <b>TRADE PRO</b></div>
+      <div class="tag">V4.1 · LIVE MARKET INTELLIGENCE</div>
+    </div>
+  </div>
+
+  <div id="notificationPill" class="top-status">
+    <span class="status-dot"></span>
+    <span id="notificationPillText">ALERTS OFF</span>
+  </div>
 </header>
 
 <main>
 
-<section class="panel">
+<section class="panel hero-panel">
+  <div class="eyebrow">Hyperliquid market intelligence</div>
   <h1>Trading Dashboard</h1>
 
   <div class="muted">
@@ -512,17 +724,22 @@ footer{
     <b>ONE SOURCE:</b> Hyperliquid candles drive the chart,
     indicators, direction and trade levels.
   </div>
+
+  <div class="hero-actions">
+    <span class="hero-chip">15m Entry</span>
+    <span class="hero-chip">1H Trend</span>
+    <span class="hero-chip">Volume Confirmation</span>
+    <span class="hero-chip">No Auto Trading</span>
+  </div>
 </section>
 
 <section class="panel" id="cryptoMarketPanel">
-
   <div class="section-title">
     <h2 style="margin:0">Crypto Market</h2>
     <span class="live-dot">LIVE</span>
   </div>
 
   <div class="market-summary">
-
     <div class="metric">
       <small>Perpetual markets</small>
       <strong id="perpCount">—</strong>
@@ -542,7 +759,6 @@ footer{
       <small>24h notional</small>
       <strong id="marketNotional">—</strong>
     </div>
-
   </div>
 
   <div class="mover-tabs" id="moverTabs">
@@ -565,12 +781,10 @@ footer{
   </div>
 
   <p id="marketListStatus" class="muted mini"></p>
-
   <div id="cryptoDetail" class="crypto-detail hidden"></div>
-
 </section>
-<section class="panel">
 
+<section class="panel">
   <h2>Market &amp; Strategy</h2>
 
   <div class="market-tabs" id="marketTabs">
@@ -582,7 +796,6 @@ footer{
   </div>
 
   <div class="controls">
-
     <div>
       <label>Market search</label>
 
@@ -603,38 +816,20 @@ footer{
       <label>Strategy</label>
 
       <select id="strategy">
-        <option value="ema21" selected>
-          EMA21 / EMA89 (Main)
-        </option>
-
-        <option value="ema13">
-          EMA13 / EMA89
-        </option>
-
-        <option value="ema9">
-          EMA9 / EMA89
-        </option>
-
-        <option value="cross">
-          EMA9 / EMA21 Cross
-        </option>
+        <option value="ema21" selected>EMA21 / EMA89 (Main)</option>
+        <option value="ema13">EMA13 / EMA89</option>
+        <option value="ema9">EMA9 / EMA89</option>
+        <option value="cross">EMA9 / EMA21 Cross</option>
       </select>
     </div>
 
     <div>
       <label>Market Feed</label>
-
-      <input
-        value="Hyperliquid live candles"
-        disabled
-      >
+      <input value="Hyperliquid live candles" disabled>
     </div>
-
   </div>
 
-  <h2 style="margin-top:22px">
-    Multi-Timeframe Analysis
-  </h2>
+  <h2 style="margin-top:22px">Multi-Timeframe Analysis</h2>
 
   <div class="tabs">
     <button id="single">Single</button>
@@ -652,156 +847,112 @@ footer{
     <button data-tf="1M">1M</button>
   </div>
 
-  <div class="status" id="status">
-    Connecting...
-  </div>
+  <div class="status" id="status">Connecting...</div>
 
   <div class="notice" id="connectionHelp">
-    For live data, publish this HTML on HTTPS and open it
-    in Safari. If the feed is unavailable, no signal or
-    trading level is shown.
+    For live data, publish this HTML on HTTPS and open it in Safari.
+    If the feed is unavailable, no signal or trading level is shown.
   </div>
 
-  <button id="analyze" class="primary">
-    ANALYZE NOW →
-  </button>
+  <button id="analyze" class="primary">ANALYZE NOW →</button>
 
-  <div class="notice">
+  <div class="notification-card">
+    <div class="notification-head">
+      <div class="notification-title">
+        <span class="notification-icon">◆</span>
+        Signal Notifications
+      </div>
+      <span class="live-dot">READY</span>
+    </div>
 
-    <b>
-      EMA21/89 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2×
-    </b>
+    <b>EMA21/89 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2×</b>
 
     <p class="muted mini">
-      Confirmed entry requires aligned trend, a completed
-      entry candle, volume confirmation and verified live price.
+      Confirmed entry requires aligned trend, a completed entry candle,
+      volume confirmation and verified live price.
     </p>
 
-    <button id="alertsToggle">
-      ENABLE SIGNAL NOTIFICATIONS
-    </button>
+    <button id="alertsToggle">ENABLE SIGNAL NOTIFICATIONS</button>
 
     <p id="alertsStatus" class="muted mini">
       Alerts are currently off.
     </p>
-
   </div>
-
 </section>
 
-<section class="panel">
-
+<section class="panel" id="liveChart">
   <h2>Live Price Chart</h2>
 
   <div class="chartwrap">
-
-    <div id="chartLegend">
-      Select a market and tap Analyze.
-    </div>
+    <div id="chartLegend">Select a market and tap Analyze.</div>
 
     <div id="tvchart">
       <canvas id="priceChart"></canvas>
     </div>
-
   </div>
 
   <p id="chartcaption" class="muted mini">
     Chart and analysis use the same Hyperliquid feed.
   </p>
-
 </section>
 
-<section class="panel">
-
-  <h2>
-    ANYTIME ANALYSIS · LONG / SHORT / NEUTRAL
-  </h2>
+<section class="panel signal-panel" id="anytimeAnalysis">
+  <h2>ANYTIME ANALYSIS · LONG / SHORT / NEUTRAL</h2>
 
   <span class="badge unconfirmed">
     DIRECTIONAL RESEARCH · NOT AN ENTRY ALERT
   </span>
 
   <div id="manualResult" class="notice">
-
-    <div class="signalhead">
-      ⚪ NOT ANALYZED
-    </div>
+    <div class="signalhead">⚪ NOT ANALYZED</div>
 
     <p class="muted">
       Tap Analyze to see the current market direction.
     </p>
-
   </div>
 
   <p class="muted mini">
     Directional bias can differ from the latest candle.
     The 15m and 1H timeframe conflict is shown clearly.
   </p>
-
 </section>
 
-<section class="panel">
+<section class="panel confirmed-panel" id="confirmedEntry">
+  <h2>CONFIRMED ENTRY · LONG / SHORT / WAIT</h2>
 
-  <h2>
-    CONFIRMED ENTRY · LONG / SHORT / WAIT
-  </h2>
-
-  <span
-    id="confirmedBadge"
-    class="badge unconfirmed"
-  >
+  <span id="confirmedBadge" class="badge unconfirmed">
     WAITING
   </span>
 
   <div id="confirmedResult" class="notice">
-
-    <div class="signalhead">
-      ⚪ WAIT — NO CONFIRMED ENTRY
-    </div>
-
+    <div class="signalhead">⚪ WAIT — NO CONFIRMED ENTRY</div>
   </div>
 
   <p class="muted mini">
-    ENTRY, STOP LOSS and TP1–TP3 appear only
-    after the signal is confirmed.
+    ENTRY, STOP LOSS and TP1–TP3 appear only after the signal is confirmed.
   </p>
-
 </section>
 
 <section class="panel">
-
   <div class="section-title">
+    <h2 style="margin:0">Confirmed Signal History</h2>
 
-    <h2 style="margin:0">
-      Confirmed Signal History
-    </h2>
-
-    <button
-      id="clearHistory"
-      class="compact-button"
-    >
+    <button id="clearHistory" class="compact-button">
       Clear
     </button>
-
   </div>
 
   <p class="muted mini">
     Confirmed signals are saved separately on this device.
   </p>
 
-  <div
-    id="signalHistory"
-    class="history-list"
-  ></div>
-
+  <div id="signalHistory" class="history-list"></div>
 </section>
 
 <section class="panel">
-
   <h2>Signal Details</h2>
 
   <div class="grid">
-
     <div class="metric">
       <small>Strategy</small>
       <strong id="strategyMetric">—</strong>
@@ -851,31 +1002,33 @@ footer{
       <small>Signal alignment</small>
       <strong id="alignmentMetric">—</strong>
     </div>
-
   </div>
-
 </section>
 
 </main>
 
+<div
+  id="signalToast"
+  class="signal-toast"
+  role="status"
+  aria-live="polite"
+></div>
+
 <footer>
-  YOYO TRADE PRO V4.0 © 2026 ·
-  Research only · No automatic execution
+  YOYO TRADE PRO V4.1 © 2026 · Research only · No automatic execution
 </footer>
 
 <script>
 'use strict';
 
-const API = 'https://api.hyperliquid.xyz/info';
+const API='https://api.hyperliquid.xyz/info';
+const $=id=>document.getElementById(id);
 
-const $ = id =>
-  document.getElementById(id);
+const MIN=60000;
+const HOUR=3600000;
+const DAY=86400000;
 
-const MIN = 60000;
-const HOUR = 3600000;
-const DAY = 86400000;
-
-const tfMs = {
+const tfMs={
   '1m':MIN,
   '5m':5*MIN,
   '15m':15*MIN,
@@ -886,773 +1039,403 @@ const tfMs = {
   '1M':30*DAY
 };
 
-const STOCKS = [
-  'AAPL',
-  'MSFT',
-  'NVDA',
-  'TSLA',
-  'AMZN',
-  'GOOGL',
-  'META',
-  'AMD',
-  'AVGO',
-  'NFLX',
-  'PLTR',
-  'COIN',
-  'MSTR',
-  'HOOD',
-  'SOFI',
-  'SPY',
-  'QQQ'
+const STOCKS=[
+  'AAPL','MSFT','NVDA','TSLA','AMZN','GOOGL','META','AMD',
+  'AVGO','NFLX','PLTR','COIN','MSTR','HOOD','SOFI','SPY','QQQ'
 ];
 
-const WATCHLIST_KEY =
-  'yoyo-v40-watchlist';
+const WATCHLIST_KEY='yoyo-v41-watchlist';
+const HISTORY_KEY='yoyo-v41-confirmed-history';
 
-const HISTORY_KEY =
-  'yoyo-v40-confirmed-history';
-
-let marketInfo = new Map([
-  [
-    'SOL',
-    {
-      kind:'perp',
-      coin:'SOL',
-      asset:'SOL',
-      label:'SOL · PERP'
-    }
-  ]
+let marketInfo=new Map([
+  ['SOL',{
+    kind:'perp',
+    coin:'SOL',
+    asset:'SOL',
+    label:'SOL · PERP'
+  }]
 ]);
 
-let markets = ['SOL'];
-let marketRows = [];
-let marketFilter = 'all';
-let moverFilter = 'all';
-let mode = 'multi';
-
-let selected =
-  new Set(['15m','1h']);
-
-let analysisSeq = 0;
-let alertTimer = null;
-let alertBusy = false;
-let lastSnapshot = null;
+let markets=['SOL'];
+let marketRows=[];
+let marketFilter='all';
+let moverFilter='all';
+let mode='multi';
+let selected=new Set(['15m','1h']);
+let analysisSeq=0;
+let alertTimer=null;
+let alertBusy=false;
+let lastSnapshot=null;
+let toastTimer=null;
 
 function storedList(key){
-
   try{
-
-    const value = JSON.parse(
-      localStorage.getItem(key) || '[]'
-    );
-
-    return Array.isArray(value)
-      ? value
-      : [];
-
+    const value=JSON.parse(localStorage.getItem(key)||'[]');
+    return Array.isArray(value)?value:[];
   }catch{
-
-    return [];
-
+    return[];
   }
-
 }
 
-let watchlist =
-  new Set(storedList(WATCHLIST_KEY));
+let watchlist=new Set(storedList(WATCHLIST_KEY));
 
-const fmt = number => {
+const fmt=number=>{
+  if(!Number.isFinite(number))return'—';
 
-  if(!Number.isFinite(number)){
-    return '—';
-  }
-
-  return Number(number).toLocaleString(
-    'en-US',
-    {
-      maximumFractionDigits:
-        Math.abs(number)<1
-          ? 6
-          : Math.abs(number)<100
-            ? 4
-            : 2
-    }
-  );
-
+  return Number(number).toLocaleString('en-US',{
+    maximumFractionDigits:
+      Math.abs(number)<1?6:
+      Math.abs(number)<100?4:2
+  });
 };
 
-const compact = number => {
+const compact=number=>{
+  if(!Number.isFinite(number))return'—';
 
-  if(!Number.isFinite(number)){
-    return '—';
-  }
-
-  return new Intl.NumberFormat(
-    'en-US',
-    {
-      notation:'compact',
-      maximumFractionDigits:2
-    }
-  ).format(number);
-
+  return new Intl.NumberFormat('en-US',{
+    notation:'compact',
+    maximumFractionDigits:2
+  }).format(number);
 };
 
-const ny = time =>
-  new Date(time).toLocaleString(
-    'en-US',
-    {
-      timeZone:'America/New_York',
-      month:'short',
-      day:'numeric',
-      hour:'numeric',
-      minute:'2-digit',
-      timeZoneName:'short'
-    }
-  );
+const ny=time=>new Date(time).toLocaleString('en-US',{
+  timeZone:'America/New_York',
+  month:'short',
+  day:'numeric',
+  hour:'numeric',
+  minute:'2-digit',
+  timeZoneName:'short'
+});
 
-const esc = value =>
-  String(value).replace(
-    /[&<>"']/g,
-    character => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#39;'
-    })[character]
-  );
+const esc=value=>String(value).replace(
+  /[&<>"']/g,
+  character=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[character]
+);
 
 async function api(body){
-
-  const controller =
-    new AbortController();
-
-  const timer = setTimeout(
-    () => controller.abort(),
-    16000
-  );
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),16000);
 
   try{
-
-    const response = await fetch(
-      API,
-      {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json'
-        },
-        body:JSON.stringify(body),
-        signal:controller.signal
-      }
-    );
+    const response=await fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body),
+      signal:controller.signal
+    });
 
     if(!response.ok){
-
-      throw Error(
-        'Hyperliquid HTTP ' +
-        response.status
-      );
-
+      throw Error('Hyperliquid HTTP '+response.status);
     }
 
     return await response.json();
-
   }finally{
-
     clearTimeout(timer);
-
   }
+}
 
-} 
 async function loadMarkets(){
+  const found=new Map();
+  const failures=[];
+  const dexes=[''];
 
-  const found = new Map();
-  const failures = [];
-  const dexes = [''];
-
-  const add = (id,item) => {
-
-    if(!found.has(id)){
-      found.set(id,item);
-    }
-
+  const add=(id,item)=>{
+    if(!found.has(id))found.set(id,item);
   };
 
   try{
+    const rows=await api({type:'perpDexs'});
 
-    const rows = await api({
-      type:'perpDexs'
-    });
+    for(const row of rows||[]){
+      const name=
+        typeof row==='string'
+          ?row
+          :Array.isArray(row)
+            ?row[0]
+            :row?.name;
 
-    for(const row of rows || []){
-
-      const name =
-        typeof row === 'string'
-          ? row
-          : Array.isArray(row)
-            ? row[0]
-            : row?.name;
-
-      if(
-        name &&
-        name !== 'default' &&
-        !dexes.includes(name)
-      ){
+      if(name&&name!=='default'&&!dexes.includes(name)){
         dexes.push(name);
       }
-
     }
-
   }catch{
-
-    failures.push(
-      'Additional DEX discovery unavailable'
-    );
-
+    failures.push('Additional DEX discovery unavailable');
   }
 
   for(const dex of dexes){
-
     try{
+      const body={type:'metaAndAssetCtxs'};
+      if(dex)body.dex=dex;
 
-      const body = {
-        type:'metaAndAssetCtxs'
-      };
+      const data=await api(body);
+      const universe=data?.[0]?.universe||[];
+      const contexts=data?.[1]||[];
 
-      if(dex){
-        body.dex = dex;
+      for(let index=0;index<universe.length;index++){
+        const asset=universe[index];
+
+        if(asset.isDelisted||asset.name==='BTC')continue;
+
+        const id=(dex?dex+':':'')+asset.name;
+        const context=contexts[index]||{};
+        const price=Number(context.midPx||context.markPx);
+        const previous=Number(context.prevDayPx);
+
+        const change=
+          Number.isFinite(price)&&
+          Number.isFinite(previous)&&
+          previous>0
+            ?(price-previous)/previous*100
+            :null;
+
+        const openInterest=Number(context.openInterest);
+
+        add(id,{
+          kind:'perp',
+          coin:id,
+          label:id+' · PERP',
+          dex:dex||'',
+          asset:asset.name,
+          price,
+          change,
+          notional:Number(context.dayNtlVlm),
+          openInterest:
+            Number.isFinite(openInterest)&&Number.isFinite(price)
+              ?openInterest*price
+              :null,
+          funding:Number(context.funding)
+        });
       }
-
-      const data = await api(body);
-
-      const universe =
-        data?.[0]?.universe || [];
-
-      const contexts =
-        data?.[1] || [];
-
-      for(
-        let index=0;
-        index<universe.length;
-        index++
-      ){
-
-        const asset =
-          universe[index];
-
-        if(
-          asset.isDelisted ||
-          asset.name === 'BTC'
-        ){
-          continue;
-        }
-
-        const id =
-          (dex ? dex+':' : '') +
-          asset.name;
-
-        const context =
-          contexts[index] || {};
-
-        const price = Number(
-          context.midPx ||
-          context.markPx
-        );
-
-        const previous = Number(
-          context.prevDayPx
-        );
-
-        const change =
-          Number.isFinite(price) &&
-          Number.isFinite(previous) &&
-          previous > 0
-            ? (price-previous) /
-              previous * 100
-            : null;
-
-        const openInterest = Number(
-          context.openInterest
-        );
-
-        add(
-          id,
-          {
-            kind:'perp',
-            coin:id,
-            label:id+' · PERP',
-            dex:dex || '',
-            asset:asset.name,
-            price,
-            change,
-            notional:Number(
-              context.dayNtlVlm
-            ),
-            openInterest:
-              Number.isFinite(openInterest) &&
-              Number.isFinite(price)
-                ? openInterest*price
-                : null,
-            funding:Number(
-              context.funding
-            )
-          }
-        );
-
-      }
-
     }catch{
-
-      failures.push(
-        (dex || 'Default') +
-        ' perps unavailable'
-      );
-
+      failures.push((dex||'Default')+' perps unavailable');
     }
-
   }
 
   try{
+    const data=await api({type:'spotMeta'});
 
-    const data = await api({
-      type:'spotMeta'
-    });
+    for(const asset of data.universe||[]){
+      const id='SPOT:'+asset.name;
 
-    for(const asset of data.universe || []){
-
-      const id =
-        'SPOT:' + asset.name;
-
-      add(
-        id,
-        {
-          kind:'spot',
-          coin:'@'+asset.index,
-          label:
-            asset.name+
-            ' · HL SPOT'
-        }
-      );
-
+      add(id,{
+        kind:'spot',
+        coin:'@'+asset.index,
+        label:asset.name+' · HL SPOT'
+      });
     }
-
   }catch{
-
-    failures.push(
-      'Spot discovery unavailable'
-    );
-
+    failures.push('Spot discovery unavailable');
   }
 
   for(const ticker of STOCKS){
-
-    add(
-      'STOCK:'+ticker,
-      {
-        kind:'stock',
-        coin:ticker,
-        label:
-          ticker+
-          ' · STOCK WATCHLIST'
-      }
-    );
-
+    add('STOCK:'+ticker,{
+      kind:'stock',
+      coin:ticker,
+      label:ticker+' · STOCK WATCHLIST'
+    });
   }
 
-  marketInfo = found;
+  marketInfo=found;
+  markets=[...found.keys()].sort((a,b)=>a.localeCompare(b));
 
-  markets = [...found.keys()]
-    .sort(
-      (a,b) => a.localeCompare(b)
-    );
-
-  marketRows = [...found.entries()]
-    .filter(
-      ([,item]) =>
-        item.kind === 'perp' &&
-        Number.isFinite(item.price)
+  marketRows=[...found.entries()]
+    .filter(([,item])=>
+      item.kind==='perp'&&Number.isFinite(item.price)
     )
-    .map(
-      ([id,item]) => ({
-        id,
-        ...item
-      })
-    );
+    .map(([id,item])=>({id,...item}));
 
   updateMarkets();
   renderCryptoMarket();
 
-  const spotCount =
-    [...found.values()]
-      .filter(
-        item => item.kind === 'spot'
-      )
-      .length;
+  const spotCount=[...found.values()]
+    .filter(item=>item.kind==='spot')
+    .length;
 
-  $('status').textContent =
-    `${marketRows.length} perps · ` +
-    `${spotCount} spot · ` +
-    `${STOCKS.length} stocks. ` +
+  $('status').textContent=
+    `${marketRows.length} perps · `+
+    `${spotCount} spot · `+
+    `${STOCKS.length} stocks. `+
     failures.join('; ');
-
 }
 
 function updateMarkets(){
+  const query=$('search').value.toUpperCase().trim();
+  const previous=$('market').value;
 
-  const query =
-    $('search').value
-      .toUpperCase()
-      .trim();
+  const filtered=markets.filter(id=>{
+    const info=marketInfo.get(id);
 
-  const previous =
-    $('market').value;
+    if(
+      marketFilter==='crypto'&&
+      info.kind!=='perp'&&
+      info.kind!=='spot'
+    )return false;
 
-  const filtered =
-    markets.filter(id => {
+    if(marketFilter==='perp'&&info.kind!=='perp')return false;
+    if(marketFilter==='spot'&&info.kind!=='spot')return false;
+    if(marketFilter==='stock'&&info.kind!=='stock')return false;
 
-      const info =
-        marketInfo.get(id);
-
-      if(
-        marketFilter === 'crypto' &&
-        info.kind !== 'perp' &&
-        info.kind !== 'spot'
-      ){
-        return false;
-      }
-
-      if(
-        marketFilter === 'perp' &&
-        info.kind !== 'perp'
-      ){
-        return false;
-      }
-
-      if(
-        marketFilter === 'spot' &&
-        info.kind !== 'spot'
-      ){
-        return false;
-      }
-
-      if(
-        marketFilter === 'stock' &&
-        info.kind !== 'stock'
-      ){
-        return false;
-      }
-
-      return(
-        id.toUpperCase().includes(query) ||
-        info.label
-          .toUpperCase()
-          .includes(query)
-      );
-
-    });
+    return(
+      id.toUpperCase().includes(query)||
+      info.label.toUpperCase().includes(query)
+    );
+  });
 
   $('market').replaceChildren();
 
   for(const id of filtered){
-
-    const option =
-      document.createElement('option');
-
-    option.value = id;
-
-    option.textContent =
-      marketInfo.get(id).label;
-
+    const option=document.createElement('option');
+    option.value=id;
+    option.textContent=marketInfo.get(id).label;
     $('market').append(option);
-
   }
 
   if(filtered.includes(previous)){
-
-    $('market').value = previous;
-
+    $('market').value=previous;
   }else if(filtered.includes('SOL')){
-
-    $('market').value = 'SOL';
-
+    $('market').value='SOL';
   }else if(filtered.length){
-
-    $('market').value = filtered[0];
-
+    $('market').value=filtered[0];
   }
-
 }
 
 function renderCryptoMarket(){
+  const query=$('cryptoSearch').value.toUpperCase().trim();
 
-  const query =
-    $('cryptoSearch').value
-      .toUpperCase()
-      .trim();
+  const rising=marketRows.filter(item=>item.change>0).length;
+  const falling=marketRows.filter(item=>item.change<0).length;
 
-  const rising =
-    marketRows.filter(
-      item => item.change > 0
-    ).length;
+  const total=marketRows.reduce(
+    (sum,item)=>sum+(Number.isFinite(item.notional)?item.notional:0),
+    0
+  );
 
-  const falling =
-    marketRows.filter(
-      item => item.change < 0
-    ).length;
+  $('perpCount').textContent=marketRows.length||'—';
+  $('risingCount').textContent=rising;
+  $('fallingCount').textContent=falling;
+  $('marketNotional').textContent='$'+compact(total);
 
-  const total =
-    marketRows.reduce(
-      (sum,item) =>
-        sum +
-        (
-          Number.isFinite(item.notional)
-            ? item.notional
-            : 0
-        ),
-      0
-    );
+  let rows=marketRows.filter(item=>
+    (item.id+' '+item.asset).toUpperCase().includes(query)
+  );
 
-  $('perpCount').textContent =
-    marketRows.length || '—';
-
-  $('risingCount').textContent =
-    rising;
-
-  $('fallingCount').textContent =
-    falling;
-
-  $('marketNotional').textContent =
-    '$'+compact(total);
-
-  let rows =
-    marketRows.filter(item =>
-      (
-        item.id+' '+item.asset
-      )
-      .toUpperCase()
-      .includes(query)
-    );
-
-  if(moverFilter === 'gainers'){
-
-    rows = rows
-      .filter(
-        item => item.change > 0
-      )
-      .sort(
-        (a,b) =>
-          b.change-a.change
-      );
-
-  }else if(moverFilter === 'losers'){
-
-    rows = rows
-      .filter(
-        item => item.change < 0
-      )
-      .sort(
-        (a,b) =>
-          a.change-b.change
-      );
-
-  }else if(moverFilter === 'watchlist'){
-
-    rows = rows
-      .filter(
-        item =>
-          watchlist.has(item.id)
-      )
-      .sort(
-        (a,b) =>
-          (b.notional || 0) -
-          (a.notional || 0)
-      );
-
+  if(moverFilter==='gainers'){
+    rows=rows
+      .filter(item=>item.change>0)
+      .sort((a,b)=>b.change-a.change);
+  }else if(moverFilter==='losers'){
+    rows=rows
+      .filter(item=>item.change<0)
+      .sort((a,b)=>a.change-b.change);
+  }else if(moverFilter==='watchlist'){
+    rows=rows
+      .filter(item=>watchlist.has(item.id))
+      .sort((a,b)=>(b.notional||0)-(a.notional||0));
   }else{
-
-    rows.sort(
-      (a,b) =>
-        (b.notional || 0) -
-        (a.notional || 0)
-    );
-
+    rows.sort((a,b)=>(b.notional||0)-(a.notional||0));
   }
 
-  rows = rows.slice(0,30);
+  rows=rows.slice(0,5);
 
-  $('marketListStatus').textContent =
-    `Showing ${rows.length} of ` +
-    `${marketRows.length} live markets.`;
+  $('marketListStatus').textContent=
+    `Showing ${rows.length} of ${marketRows.length} live markets.`;
 
   if(!rows.length){
-
-    $('cryptoMarketList').innerHTML = `
+    $('cryptoMarketList').innerHTML=`
       <div class="empty-state">
         No markets match this filter.
       </div>
     `;
-
     return;
-
   }
 
-  $('cryptoMarketList').innerHTML =
-    rows.map(item => `
-
-      <div
-        class="market-row"
-        data-market-id="${esc(item.id)}"
+  $('cryptoMarketList').innerHTML=rows.map(item=>`
+    <div class="market-row" data-market-id="${esc(item.id)}">
+      <button
+        class="star ${watchlist.has(item.id)?'saved':''}"
+        data-watch-id="${esc(item.id)}"
       >
+        ★
+      </button>
 
-        <button
-          class="star ${
-            watchlist.has(item.id)
-              ? 'saved'
-              : ''
-          }"
-          data-watch-id="${esc(item.id)}"
-        >
-          ★
-        </button>
+      <div>
+        <div class="market-symbol">${esc(item.id)}</div>
 
-        <div>
-
-          <div class="market-symbol">
-            ${esc(item.id)}
-          </div>
-
-          <div class="market-sub">
-
-            24h $${compact(item.notional)}
-
-            ${
-              Number.isFinite(item.funding)
-                ? ' · funding ' +
-                  (
-                    item.funding*100
-                  ).toFixed(4) +
-                  '%'
-                : ''
-            }
-
-          </div>
-
-        </div>
-
-        <div class="market-price">
-          $${fmt(item.price)}
-        </div>
-
-        <div
-          class="market-change ${
-            item.change >= 0
-              ? 'up'
-              : 'down'
-          }"
-        >
-
+        <div class="market-sub">
+          24h $${compact(item.notional)}
           ${
-            item.change >= 0
-              ? '+'
-              : ''
+            Number.isFinite(item.funding)
+              ?' · funding '+(item.funding*100).toFixed(4)+'%'
+              :''
           }
-
-          ${
-            Number.isFinite(item.change)
-              ? item.change.toFixed(2)
-              : '—'
-          }%
-
         </div>
-
       </div>
 
-    `).join('');
+      <div class="market-price">
+        $${fmt(item.price)}
+      </div>
 
+      <div class="market-change ${item.change>=0?'up':'down'}">
+        ${item.change>=0?'+':''}
+        ${
+          Number.isFinite(item.change)
+            ?item.change.toFixed(2)
+            :'—'
+        }%
+      </div>
+    </div>
+  `).join('');
 }
 
 function showCryptoDetail(id){
+  const info=marketInfo.get(id);
 
-  const info =
-    marketInfo.get(id);
+  if(!info||info.kind!=='perp')return;
 
-  if(
-    !info ||
-    info.kind !== 'perp'
-  ){
-    return;
-  }
-
-  const detail =
-    $('cryptoDetail');
-
+  const detail=$('cryptoDetail');
   detail.classList.remove('hidden');
 
-  detail.innerHTML = `
-
+  detail.innerHTML=`
     <div class="detail-head">
-
       <div>
+        <div class="muted mini">HYPERLIQUID PERPETUAL</div>
 
-        <div class="muted mini">
-          HYPERLIQUID PERPETUAL
-        </div>
-
-        <div
-          class="signalhead"
-          style="margin-top:4px"
-        >
+        <div class="signalhead" style="margin-top:4px">
           ${esc(id)}
         </div>
-
       </div>
 
       <div style="text-align:right">
-
         <strong style="font-size:22px">
           $${fmt(info.price)}
         </strong>
 
-        <div
-          class="${
-            info.change >= 0
-              ? 'green'
-              : 'red'
-          }"
-        >
-
-          ${
-            info.change >= 0
-              ? '+'
-              : ''
-          }
-
+        <div class="${info.change>=0?'green':'red'}">
+          ${info.change>=0?'+':''}
           ${
             Number.isFinite(info.change)
-              ? info.change.toFixed(2)
-              : '—'
+              ?info.change.toFixed(2)
+              :'—'
           }%
-
         </div>
-
       </div>
-
     </div>
 
     <div class="grid">
-
       <div class="metric">
         <small>24h notional</small>
-        <strong>
-          $${compact(info.notional)}
-        </strong>
+        <strong>$${compact(info.notional)}</strong>
       </div>
 
       <div class="metric">
         <small>Open interest</small>
-        <strong>
-          $${compact(info.openInterest)}
-        </strong>
+        <strong>$${compact(info.openInterest)}</strong>
       </div>
 
       <div class="metric">
@@ -1660,36 +1443,24 @@ function showCryptoDetail(id){
         <strong>
           ${
             Number.isFinite(info.funding)
-              ? (
-                  info.funding*100
-                ).toFixed(4)+'%'
-              : '—'
+              ?(info.funding*100).toFixed(4)+'%'
+              :'—'
           }
         </strong>
       </div>
 
       <div class="metric">
         <small>DEX</small>
-        <strong>
-          ${esc(info.dex || 'Default')}
-        </strong>
+        <strong>${esc(info.dex||'Default')}</strong>
       </div>
 
       <div class="metric">
         <small>Watchlist</small>
-        <strong>
-          ${
-            watchlist.has(id)
-              ? 'SAVED'
-              : 'NOT SAVED'
-          }
-        </strong>
+        <strong>${watchlist.has(id)?'SAVED':'NOT SAVED'}</strong>
       </div>
-
     </div>
 
     <div class="detail-actions">
-
       <button
         id="detailAnalyze"
         class="primary"
@@ -1699,81 +1470,40 @@ function showCryptoDetail(id){
       </button>
 
       <button id="detailWatch">
-        ${
-          watchlist.has(id)
-            ? 'REMOVE FROM'
-            : 'ADD TO'
-        }
-        WATCHLIST
+        ${watchlist.has(id)?'REMOVE FROM':'ADD TO'} WATCHLIST
       </button>
-
     </div>
-
   `;
 
-  $('detailAnalyze').onclick =
-    () => selectCryptoMarket(
-      id,
-      true
-    );
-
-  $('detailWatch').onclick =
-    () => toggleWatch(
-      id,
-      true
-    );
-
+  $('detailAnalyze').onclick=()=>selectCryptoMarket(id,true);
+  $('detailWatch').onclick=()=>toggleWatch(id,true);
 }
 
-function selectCryptoMarket(
-  id,
-  run=false
-){
+function selectCryptoMarket(id,run=false){
+  if(!marketInfo.has(id))return;
 
-  if(!marketInfo.has(id)){
-    return;
-  }
+  marketFilter='all';
 
-  marketFilter = 'all';
+  document.querySelectorAll('[data-filter]').forEach(button=>{
+    button.classList.toggle(
+      'active',
+      button.dataset.filter==='all'
+    );
+  });
 
-  document
-    .querySelectorAll('[data-filter]')
-    .forEach(button => {
-
-      button.classList.toggle(
-        'active',
-        button.dataset.filter === 'all'
-      );
-
-    });
-
-  $('search').value = '';
-
+  $('search').value='';
   updateMarkets();
-
-  $('market').value = id;
-
+  $('market').value=id;
   invalidate();
 
-  if(run){
-    analyze();
-  }
-
+  if(run)analyze();
 }
 
-function toggleWatch(
-  id,
-  refreshDetail=false
-){
-
+function toggleWatch(id,refreshDetail=false){
   if(watchlist.has(id)){
-
     watchlist.delete(id);
-
   }else{
-
     watchlist.add(id);
-
   }
 
   localStorage.setItem(
@@ -1783,13 +1513,8 @@ function toggleWatch(
 
   renderCryptoMarket();
 
-  if(refreshDetail){
-    showCryptoDetail(id);
-  }
-
-}
-
-function getDisplayTf(){
+  if(refreshDetail)showCryptoDetail(id);
+}function getDisplayTf(){
 
   return selected.has('15m')
     ? '15m'
@@ -1865,6 +1590,8 @@ function resetOutputs(
       ${esc(message)}
     </p>
 
+    ${levelGrid({})}
+
   `;
 
   $('confirmedResult').innerHTML = `
@@ -1876,6 +1603,8 @@ function resetOutputs(
     <p class="muted">
       Reanalysis required.
     </p>
+
+    ${levelGrid({})}
 
   `;
 
@@ -2349,6 +2078,7 @@ async function candles(
     );
 
 }
+
 function evaluate(candles15,candles1h,strategy){
 
   if(
@@ -2551,6 +2281,7 @@ function evaluate(candles15,candles1h,strategy){
   let tp1 = null;
   let tp2 = null;
   let tp3 = null;
+  let riskPct = null;
 
   if(side !== 'NEUTRAL'){
 
@@ -2568,10 +2299,9 @@ function evaluate(candles15,candles1h,strategy){
     const risk =
       Math.abs(entry-stop);
 
-    if(
-      risk > 0 &&
-      risk/entry <= 0.07
-    ){
+    if(risk > 0){
+
+      riskPct = risk/entry;
 
       const direction =
         side === 'LONG'
@@ -2586,10 +2316,6 @@ function evaluate(candles15,candles1h,strategy){
 
       tp3 =
         entry+direction*4*risk;
-
-    }else{
-
-      stop = null;
 
     }
 
@@ -2607,6 +2333,7 @@ function evaluate(candles15,candles1h,strategy){
     tp1,
     tp2,
     tp3,
+    riskPct,
     vr,
     rs,
     mh,
@@ -2652,7 +2379,11 @@ function confirmEntry(
 
   }
 
-  if(analysis.stop === null){
+  if(
+    analysis.stop === null ||
+    !Number.isFinite(analysis.riskPct) ||
+    analysis.riskPct > 0.07
+  ){
 
     return{
       reason:'Stop-loss risk is invalid or above 7%'
@@ -2757,51 +2488,55 @@ function confirmEntry(
 
 }
 
-function levelGrid(signal){
+function levelGrid(signal={}){
 
   return`
 
-    <div class="grid">
+    <div class="grid level-grid">
 
-      <div class="metric">
+      <div class="metric level-card level-entry">
         <small>ENTRY</small>
         <strong class="gold">
           ${fmt(signal.entry)}
         </strong>
       </div>
 
-      <div class="metric">
+      <div class="metric level-card level-stop">
         <small>STOP LOSS</small>
         <strong class="red">
           ${fmt(signal.stop)}
         </strong>
       </div>
 
-      <div class="metric">
+      <div class="metric level-card level-target">
         <small>TP1 · 2R</small>
         <strong class="green">
           ${fmt(signal.tp1)}
         </strong>
       </div>
 
-      <div class="metric">
+      <div class="metric level-card level-target">
         <small>TP2 · 3R</small>
         <strong class="green">
           ${fmt(signal.tp2)}
         </strong>
       </div>
 
-      <div class="metric">
+      <div class="metric level-card level-target">
         <small>TP3 · 4R</small>
         <strong class="green">
           ${fmt(signal.tp3)}
         </strong>
       </div>
 
-      <div class="metric">
+      <div class="metric level-card level-volume">
         <small>VOLUME</small>
         <strong>
-          ${signal.vr.toFixed(2)}×
+          ${
+            Number.isFinite(signal.vr)
+              ? signal.vr.toFixed(2)+'×'
+              : '—'
+          }
         </strong>
       </div>
 
@@ -2827,6 +2562,8 @@ function renderAnalysis(
       <p>
         ${esc(analysis.error)}
       </p>
+
+      ${levelGrid({})}
 
     `;
 
@@ -2878,10 +2615,12 @@ function renderAnalysis(
       ${esc(analysis.reason)} ·
       ${ny(analysis.time)}
     </p>
+
     ${analysis.stop !== null
-  ? levelGrid(analysis)
-  : '<p class="muted">No valid ENTRY / SL / TP levels right now.</p>'
-}
+      ? levelGrid(analysis)
+      : levelGrid({vr:analysis.vr})+
+        '<p class="muted">No valid ENTRY / SL / TP levels right now.</p>'
+    }
 
     <p class="muted mini">
 
@@ -2922,6 +2661,8 @@ function renderConfirmed(
       <p class="muted">
         ${esc(signal.reason)}
       </p>
+
+      ${levelGrid({})}
 
     `;
 
@@ -2964,9 +2705,7 @@ function renderConfirmed(
 
   `;
 
-}
-
-async function validatePrice(
+}async function validatePrice(
   info,
   signal,
   candles15
@@ -3026,10 +2765,20 @@ async function validatePrice(
     return false;
   }
 
+  const averageRange =
+    atr(candles15);
+
+  if(
+    !Number.isFinite(averageRange) ||
+    averageRange <= 0
+  ){
+    return false;
+  }
+
   const drift =
     Math.min(
       signal.entry*0.005,
-      atr(candles15)*0.35
+      averageRange*0.35
     );
 
   return(
@@ -3118,13 +2867,21 @@ function drawChart(
   }
 
   const closes =
-    candleData.map(item=>item.c);
+    candleData.map(
+      item=>item.c
+    );
 
   const fast =
-    ema(closes,analysis.fastN);
+    ema(
+      closes,
+      analysis.fastN
+    );
 
   const slow =
-    ema(closes,analysis.slowN);
+    ema(
+      closes,
+      analysis.slowN
+    );
 
   const start =
     candleData.length-
@@ -3148,13 +2905,17 @@ function drawChart(
 
   let low =
     Math.min(
-      ...displayed.map(item=>item.l),
+      ...displayed.map(
+        item=>item.l
+      ),
       ...levelValues
     );
 
   let high =
     Math.max(
-      ...displayed.map(item=>item.h),
+      ...displayed.map(
+        item=>item.h
+      ),
       ...levelValues
     );
 
@@ -3183,13 +2944,22 @@ function drawChart(
     '#22334a';
 
   context.lineWidth = 1;
-  context.font = '11px system-ui';
-  context.fillStyle = '#9fb2c9';
+  context.font =
+    '11px system-ui';
 
-  for(let line=0;line<=5;line++){
+  context.fillStyle =
+    '#9fb2c9';
+
+  for(
+    let line=0;
+    line<=5;
+    line++
+  ){
 
     const value =
-      low+(high-low)*line/5;
+      low+
+      (high-low)*
+      line/5;
 
     const positionY =
       y(value);
@@ -3235,8 +3005,11 @@ function drawChart(
           ? '#21d6a5'
           : '#ff637c';
 
-      context.strokeStyle = color;
-      context.fillStyle = color;
+      context.strokeStyle =
+        color;
+
+      context.fillStyle =
+        color;
 
       context.beginPath();
 
@@ -3253,13 +3026,24 @@ function drawChart(
       context.stroke();
 
       const top =
-        y(Math.max(item.o,item.c));
+        y(
+          Math.max(
+            item.o,
+            item.c
+          )
+        );
 
       const bottom =
-        y(Math.min(item.o,item.c));
+        y(
+          Math.min(
+            item.o,
+            item.c
+          )
+        );
 
       context.fillRect(
-        x(index)-candleWidth/2,
+        x(index)-
+        candleWidth/2,
         top,
         candleWidth,
         Math.max(
@@ -3313,23 +3097,54 @@ function drawChart(
 
     }
 
-    context.strokeStyle = color;
-    context.lineWidth = 1.8;
+    context.strokeStyle =
+      color;
+
+    context.lineWidth =
+      1.8;
+
     context.stroke();
 
   }
 
-  drawLine(fast,'#dafa4b');
-  drawLine(slow,'#58a6ff');
+  drawLine(
+    fast,
+    '#dafa4b'
+  );
+
+  drawLine(
+    slow,
+    '#58a6ff'
+  );
 
   const planLevels =
     plan
       ? [
-          ['ENTRY',plan.entry,'#f6c96b'],
-          ['SL',plan.stop,'#ff637c'],
-          ['TP1',plan.tp1,'#21d6a5'],
-          ['TP2',plan.tp2,'#21d6a5'],
-          ['TP3',plan.tp3,'#21d6a5']
+          [
+            'ENTRY',
+            plan.entry,
+            '#f6c96b'
+          ],
+          [
+            'SL',
+            plan.stop,
+            '#ff637c'
+          ],
+          [
+            'TP1',
+            plan.tp1,
+            '#21d6a5'
+          ],
+          [
+            'TP2',
+            plan.tp2,
+            '#21d6a5'
+          ],
+          [
+            'TP3',
+            plan.tp3,
+            '#21d6a5'
+          ]
         ]
       : [];
 
@@ -3348,9 +3163,15 @@ function drawChart(
     const positionY =
       y(value);
 
-    context.setLineDash([5,4]);
-    context.strokeStyle = color;
+    context.setLineDash(
+      [5,4]
+    );
+
+    context.strokeStyle =
+      color;
+
     context.lineWidth = 1;
+
     context.beginPath();
 
     context.moveTo(
@@ -3364,9 +3185,12 @@ function drawChart(
     );
 
     context.stroke();
+
     context.setLineDash([]);
 
-    context.fillStyle = color;
+    context.fillStyle =
+      color;
+
     context.font =
       'bold 10px system-ui';
 
@@ -3391,7 +3215,7 @@ function drawChart(
     (
       plan
         ? ' · CONFIRMED LEVELS'
-        : ' · NO CONFIRMED LEVELS'
+        : ' · DIRECTIONAL ANALYSIS'
     );
 
 }
@@ -3507,6 +3331,7 @@ async function analyze(){
         analysis.error;
 
       clearChart();
+
       return;
 
     }
@@ -3614,7 +3439,8 @@ async function analyze(){
       `chart ${display}`;
 
     lastSnapshot = {
-      candles:data.get(display),
+      candles:
+        data.get(display),
       analysis,
       id,
       timeframe:display,
@@ -3638,6 +3464,8 @@ async function analyze(){
         <p>
           ${esc(error.message)}
         </p>
+
+        ${levelGrid({})}
 
       `;
 
@@ -3738,7 +3566,7 @@ async function checkAlert(){
     );
 
     const key =
-      'yoyo-v40:'+
+      'yoyo-v41:'+
       id+':'+
       $('strategy').value+':'+
       signal.side+':'+
@@ -3764,6 +3592,11 @@ async function checkAlert(){
 
     $('alertsStatus').textContent =
       'Confirmed: '+body;
+
+    showSignalToast(
+      body,
+      signal.side
+    );
 
     if(
       'Notification' in window &&
@@ -3794,12 +3627,70 @@ async function checkAlert(){
 
 }
 
+function setNotificationState(
+  active,
+  label
+){
+
+  $('notificationPill')
+    .classList.toggle(
+      'live',
+      active
+    );
+
+  $('notificationPillText')
+    .textContent =
+      label;
+
+}
+
+function showSignalToast(
+  message,
+  side
+){
+
+  const toast =
+    $('signalToast');
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toast.className =
+    'signal-toast show '+
+    (
+      side === 'SHORT'
+        ? 'short'
+        : 'long'
+    );
+
+  toast.innerHTML =
+    `<strong>${
+      side === 'SHORT'
+        ? '🔴'
+        : '🟢'
+    } CONFIRMED ${esc(side)} SIGNAL</strong>`+
+    `<span class="mini">${esc(message)}</span>`;
+
+  toastTimer =
+    setTimeout(
+      () =>
+        toast.classList.remove(
+          'show'
+        ),
+      9000
+    );
+
+}
+
 $('alertsToggle').onclick =
 async()=>{
 
   if(alertTimer){
 
-    clearInterval(alertTimer);
+    clearInterval(
+      alertTimer
+    );
 
     alertTimer = null;
 
@@ -3808,6 +3699,11 @@ async()=>{
 
     $('alertsStatus').textContent =
       'Alerts off.';
+
+    setNotificationState(
+      false,
+      'ALERTS OFF'
+    );
 
     return;
 
@@ -3839,6 +3735,17 @@ async()=>{
   $('alertsStatus').textContent =
     'Monitoring selected Hyperliquid PERP while page is open.';
 
+  const browserGranted =
+    'Notification' in window &&
+    Notification.permission === 'granted';
+
+  setNotificationState(
+    true,
+    browserGranted
+      ? 'ALERTS LIVE'
+      : 'IN-APP LIVE'
+  );
+
   checkAlert();
 
 };
@@ -3864,11 +3771,12 @@ $('marketTabs')
       .querySelectorAll(
         '[data-filter]'
       )
-      .forEach(item=>
-        item.classList.toggle(
-          'active',
-          item === button
-        )
+      .forEach(
+        item =>
+          item.classList.toggle(
+            'active',
+            item === button
+          )
       );
 
     updateMarkets();
@@ -3898,11 +3806,12 @@ $('moverTabs')
       .querySelectorAll(
         '[data-mover]'
       )
-      .forEach(item=>
-        item.classList.toggle(
-          'active',
-          item === button
-        )
+      .forEach(
+        item =>
+          item.classList.toggle(
+            'active',
+            item === button
+          )
       );
 
     renderCryptoMarket();
@@ -4032,11 +3941,15 @@ $('times')
       selected.size > 1
     ){
 
-      selected.delete(timeframe);
+      selected.delete(
+        timeframe
+      );
 
     }else{
 
-      selected.add(timeframe);
+      selected.add(
+        timeframe
+      );
 
     }
 
@@ -4079,6 +3992,10 @@ window.addEventListener(
   }
 );
 
+resetOutputs(
+  'Tap Analyze to see ENTRY, SL and TP1–TP3.'
+);
+
 syncButtons();
 renderHistory();
 
@@ -4095,9 +4012,6 @@ loadMarkets()
 
 });
 
-</script>
-</body>
-</html>
 </script>
 </body>
 </html>
