@@ -2467,20 +2467,29 @@ function confirmEntry(
       ? analysis.last.c >
           analysis.last.o &&
         analysis.last.c >
-          fast[index]
+          fast[index] &&
+        (
+          analysis.last.c-
+          analysis.last.o
+        ) >= analysis.a*0.20
       : analysis.last.c <
           analysis.last.o &&
         analysis.last.c <
-          fast[index];
+          fast[index] &&
+        (
+          analysis.last.o-
+          analysis.last.c
+        ) >= analysis.a*0.20;
 
   if(
-    !(touch || breakout) ||
+    !touch ||
+    !breakout ||
     !candleOK
   ){
 
     return{
       reason:
-        'No completed pullback/reclaim or breakout candle'
+        'Waiting for EMA21 pullback, structure break and strong candle close'
     };
 
   }
