@@ -7,6 +7,23 @@
 
 <title>YOYO TRADE PRO V4.1</title>
 
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred=window.OneSignalDeferred||[];
+OneSignalDeferred.push(async function(OneSignal){
+  await OneSignal.init({
+    appId:"79e44e90-939e-4b66-ab64-4012c91d044a",
+    safari_web_id:"web.onesignal.auto.20cc36d3-e742-47b9-8fc8-37c27a32926f",
+    serviceWorkerPath:"OneSignalSDKWorker.js",
+    serviceWorkerParam:{scope:"/prime-trade-alerts-pro/"},
+    notifyButton:{enable:false},
+    allowLocalhostAsSecureOrigin:true
+  });
+  window.YOYOOneSignal=OneSignal;
+  window.dispatchEvent(new Event("yoyo-onesignal-ready"));
+});
+</script>
+
 <style>
 :root{
   --bg:#080d18;
@@ -3894,70 +3911,107 @@ function showSignalToast(
 
 }
 
-$('alertsToggle').onclick =
-async()=>{
+async function syncPushState(){
 
-  if(alertTimer){
+  const oneSignal =
+    window.YOYOOneSignal;
 
-    clearInterval(
-      alertTimer
-    );
-
-    alertTimer = null;
-
-    $('alertsToggle').textContent =
-      'ENABLE SIGNAL NOTIFICATIONS';
-
-    $('alertsStatus').textContent =
-      'Alerts off.';
-
-    setNotificationState(
-      false,
-      'ALERTS OFF'
-    );
-
-    return;
-
-  }
-
-  if(
-    'Notification' in window &&
-    Notification.permission === 'default'
-  ){
-
-    try{
-
-      await Notification
-        .requestPermission();
-
-    }catch{}
-
-  }
-
-  alertTimer =
-    setInterval(
-      checkAlert,
-      60000
+  const active =
+    Boolean(
+      oneSignal?.User
+        ?.PushSubscription
+        ?.optedIn
     );
 
   $('alertsToggle').textContent =
-    'STOP SIGNAL MONITORING';
+    active
+      ? 'DISABLE SIGNAL NOTIFICATIONS'
+      : 'ENABLE SIGNAL NOTIFICATIONS';
 
   $('alertsStatus').textContent =
-    'Monitoring selected Hyperliquid PERP while page is open.';
-
-  const browserGranted =
-    'Notification' in window &&
-    Notification.permission === 'granted';
+    active
+      ? '24/7 app push notifications are enabled on this device.'
+      : 'Enable once to receive confirmed signals while the app is closed.';
 
   setNotificationState(
-    true,
-    browserGranted
-      ? 'ALERTS LIVE'
-      : 'IN-APP LIVE'
+    active,
+    active
+      ? 'PUSH LIVE'
+      : 'ALERTS OFF'
   );
 
-  checkAlert();
+}
+
+window.addEventListener(
+  'yoyo-onesignal-ready',
+  ()=>{
+
+    const subscription =
+      window.YOYOOneSignal
+        ?.User
+        ?.PushSubscription;
+
+    subscription
+      ?.addEventListener(
+        'change',
+        syncPushState
+      );
+
+    syncPushState();
+
+  }
+);
+
+$('alertsToggle').onclick =
+async()=>{
+
+  const oneSignal =
+    window.YOYOOneSignal;
+
+  if(!oneSignal){
+    $('alertsStatus').textContent =
+      'Push service is still loading. Try again in a moment.';
+    return;
+  }
+
+  $('alertsToggle').disabled = true;
+
+  try{
+
+    const subscription =
+      oneSignal.User
+        .PushSubscription;
+
+    if(subscription.optedIn){
+
+      await subscription.optOut();
+
+    }else{
+
+      await oneSignal.Notifications
+        .requestPermission();
+
+      if(
+        oneSignal.Notifications
+          .permission
+      ){
+        await subscription.optIn();
+      }
+
+    }
+
+    await syncPushState();
+
+  }catch(error){
+
+    $('alertsStatus').textContent =
+      'On iPhone, add this app to the Home Screen, reopen it, then enable notifications.';
+
+  }finally{
+
+    $('alertsToggle').disabled = false;
+
+  }
 
 };
 

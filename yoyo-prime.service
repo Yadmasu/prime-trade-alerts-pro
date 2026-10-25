@@ -1,0 +1,16 @@
+[Unit]
+Description=YOYO Prime Trade 24/7 Scanner
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/yoyo-prime
+EnvironmentFile=/opt/yoyo-prime/.env
+ExecStart=/opt/yoyo-prime/.venv/bin/python /opt/yoyo-prime/scanner.py
+Restart=always
+RestartSec=10
+User=yoyo
+
+[Install]
+WantedBy=multi-user.target
