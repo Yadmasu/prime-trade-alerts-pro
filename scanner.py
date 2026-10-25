@@ -22,6 +22,7 @@ SCAN_CONCURRENCY = int(os.getenv("SCAN_CONCURRENCY", "16"))
 MIN_VOLUME_RATIO = float(os.getenv("MIN_VOLUME_RATIO", "1.2"))
 MIN_24H_NOTIONAL = float(os.getenv("MIN_24H_NOTIONAL", "1000000"))
 MAX_SIGNAL_AGE = int(os.getenv("MAX_SIGNAL_AGE_SECONDS", "1800"))
+MAX_ALERTS_PER_RUN = int(os.getenv("MAX_ALERTS_PER_RUN", "3"))
 BTC_EXCLUDED = os.getenv("BTC_EXCLUDED", "true").lower() == "true"
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() == "true"
 RUN_ONCE = os.getenv("RUN_ONCE", "false").lower() == "true"
@@ -193,6 +194,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict]) -> dict | None:
         "tp2": entry + direction * 3 * risk,
         "tp3": entry + direction * 4 * risk,
         "volume": vr,
+        "max_drift": min(entry * .005, average_range * .35),
     }
 
 
@@ -238,9 +240,14 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         "web_url": f"{APP_URL}?market={market.coin}",
         "data": {"market": market.coin, **signal},
     }
-    async with session.post(ONESIGNAL_API, headers=headers, json=payload, timeout=20) as response:
-        if response.status >= 300:
-            raise RuntimeError(f"OneSignal {response.status}: {await response.text()}")
+    for attempt in range(4):
+        async with session.post(ONESIGNAL_API, headers=headers, json=payload, timeout=20) as response:
+            if response.status < 300:
+                return
+            message = await response.text()
+            if response.status not in (429, 500, 502, 503, 504) or attempt == 3:
+                raise RuntimeError(f"OneSignal {response.status}: {message}")
+        await asyncio.sleep(2 ** attempt)
 
 
 def load_state() -> dict:
@@ -264,12 +271,23 @@ async def run_cycle() -> None:
         state = load_state()
         now = int(time.time())
         state = {key: value for key, value in state.items() if now - int(value) < 14 * 86_400}
+        candidates = []
         for market, signal in results:
             if not signal:
                 continue
             key = f"{market.coin}:{signal['side']}:{signal['candle']}"
             if key in state:
                 continue
+            if abs(market.mid - signal["entry"]) > signal["max_drift"]:
+                print(f"Skip stale price {market.coin}", flush=True)
+                continue
+            candidates.append((market, signal, key))
+
+        candidates.sort(
+            key=lambda item: (item[1]["volume"], item[0].notional),
+            reverse=True,
+        )
+        for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
             await send_push(session, market, signal)
             state[key] = now
             save_state(state)

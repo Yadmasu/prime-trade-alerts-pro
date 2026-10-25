@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
 
-<title>YOYO TRADE PRO V4.1</title>
+<title>YOYO TRADE PRO V4.2</title>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
@@ -245,6 +245,30 @@ h2{
   font-weight:800;
 }
 
+.scanner-strip{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:14px;
+}
+
+.scanner-stat{
+  padding:11px;
+  border:1px solid rgba(33,214,165,.25);
+  border-radius:10px;
+  background:rgba(5,20,31,.64);
+}
+
+.scanner-stat small{
+  display:block;
+  margin-bottom:4px;
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+}
+
+.scanner-stat strong{font-size:12px;color:var(--green)}
+
 .controls{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -316,7 +340,7 @@ button:active{transform:translateY(1px)}
 
 .market-tabs{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:7px;
   margin:14px 0 20px;
 }
@@ -556,6 +580,30 @@ button:active{transform:translateY(1px)}
 .signal-panel{border-color:rgba(88,166,255,.42)}
 .confirmed-panel{border-color:rgba(33,214,165,.35)}
 
+.quality-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:14px;
+}
+
+.quality-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px 11px;
+  border:1px solid var(--edge);
+  border-radius:9px;
+  background:#0c1829;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.quality-item b{color:#8295aa}
+.quality-item.pass b{color:var(--green)}
+.quality-item.fail b{color:var(--red)}
+
 .level-grid{
   grid-template-columns:repeat(2,minmax(0,1fr));
   margin-top:13px;
@@ -704,6 +752,7 @@ footer{
   .market-change,
   .market-price{grid-column:3}
   .detail-actions{grid-template-columns:1fr}
+  .scanner-strip{grid-template-columns:1fr}
 }
 
 @media(max-width:420px){
@@ -728,7 +777,7 @@ footer{
     <div class="brand-mark">Y</div>
     <div>
       <div class="brand">YOYO <b>TRADE PRO</b></div>
-      <div class="tag">V4.1 · LIVE MARKET INTELLIGENCE</div>
+      <div class="tag">V4.2 · LIVE MARKET INTELLIGENCE</div>
     </div>
   </div>
 
@@ -745,7 +794,7 @@ footer{
   <h1>Trading Dashboard</h1>
 
   <div class="muted">
-    Hyperliquid perpetuals, spot and stock watchlist.
+    Hyperliquid perpetual signals with professional live charts.
     No automatic trading.
   </div>
 
@@ -759,6 +808,12 @@ footer{
     <span class="hero-chip">1H Trend</span>
     <span class="hero-chip">Volume Confirmation</span>
     <span class="hero-chip">No Auto Trading</span>
+  </div>
+
+  <div class="scanner-strip">
+    <div class="scanner-stat"><small>Background scanner</small><strong>24/7 ACTIVE</strong></div>
+    <div class="scanner-stat"><small>Scan interval</small><strong>EVERY 15 MIN</strong></div>
+    <div class="scanner-stat"><small>Signal policy</small><strong>CONFIRMED ONLY · BTC EXCLUDED</strong></div>
   </div>
 </section>
 
@@ -817,11 +872,8 @@ footer{
   <h2>Market &amp; Strategy</h2>
 
   <div class="market-tabs" id="marketTabs">
-    <button data-filter="all" class="active">All</button>
-    <button data-filter="crypto">Crypto</button>
-    <button data-filter="perp">Perps</button>
-    <button data-filter="spot">Spot</button>
-    <button data-filter="stock">Stocks</button>
+    <button data-filter="all" class="active">All Perps</button>
+    <button data-filter="perp">Hyperliquid Perps</button>
   </div>
 
   <div class="controls">
@@ -830,7 +882,7 @@ footer{
 
       <input
         id="search"
-        placeholder="SOL, XRP, GOLD, AAPL..."
+        placeholder="SOL, XRP, HYPE, GOLD..."
         autocomplete="off"
       >
 
@@ -846,9 +898,6 @@ footer{
 
       <select id="strategy">
         <option value="ema21" selected>EMA21 / EMA89 (Main)</option>
-        <option value="ema13">EMA13 / EMA89</option>
-        <option value="ema9">EMA9 / EMA89</option>
-        <option value="cross">EMA9 / EMA21 Cross</option>
       </select>
     </div>
 
@@ -894,7 +943,7 @@ footer{
       <span class="live-dot">READY</span>
     </div>
 
-    <b>EMA21/89 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2×</b>
+    <b>EMA21/89 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2× · 24H VOLUME ≥ $1M</b>
 
     <p class="muted mini">
       Confirmed entry requires aligned trend, a completed entry candle,
@@ -957,6 +1006,8 @@ footer{
   <div id="confirmedResult" class="notice">
     <div class="signalhead">⚪ WAIT — NO CONFIRMED ENTRY</div>
   </div>
+
+  <div id="signalQuality" class="quality-grid" aria-label="Signal confirmation checklist"></div>
 
   <p class="muted mini">
     ENTRY, STOP LOSS and TP1–TP3 appear only after the signal is confirmed.
@@ -1045,7 +1096,7 @@ footer{
 ></div>
 
 <footer>
-  YOYO TRADE PRO V4.1 © 2026 · Research only · No automatic execution
+  YOYO TRADE PRO V4.2 © 2026 · Research only · No automatic execution
 </footer>
 
 <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -1070,13 +1121,9 @@ const tfMs={
   '1M':30*DAY
 };
 
-const STOCKS=[
-  'AAPL','MSFT','NVDA','TSLA','AMZN','GOOGL','META','AMD',
-  'AVGO','NFLX','PLTR','COIN','MSTR','HOOD','SOFI','SPY','QQQ'
-];
-
 const WATCHLIST_KEY='yoyo-v41-watchlist';
 const HISTORY_KEY='yoyo-v41-confirmed-history';
+const MIN_24H_NOTIONAL=1_000_000;
 
 let marketInfo=new Map([
   ['SOL',{
@@ -1262,30 +1309,6 @@ async function loadMarkets(){
     }
   }
 
-  try{
-    const data=await api({type:'spotMeta'});
-
-    for(const asset of data.universe||[]){
-      const id='SPOT:'+asset.name;
-
-      add(id,{
-        kind:'spot',
-        coin:'@'+asset.index,
-        label:asset.name+' · HL SPOT'
-      });
-    }
-  }catch{
-    failures.push('Spot discovery unavailable');
-  }
-
-  for(const ticker of STOCKS){
-    add('STOCK:'+ticker,{
-      kind:'stock',
-      coin:ticker,
-      label:ticker+' · STOCK WATCHLIST'
-    });
-  }
-
   marketInfo=found;
   markets=[...found.keys()].sort((a,b)=>a.localeCompare(b));
 
@@ -1298,14 +1321,8 @@ async function loadMarkets(){
   updateMarkets();
   renderCryptoMarket();
 
-  const spotCount=[...found.values()]
-    .filter(item=>item.kind==='spot')
-    .length;
-
   $('status').textContent=
-    `${marketRows.length} perps · `+
-    `${spotCount} spot · `+
-    `${STOCKS.length} stocks. `+
+    `${marketRows.length} Hyperliquid perpetual markets · `+
     failures.join('; ');
 }
 
@@ -1316,15 +1333,7 @@ function updateMarkets(){
   const filtered=markets.filter(id=>{
     const info=marketInfo.get(id);
 
-    if(
-      marketFilter==='crypto'&&
-      info.kind!=='perp'&&
-      info.kind!=='spot'
-    )return false;
-
     if(marketFilter==='perp'&&info.kind!=='perp')return false;
-    if(marketFilter==='spot'&&info.kind!=='spot')return false;
-    if(marketFilter==='stock'&&info.kind!=='stock')return false;
 
     return(
       id.toUpperCase().includes(query)||
@@ -1663,6 +1672,8 @@ function resetOutputs(
 
   $('chartLegend').textContent =
     'Auto analysis is loading the chart.';
+
+  renderSignalQuality({},null,null);
 
   for(const id of [
     'strategyMetric',
@@ -2415,7 +2426,8 @@ function confirmEntry(
   if(analysis.error){
 
     return{
-      reason:analysis.error
+      reason:analysis.error,
+      checks:{}
     };
 
   }
@@ -2426,7 +2438,8 @@ function confirmEntry(
   ){
 
     return{
-      reason:analysis.reason
+      reason:analysis.reason,
+      checks:{trend:false}
     };
 
   }
@@ -2438,7 +2451,8 @@ function confirmEntry(
   ){
 
     return{
-      reason:'Stop-loss risk is invalid or above 7%'
+      reason:'Stop-loss risk is invalid or above 7%',
+      checks:{trend:true,risk:false}
     };
 
   }
@@ -2446,7 +2460,8 @@ function confirmEntry(
   if(analysis.vr < 1.2){
 
     return{
-      reason:'Volume is below 1.2×'
+      reason:'Volume is below 1.2×',
+      checks:{trend:true,risk:true,volume:false}
     };
 
   }
@@ -2460,7 +2475,8 @@ function confirmEntry(
   ){
 
     return{
-      reason:'Last completed 15m candle is stale'
+      reason:'Last completed 15m candle is stale',
+      checks:{trend:true,risk:true,volume:true,fresh:false}
     };
 
   }
@@ -2536,7 +2552,16 @@ function confirmEntry(
 
     return{
       reason:
-        'Waiting for EMA21 pullback, structure break and strong candle close'
+        'Waiting for EMA21 pullback, structure break and strong candle close',
+      checks:{
+        trend:true,
+        risk:true,
+        volume:true,
+        fresh:true,
+        pullback:touch,
+        breakout,
+        candle:candleOK
+      }
     };
 
   }
@@ -2544,9 +2569,39 @@ function confirmEntry(
   return{
     ...analysis,
     reason:'CONFIRMED',
-    confirmed:true
+    confirmed:true,
+    checks:{
+      trend:true,
+      risk:true,
+      volume:true,
+      fresh:true,
+      pullback:true,
+      breakout:true,
+      candle:true
+    }
   };
 
+}
+
+function renderSignalQuality(signal={},info=null,liveValid=null){
+  const checks=signal.checks||{};
+  const rows=[
+    ['15m + 1H trend',checks.trend],
+    ['Volume ≥ 1.2×',checks.volume],
+    ['EMA21 pullback',checks.pullback],
+    ['Structure break',checks.breakout],
+    ['Strong candle close',checks.candle],
+    ['Risk ≤ 7%',checks.risk],
+    ['Fresh 15m candle',checks.fresh],
+    ['24h volume ≥ $1M',info?Number(info.notional)>=MIN_24H_NOTIONAL:null],
+    ['Live price verified',liveValid]
+  ];
+
+  $('signalQuality').innerHTML=rows.map(([label,value])=>{
+    const state=value===true?'pass':value===false?'fail':'';
+    const text=value===true?'PASS':value===false?'WAIT':'PENDING';
+    return `<div class="quality-item ${state}"><span>${esc(label)}</span><b>${text}</b></div>`;
+  }).join('');
 }
 
 function levelGrid(signal={}){
@@ -3600,6 +3655,19 @@ async function analyze(){
         analysis
       );
 
+    let livePriceValid = null;
+
+    if(
+      confirmed.confirmed &&
+      Number(info.notional) < MIN_24H_NOTIONAL
+    ){
+      confirmed = {
+        ...confirmed,
+        confirmed:false,
+        reason:'24h market volume is below $1M; no entry alert'
+      };
+    }
+
     if(confirmed.confirmed){
 
       const valid =
@@ -3609,9 +3677,13 @@ async function analyze(){
           candles15
         ).catch(()=>false);
 
+      livePriceValid = valid;
+
       if(!valid){
 
         confirmed = {
+          ...confirmed,
+          confirmed:false,
           reason:
             'Live price could not be verified; no confirmed entry'
         };
@@ -3632,6 +3704,12 @@ async function analyze(){
     renderConfirmed(
       confirmed,
       id
+    );
+
+    renderSignalQuality(
+      confirmed,
+      info,
+      livePriceValid
     );
 
     drawChart(
@@ -3733,6 +3811,8 @@ async function analyze(){
         },
         id
       );
+
+      renderSignalQuality({},info,false);
 
       clearChart();
 
