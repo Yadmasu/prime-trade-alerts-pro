@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080d18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
 
 <title>YOYO TRADE PRO V4.1</title>
 
@@ -11,16 +15,21 @@
 <script>
 window.OneSignalDeferred=window.OneSignalDeferred||[];
 OneSignalDeferred.push(async function(OneSignal){
-  await OneSignal.init({
-    appId:"79e44e90-939e-4b66-ab64-4012c91d044a",
-    safari_web_id:"web.onesignal.auto.20cc36d3-e742-47b9-8fc8-37c27a32926f",
-    serviceWorkerPath:"OneSignalSDKWorker.js",
-    serviceWorkerParam:{scope:"/prime-trade-alerts-pro/"},
-    notifyButton:{enable:false},
-    allowLocalhostAsSecureOrigin:true
-  });
-  window.YOYOOneSignal=OneSignal;
-  window.dispatchEvent(new Event("yoyo-onesignal-ready"));
+  try{
+    await OneSignal.init({
+      appId:"79e44e90-939e-4b66-ab64-4012c91d044a",
+      safari_web_id:"web.onesignal.auto.20cc36d3-e742-47b9-8fc8-37c27a32926f",
+      serviceWorkerPath:"OneSignalSDKWorker.js",
+      serviceWorkerParam:{scope:"/prime-trade-alerts-pro/"},
+      notifyButton:{enable:false},
+      allowLocalhostAsSecureOrigin:true
+    });
+    window.YOYOOneSignal=OneSignal;
+    window.dispatchEvent(new Event("yoyo-onesignal-ready"));
+  }catch(error){
+    window.YOYOOneSignalError=error;
+    window.dispatchEvent(new Event("yoyo-onesignal-error"));
+  }
 });
 </script>
 
@@ -874,7 +883,7 @@ footer{
     If the feed is unavailable, no signal or trading level is shown.
   </div>
 
-  <button id="analyze" class="primary">ANALYZE NOW →</button>
+  <button id="analyze" class="primary">REFRESH NOW · AUTO ON</button>
 
   <div class="notification-card">
     <div class="notification-head">
@@ -904,7 +913,7 @@ footer{
   <h2>Live Price Chart</h2>
 
   <div class="chartwrap">
-    <div id="chartLegend">Select a market and tap Analyze.</div>
+    <div id="chartLegend">Select a market; analysis loads automatically.</div>
 
     <div id="tvchart">
       <div id="interactiveChart"></div>
@@ -1087,6 +1096,7 @@ let selected=new Set(['15m','1h']);
 let analysisSeq=0;
 let alertTimer=null;
 let alertBusy=false;
+let autoAnalyzeTimer=null;
 let lastSnapshot=null;
 let toastTimer=null;
 
@@ -1141,25 +1151,35 @@ const esc=value=>String(value).replace(
 );
 
 async function api(body){
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),16000);
+  let lastError;
 
-  try{
-    const response=await fetch(API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(body),
-      signal:controller.signal
-    });
+  for(let attempt=0;attempt<4;attempt++){
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),20000);
 
-    if(!response.ok){
-      throw Error('Hyperliquid HTTP '+response.status);
+    try{
+      const response=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(body),
+        signal:controller.signal
+      });
+
+      if(response.ok)return await response.json();
+
+      lastError=Error('Hyperliquid HTTP '+response.status);
+      if(response.status<500&&response.status!==429)throw lastError;
+    }catch(error){
+      lastError=error;
+      if(attempt===3)throw error;
+    }finally{
+      clearTimeout(timer);
     }
 
-    return await response.json();
-  }finally{
-    clearTimeout(timer);
+    await new Promise(resolve=>setTimeout(resolve,750*(2**attempt)));
   }
+
+  throw lastError||Error('Hyperliquid unavailable');
 }
 
 async function loadMarkets(){
@@ -1488,7 +1508,7 @@ function showCryptoDetail(id){
         class="primary"
         style="margin-top:0"
       >
-        ANALYZE ${esc(id)} →
+        OPEN ${esc(id)} · AUTO ANALYSIS
       </button>
 
       <button id="detailWatch">
@@ -1518,7 +1538,9 @@ function selectCryptoMarket(id,run=false){
   $('market').value=id;
   invalidate();
 
-  if(run)analyze();
+  if(run){
+    document.getElementById('liveChart')?.scrollIntoView({behavior:'smooth'});
+  }
 }
 
 function toggleWatch(id,refreshDetail=false){
@@ -1597,7 +1619,7 @@ function clearChart(){
 }
 
 function resetOutputs(
-  message='Settings changed. Tap Analyze.'
+  message='Settings changed. Auto analysis is starting.'
 ){
 
   lastSnapshot = null;
@@ -1637,7 +1659,7 @@ function resetOutputs(
     'badge unconfirmed';
 
   $('chartLegend').textContent =
-    'Tap Analyze to load the chart.';
+    'Auto analysis is loading the chart.';
 
   for(const id of [
     'strategyMetric',
@@ -1664,6 +1686,11 @@ function invalidate(){
 
   analysisSeq++;
   resetOutputs();
+
+  clearTimeout(autoAnalyzeTimer);
+  autoAnalyzeTimer=setTimeout(()=>{
+    if(!document.hidden)analyze();
+  },500);
 
 }
 
@@ -3962,6 +3989,19 @@ window.addEventListener(
   }
 );
 
+window.addEventListener(
+  'yoyo-onesignal-error',
+  ()=>{
+    const ios=/iPad|iPhone|iPod/.test(navigator.userAgent);
+    const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+    $('alertsStatus').textContent=
+      ios&&!standalone
+        ?'On iPhone: Share → Add to Home Screen, open the installed app, then enable notifications.'
+        :'Push service could not start. Reload the app and try again.';
+    setNotificationState(false,'ALERTS OFF');
+  }
+);
+
 if(window.YOYOOneSignal){
   syncPushState();
 }
@@ -4262,13 +4302,26 @@ window.addEventListener(
 );
 
 resetOutputs(
-  'Tap Analyze to see ENTRY, SL and TP1–TP3.'
+  'Auto analysis is starting. ENTRY, SL and TP1–TP3 appear only after confirmation.'
 );
 
 syncButtons();
 renderHistory();
 
 loadMarkets()
+.then(()=>{
+  const requested=new URLSearchParams(location.search).get('market');
+
+  if(requested&&marketInfo.has(requested)){
+    $('market').value=requested;
+  }
+
+  analyze();
+
+  alertTimer=setInterval(()=>{
+    if(!document.hidden)analyze();
+  },15*60*1000);
+})
 .catch(error=>{
 
   $('status').textContent =
@@ -4279,6 +4332,10 @@ loadMarkets()
     'Live market data unavailable: '+
     error.message;
 
+});
+
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&marketInfo.has($('market').value))analyze();
 });
 
 </script>

@@ -24,6 +24,7 @@ MIN_24H_NOTIONAL = float(os.getenv("MIN_24H_NOTIONAL", "1000000"))
 MAX_SIGNAL_AGE = int(os.getenv("MAX_SIGNAL_AGE_SECONDS", "1800"))
 BTC_EXCLUDED = os.getenv("BTC_EXCLUDED", "true").lower() == "true"
 DRY_RUN = os.getenv("DRY_RUN", "false").lower() == "true"
+RUN_ONCE = os.getenv("RUN_ONCE", "false").lower() == "true"
 
 
 @dataclass
@@ -280,6 +281,8 @@ async def main() -> None:
             await run_cycle()
         except Exception as error:
             print(f"Scan failed: {error}", flush=True)
+        if RUN_ONCE:
+            return
         now = time.time()
         next_run = (math.floor(now / 900) + 1) * 900 + 35
         await asyncio.sleep(max(30, next_run - now))
