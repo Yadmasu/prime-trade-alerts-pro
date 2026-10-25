@@ -23,8 +23,19 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: signal_state.json
+          key: yoyo-signal-state-${{ github.run_id }}
+          restore-keys: yoyo-signal-state-
+      - run: test -f signal_state.json || printf '{}' > signal_state.json
       - name: Scan all liquid Hyperliquid perpetuals
         env:
           ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
           RUN_ONCE: "true"
         run: python scanner.py
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: signal_state.json
+          key: yoyo-signal-state-${{ github.run_id }}
