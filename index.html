@@ -3962,6 +3962,10 @@ window.addEventListener(
   }
 );
 
+if(window.YOYOOneSignal){
+  syncPushState();
+}
+
 $('alertsToggle').onclick =
 async()=>{
 
