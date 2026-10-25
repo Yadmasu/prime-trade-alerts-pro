@@ -104,7 +104,7 @@ async def discover_markets(session: aiohttp.ClientSession) -> list[Market]:
             if asset.get("isDelisted") or (BTC_EXCLUDED and name == "BTC"):
                 continue
             context = contexts[index] if index < len(contexts) else {}
-            coin = f"{dex}:{name}" if dex else name
+            coin = f"{dex}:{name}" if dex and ":" not in name else name
             mid = float(context.get("midPx") or context.get("markPx") or 0)
             notional = float(context.get("dayNtlVlm") or 0)
             if mid > 0 and notional >= MIN_24H_NOTIONAL:

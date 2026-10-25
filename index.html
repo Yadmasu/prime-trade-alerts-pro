@@ -1224,7 +1224,10 @@ async function loadMarkets(){
 
         if(asset.isDelisted||asset.name==='BTC')continue;
 
-        const id=(dex?dex+':':'')+asset.name;
+        const id=
+          dex&&!asset.name.includes(':')
+            ?dex+':'+asset.name
+            :asset.name;
         const context=contexts[index]||{};
         const price=Number(context.midPx||context.markPx);
         const previous=Number(context.prevDayPx);
