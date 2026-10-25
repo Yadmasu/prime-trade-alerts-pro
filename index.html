@@ -505,11 +505,14 @@ button:active{transform:translateY(1px)}
 }
 
 #tvchart,
+#interactiveChart,
 #priceChart{
   width:100%;
   height:100%;
 }
 
+#tvchart{position:relative}
+#interactiveChart{position:absolute;inset:0;z-index:1}
 #priceChart{display:block}
 
 #chartLegend{
@@ -887,6 +890,7 @@ footer{
     <div id="chartLegend">Select a market and tap Analyze.</div>
 
     <div id="tvchart">
+      <div id="interactiveChart"></div>
       <canvas id="priceChart"></canvas>
     </div>
   </div>
@@ -1018,6 +1022,7 @@ footer{
   YOYO TRADE PRO V4.1 © 2026 · Research only · No automatic execution
 </footer>
 
+<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
 'use strict';
 
@@ -2794,7 +2799,7 @@ function renderConfirmed(
 
 }
 
-function drawChart(
+function drawCanvasChart(
   candleData,
   analysis,
   id,
@@ -3218,6 +3223,203 @@ function drawChart(
         : ' · DIRECTIONAL ANALYSIS'
     );
 
+}
+
+let liveChart = null;
+let liveChartObserver = null;
+
+function drawChart(
+  candleData,
+  analysis,
+  id,
+  timeframe,
+  confirmed=null
+){
+
+  const host = $('interactiveChart');
+  const fallback = $('priceChart');
+
+  if(
+    !window.LightweightCharts ||
+    !host ||
+    candleData.length < 5
+  ){
+    host.style.display = 'none';
+    fallback.style.display = 'block';
+    drawCanvasChart(
+      candleData,
+      analysis,
+      id,
+      timeframe,
+      confirmed
+    );
+    return;
+  }
+
+  fallback.style.display = 'none';
+  host.style.display = 'block';
+
+  if(liveChartObserver){
+    liveChartObserver.disconnect();
+  }
+
+  if(liveChart){
+    liveChart.remove();
+  }
+
+  host.innerHTML = '';
+
+  liveChart = LightweightCharts.createChart(
+    host,
+    {
+      width:host.clientWidth,
+      height:host.clientHeight,
+      layout:{
+        background:{color:'#0b1422'},
+        textColor:'#a7b9ce',
+        attributionLogo:true
+      },
+      grid:{
+        vertLines:{color:'rgba(48,68,94,.35)'},
+        horzLines:{color:'rgba(48,68,94,.35)'}
+      },
+      crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
+      rightPriceScale:{
+        borderColor:'#30445e',
+        scaleMargins:{top:.08,bottom:.25}
+      },
+      timeScale:{
+        borderColor:'#30445e',
+        timeVisible:true,
+        secondsVisible:false,
+        rightOffset:5,
+        barSpacing:8,
+        minBarSpacing:3
+      }
+    }
+  );
+
+  const candleSeries =
+    liveChart.addCandlestickSeries({
+      upColor:'#21d6a5',
+      downColor:'#ff637c',
+      borderUpColor:'#21d6a5',
+      borderDownColor:'#ff637c',
+      wickUpColor:'#21d6a5',
+      wickDownColor:'#ff637c',
+      priceLineVisible:true,
+      lastValueVisible:true
+    });
+
+  candleSeries.setData(
+    candleData.map(item=>({
+      time:Math.floor(item.t/1000),
+      open:item.o,
+      high:item.h,
+      low:item.l,
+      close:item.c
+    }))
+  );
+
+  const closes = candleData.map(item=>item.c);
+  const fastValues = ema(closes,analysis.fastN);
+  const slowValues = ema(closes,analysis.slowN);
+
+  const fastSeries =
+    liveChart.addLineSeries({
+      color:'#dafa4b',
+      lineWidth:2,
+      priceLineVisible:false,
+      lastValueVisible:false
+    });
+
+  const slowSeries =
+    liveChart.addLineSeries({
+      color:'#58a6ff',
+      lineWidth:2,
+      priceLineVisible:false,
+      lastValueVisible:false
+    });
+
+  const lineData = values =>
+    values
+      .map((value,index)=>({
+        time:Math.floor(candleData[index].t/1000),
+        value
+      }))
+      .filter(item=>Number.isFinite(item.value));
+
+  fastSeries.setData(lineData(fastValues));
+  slowSeries.setData(lineData(slowValues));
+
+  const volumeSeries =
+    liveChart.addHistogramSeries({
+      priceFormat:{type:'volume'},
+      priceScaleId:'',
+      priceLineVisible:false,
+      lastValueVisible:false
+    });
+
+  volumeSeries.priceScale().applyOptions({
+    scaleMargins:{top:.80,bottom:0}
+  });
+
+  volumeSeries.setData(
+    candleData.map(item=>({
+      time:Math.floor(item.t/1000),
+      value:item.v,
+      color:item.c>=item.o
+        ? 'rgba(33,214,165,.42)'
+        : 'rgba(255,99,124,.42)'
+    }))
+  );
+
+  const plan =
+    confirmed?.confirmed
+      ? confirmed
+      : null;
+
+  if(plan){
+    [
+      ['ENTRY',plan.entry,'#f6c96b'],
+      ['SL',plan.stop,'#ff637c'],
+      ['TP1',plan.tp1,'#21d6a5'],
+      ['TP2',plan.tp2,'#21d6a5'],
+      ['TP3',plan.tp3,'#21d6a5']
+    ].forEach(([title,price,color])=>{
+      if(Number.isFinite(price)){
+        candleSeries.createPriceLine({
+          price,
+          color,
+          lineWidth:2,
+          lineStyle:LightweightCharts.LineStyle.Dashed,
+          axisLabelVisible:true,
+          title
+        });
+      }
+    });
+  }
+
+  liveChart.timeScale().fitContent();
+
+  liveChartObserver =
+    new ResizeObserver(entries=>{
+      const size = entries[0]?.contentRect;
+      if(liveChart && size){
+        liveChart.applyOptions({
+          width:Math.floor(size.width),
+          height:Math.floor(size.height)
+        });
+      }
+    });
+
+  liveChartObserver.observe(host);
+
+  $('chartLegend').innerHTML =
+    `${esc(id)} · ${esc(timeframe)} · ${analysis.side} · `+
+    `<span style="color:#dafa4b">EMA${analysis.fastN}</span> / `+
+    `<span style="color:#58a6ff">EMA${analysis.slowN}</span>`+
+    (plan ? ' · CONFIRMED LEVELS' : ' · DIRECTIONAL ANALYSIS');
 }
 
 async function analyze(){
