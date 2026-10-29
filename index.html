@@ -2766,6 +2766,23 @@ function renderConfirmed(
 
   if(!signal.confirmed){
 
+    const checkLabels = {
+      trend:'15m / 1H trend alignment',
+      risk:'Stop-loss risk',
+      volume:'Volume ≥ 1.2×',
+      fresh:'Fresh completed 15m candle',
+      pullback:'EMA21 pullback',
+      breakout:'5-bar structure break',
+      candle:'Strong candle close'
+    };
+    const missing = Object.entries(checkLabels)
+      .filter(([key])=>signal.checks?.[key]===false)
+      .map(([,label])=>label);
+    const missingHtml = missing.length
+      ? '<p class="muted mini"><b>BLOCKING CHECKS:</b> '+
+        missing.map(esc).join(' · ')+'</p>'
+      : '';
+
     $('confirmedBadge').textContent =
       'NOT CONFIRMED';
 
@@ -2781,9 +2798,10 @@ function renderConfirmed(
       <p class="muted">
         ${esc(signal.reason)}
       </p>
+      ${missingHtml}
       <p class="muted mini">
         Entry is blocked until all required checks pass.
-        Review the SIGNAL QUALITY checklist below to see the missing confirmation.
+        Review SIGNAL QUALITY for the latest checks.
         No estimated entry is presented as executable.
       </p>
 
