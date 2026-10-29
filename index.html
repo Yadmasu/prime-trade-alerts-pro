@@ -867,7 +867,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .ai-time-grid button{background:#252525;border:2px solid #424242;border-radius:10px;color:#a9a9a9;min-height:61px;font-size:19px;font-weight:650}
 .ai-time-grid button.active{background:#292e18;border-color:#e7ff4c;color:#e7ff4c;box-shadow:none}
 @media(max-width:749px){.ai-analysis-head{margin-top:15px}.ai-analysis-head h2{font-size:21px}.ai-mode-tabs button{min-height:55px}.ai-time-grid button{min-height:64px;font-size:18px}}
-.indicator-settings select{width:100%;margin:8px 0 12px;padding:12px;background:#142338;color:#eef6ff;border:1px solid #49627c;border-radius:10px}.indicator-settings summary{min-height:42px;display:list-item;align-content:center}.indicator-settings{border-color:#dafa4b}.indicator-settings[open]{background:#111d2c}.chart-quickbar{display:flex;gap:8px;margin:9px 0}.chart-quickbar button{flex:1;min-height:42px;border:1px solid #38536d;background:#14253a;color:#e5f3ff;border-radius:10px;font-size:13px;font-weight:800}.chart-quickbar button:first-child{border-color:#dafa4b;color:#e6ff83}.chart-oscillators{display:grid;gap:8px;margin-top:9px}.osc-panel{background:#0a1525;border:1px solid #304259;border-radius:10px;padding:7px}.osc-panel canvas{width:100%;height:94px;display:block}.osc-label{display:flex;justify-content:space-between;color:#c9d6e7;font-size:12px;font-weight:800;padding:4px 5px}.osc-label b{color:#dafa4b}.chart-expanded #tvchart,.chart-expanded #interactiveChart{min-height:560px!important;height:560px!important}.chart-expanded .chartwrap{min-height:580px!important}@media(max-width:749px){.chart-expanded #tvchart,.chart-expanded #interactiveChart{min-height:68vh!important;height:68vh!important}.chart-expanded .chartwrap{min-height:70vh!important}}</style>
+.indicator-settings select{width:100%;margin:8px 0 12px;padding:12px;background:#142338;color:#eef6ff;border:1px solid #49627c;border-radius:10px}.indicator-settings summary{min-height:42px;display:list-item;align-content:center}.indicator-settings{border-color:#dafa4b}.indicator-settings[open]{background:#111d2c}.chart-quickbar{display:flex;gap:8px;margin:9px 0}.chart-quickbar button{flex:1;min-height:42px;border:1px solid #38536d;background:#14253a;color:#e5f3ff;border-radius:10px;font-size:13px;font-weight:800}.chart-quickbar button:first-child{border-color:#dafa4b;color:#e6ff83}.chart-oscillators{display:grid;gap:8px;margin-top:9px}.osc-panel{background:#0a1525;border:1px solid #304259;border-radius:10px;padding:7px}.osc-panel canvas{width:100%;height:94px;display:block}.osc-label{display:flex;justify-content:space-between;color:#c9d6e7;font-size:12px;font-weight:800;padding:4px 5px}.osc-label b{color:#dafa4b}.chart-expanded #tvchart,.chart-expanded #interactiveChart{min-height:560px!important;height:560px!important}.chart-expanded .chartwrap{min-height:580px!important}@media(max-width:749px){.chart-expanded #tvchart,.chart-expanded #interactiveChart{min-height:68vh!important;height:68vh!important}.chart-expanded .chartwrap{min-height:70vh!important}}.indicator-settings[open] summary{margin-bottom:10px}.indicator-settings summary{font-size:14px}.indicator-settings .indicator-switches label{min-height:38px;padding:5px;background:#172b3d;border-radius:8px}.indicator-settings .indicator-switches input{width:22px;height:22px}</style>
 </head>
 
 <body>
@@ -1068,7 +1068,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>⚙ Indicators · Chart Settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><p class="muted mini">Display settings only · Confirmed entry still uses EMA21/89 and 15m + 1H.</p></details>
+  <details class="indicator-settings" open><summary>⚙ Chart Tools · Fibonacci ON/OFF · EMA · RSI · MACD</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><p class="muted mini">Display settings only · Confirmed entry still uses EMA21/89 and 15m + 1H.</p></details>
   <div class="chart-quickbar"><button type="button" id="chartToolsButton">⚙ Tools</button><button type="button" id="chartCleanButton">◉ Clean</button><button type="button" id="chartExpandButton">⛶ Expand</button></div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -3130,17 +3130,12 @@ function drawCanvasChart(
       item=>item.c
     );
 
-  const fast =
-    ema(
-      closes,
-      analysis.fastN
-    );
-
-  const slow =
-    ema(
-      closes,
-      analysis.slowN
-    );
+  const preset=document.getElementById("chartEmaPreset")?.value||"21,89";
+  const periods=preset==="none"?[]:preset.split(",").map(Number);
+  const fast=ema(closes,periods[0]||analysis.fastN);
+  const slow=ema(closes,periods[1]||analysis.slowN);
+  const shown=k=>document.querySelector('[data-indicator="'+k+'"]')?.checked!==false;
+  renderOscillators(candleData);
 
   const start =
     candleData.length-
@@ -3366,15 +3361,19 @@ function drawCanvasChart(
 
   }
 
-  drawLine(
-    fast,
-    '#dafa4b'
-  );
-
-  drawLine(
-    slow,
-    '#58a6ff'
-  );
+  if(shown('ema')&&periods.length>0)drawLine(fast,'#dafa4b');
+  if(shown('ema')&&periods.length>1)drawLine(slow,'#58a6ff');
+  if(shown('fib')){
+    const bars=candleData.slice(-96),top=Math.max(...bars.map(b=>b.h)),bottom=Math.min(...bars.map(b=>b.l)),range=top-bottom;
+    if(Number.isFinite(range)&&range>0){
+      const rising=bars.findIndex(b=>b.h===top)>bars.findIndex(b=>b.l===bottom);
+      for(const [ratio,color] of [[0,"#dbeafe"],[.236,"#38bdf8"],[.382,"#34d399"],[.5,"#fbbf24"],[.618,"#c084fc"],[.786,"#fb7185"],[.886,"#94a3b8"],[1,"#dbeafe"]]){
+        const price=rising?top-range*ratio:bottom+range*ratio;
+        if(price<low||price>high)continue;
+        context.strokeStyle=color;context.setLineDash([3,4]);context.beginPath();context.moveTo(padding.l,y(price));context.lineTo(width-padding.r,y(price));context.stroke();context.setLineDash([]);
+      }
+    }
+  }
 
   const planLevels =
     plan
