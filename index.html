@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
 
-<title>YOYO TRADE PRO V4.2.1</title>
+<title>YOYO TRADE PRO V4.3</title>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
@@ -836,7 +836,26 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  body.pro-tabs-on #liveChart .chartwrap{min-height:530px}
  #liveChart #chartLegend{font-size:11px;overflow-wrap:anywhere}
 }
-#times{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}#times button{min-height:48px;border-radius:10px;font-weight:800}#times button.active{border-color:#dafa4b;background:rgba(218,250,75,.13);color:#e9ff82}#single,#multi{min-height:46px;font-weight:850}#analyze{background:#dafa4b;color:#07111b;border-color:#dafa4b;font-weight:950;min-height:52px;box-shadow:0 6px 22px rgba(218,250,75,.14)}.indicator-settings{margin:12px 0;padding:11px;border:1px solid #324860;border-radius:12px;background:#0c1828}.indicator-settings summary{cursor:pointer;font-weight:850;color:#d9e8fb}.indicator-switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.indicator-switches label{display:flex;gap:8px;align-items:center;font-size:13px;color:#dbe9f9}.indicator-switches input{accent-color:#dafa4b;width:18px;height:18px}@media(max-width:390px){.indicator-switches{grid-template-columns:1fr}}</style>
+#times{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}#times button{min-height:48px;border-radius:10px;font-weight:800}#times button.active{border-color:#dafa4b;background:rgba(218,250,75,.13);color:#e9ff82}#single,#multi{min-height:46px;font-weight:850}#analyze{background:#dafa4b;color:#07111b;border-color:#dafa4b;font-weight:950;min-height:52px;box-shadow:0 6px 22px rgba(218,250,75,.14)}.indicator-settings{margin:12px 0;padding:11px;border:1px solid #324860;border-radius:12px;background:#0c1828}.indicator-settings summary{cursor:pointer;font-weight:850;color:#d9e8fb}.indicator-switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.indicator-switches label{display:flex;gap:8px;align-items:center;font-size:13px;color:#dbe9f9}.indicator-switches input{accent-color:#dafa4b;width:18px;height:18px}@media(max-width:390px){.indicator-switches{grid-template-columns:1fr}}
+/* V4.3 unmistakable mobile redesign: chart-first professional terminal */
+@media(max-width:749px){
+ body.pro-tabs-on main{display:flex;flex-direction:column}
+ body.pro-tabs-on main>section[data-pro-view="dashboard"]#liveChart{order:1}
+ body.pro-tabs-on main>section[data-pro-view="dashboard"]#confirmedEntry{order:2}
+ body.pro-tabs-on main>section[data-pro-view="dashboard"]#anytimeAnalysis{order:3}
+ body.pro-tabs-on main>section[data-pro-view="dashboard"].hero-panel{order:4}
+ body.pro-tabs-on main>.hero-panel .hero-actions,
+ body.pro-tabs-on main>.hero-panel .scanner-strip{display:none}
+ body.pro-tabs-on main>.hero-panel .notice{margin:7px 0}
+ body.pro-tabs-on #liveChart{border:1px solid #3979b6;background:linear-gradient(160deg,#0a192c,#09111f)}
+ body.pro-tabs-on #liveChart h2{font-size:19px}
+ body.pro-tabs-on #confirmedEntry{border-left:3px solid #24d6a5}
+ body.pro-tabs-on .hero-panel h1{font-size:18px}
+ body.pro-tabs-on .hero-panel .eyebrow{font-size:10px}
+ body.pro-tabs-on .hero-panel>.muted{font-size:11px}
+}
+.pro-workspace-nav button[aria-selected="true"]{background:#dafa4b;color:#07111b;border-color:#dafa4b;box-shadow:0 4px 20px rgba(218,250,75,.15)}
+</style>
 </head>
 
 <body>
@@ -846,7 +865,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <div class="brand-mark">Y</div>
     <div>
       <div class="brand">YOYO <b>TRADE PRO</b></div>
-      <div class="tag">V4.2.1 · LIVE MARKET INTELLIGENCE</div>
+      <div class="tag">V4.3 · PRO TERMINAL · 29 OCT 2026</div>
     </div>
   </div>
 
@@ -862,12 +881,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   <button type="button" data-pro-tab="markets" aria-selected="false">🔎 Markets &amp; Scan</button>
   <button type="button" data-pro-tab="history" aria-selected="false">📋 History &amp; Details</button>
 </nav>
-<div class="pro-view-hint">15m entry · 1H trend · EMA21/89 · Confirmed only · No auto trading</div>
+<div class="pro-view-hint"><b style="color:#dafa4b">V4.3 PRO TERMINAL</b> · 15m entry · 1H trend · Confirmed only</div>
 <main>
 
 <section class="panel hero-panel">
   <div class="eyebrow">Hyperliquid market intelligence</div>
-  <h1>Trading Dashboard</h1>
+  <h1>PRO Trading Terminal <span style="font-size:11px;color:#dafa4b;vertical-align:middle;border:1px solid #6d8e40;padding:4px 7px;border-radius:7px">V4.3</span></h1>
 
   <div class="muted">
     Hyperliquid perpetual signals with professional live charts.
