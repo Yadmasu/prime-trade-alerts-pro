@@ -835,7 +835,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  body.pro-tabs-on #liveChart .chartwrap{min-height:530px}
  #liveChart #chartLegend{font-size:11px;overflow-wrap:anywhere}
 }
-</style>
+#times{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}#times button{min-height:48px;border-radius:10px;font-weight:800}#times button.active{border-color:#dafa4b;background:rgba(218,250,75,.13);color:#e9ff82}#single,#multi{min-height:46px;font-weight:850}#analyze{background:#dafa4b;color:#07111b;border-color:#dafa4b;font-weight:950;min-height:52px;box-shadow:0 6px 22px rgba(218,250,75,.14)}</style>
 </head>
 
 <body>
@@ -981,7 +981,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     </div>
   </div>
 
-  <h2 style="margin-top:22px">Multi-Timeframe Analysis</h2>
+  <h2 style="margin-top:22px">AI Timeframe Analysis</h2><p class="muted mini">Single / Multi analysis. Confirmed entries still require 15m and 1H agreement.</p>
 
   <div class="tabs">
     <button id="single">Single</button>
@@ -1006,7 +1006,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     If the feed is unavailable, no signal or trading level is shown.
   </div>
 
-  <button id="analyze" class="primary">REFRESH NOW · AUTO ON</button>
+  <button id="analyze" class="primary">ANALYZE NOW →</button>
 
   <div class="notification-card">
     <div class="notification-head">
