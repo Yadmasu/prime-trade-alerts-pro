@@ -824,6 +824,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  body.pro-tabs-on #liveChart #tvchart{min-height:390px}
  body.pro-tabs-on #liveChart .chartwrap{min-height:410px}
 }
+
+/* Advanced chart workspace — actual candle values, not screenshot mock data */
+#liveChart #tvchart{height:510px;min-height:510px}
+#liveChart .chartwrap{min-height:550px}
+#liveChart #chartLegend{padding:10px 12px;border-radius:10px;background:rgba(7,18,34,.85);border:1px solid rgba(92,145,200,.18);line-height:1.8}
+#liveChart h2{margin-top:4px}
+@media(max-width:749px){
+ body.pro-tabs-on #liveChart #tvchart{height:490px;min-height:490px}
+ body.pro-tabs-on #liveChart .chartwrap{min-height:530px}
+ #liveChart #chartLegend{font-size:11px;overflow-wrap:anywhere}
+}
 </style>
 </head>
 
@@ -3581,7 +3592,22 @@ function drawChart(
     }))
   );
 
-  // Clean overlays: UTC session VWAP and three recent-swing Fibonacci levels.
+  // Real volume moving average, based on the same candles as the histogram.
+  const volumeAverage = candleData.map((bar,index)=>{
+    if(index<19)return {time:Math.floor(bar.t/1000),value:NaN};
+    const windowBars=candleData.slice(index-19,index+1);
+    return {time:Math.floor(bar.t/1000),value:windowBars.reduce((sum,b)=>sum+b.v,0)/20};
+  }).filter(p=>Number.isFinite(p.value));
+  if(volumeAverage.length){
+    const volumeMA=liveChart.addLineSeries({
+      color:'#cbd5e1',lineWidth:1,priceScaleId:'',
+      priceLineVisible:false,lastValueVisible:false,title:'Vol SMA20'
+    });
+    volumeMA.priceScale().applyOptions({scaleMargins:{top:.80,bottom:0}});
+    volumeMA.setData(volumeAverage);
+  }
+
+  // Clean overlays: UTC session VWAP and eight recent-swing Fibonacci levels.
   // Price values come from the selected market's candles, not market cap.
   const sessionKey = new Date(candleData[candleData.length-1].t).toISOString().slice(0,10);
   let pv = 0, volumeSum = 0;
@@ -3608,11 +3634,11 @@ function drawChart(
   if(Number.isFinite(range) && range>0){
     const rising = swingBars.findIndex(b=>b.h===high) >
                    swingBars.findIndex(b=>b.l===low);
-    for(const [ratio,color] of [[0.382,'#34d399'],[0.5,'#fbbf24'],[0.618,'#c084fc']]){
+    for(const [ratio,color] of [[0,'#dbeafe'],[0.236,'#38bdf8'],[0.382,'#34d399'],[0.5,'#fbbf24'],[0.618,'#c084fc'],[0.786,'#fb7185'],[0.886,'#94a3b8'],[1,'#dbeafe']]){
       const price = rising ? high-range*ratio : low+range*ratio;
       candleSeries.createPriceLine({
         price,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dotted,
-        axisLabelVisible:false,title:''
+        axisLabelVisible:true,title:'Fib '+ratio
       });
     }
   }
@@ -3685,7 +3711,7 @@ function drawChart(
     `${esc(id)} · ${esc(timeframe)} · ${analysis.side} · `+
     `<span style="color:#dafa4b">EMA${analysis.fastN}</span> / `+
     `<span style="color:#58a6ff">EMA${analysis.slowN}</span>`+
-    ' · <span style="color:#a78bfa">VWAP</span> · Fib 0.382/0.5/0.618'+
+    ' · <span style="color:#a78bfa">VWAP</span> · Vol SMA20 · Fib 0/.236/.382/.5/.618/.786/.886/1'+
     (plan
       ? ' · <span style="color:#21d6a5;font-weight:800">CONFIRMED ENTRY · SL · TP1–TP3</span>'
       : ' · <span style="color:#f6c96b;font-weight:800">WAIT · NO ENTRY</span>');
