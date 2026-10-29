@@ -767,6 +767,25 @@ footer{
     transition:none!important;
   }
 }
+
+/* YOYO Pro mobile workspace: compact tabs, large chart, unchanged signal logic */
+.pro-workspace-nav{display:flex;gap:8px;overflow-x:auto;padding:12px max(15px,4%);scrollbar-width:none;position:sticky;top:65px;z-index:29;background:rgba(7,16,30,.96);border-bottom:1px solid rgba(88,166,255,.18)}
+.pro-workspace-nav::-webkit-scrollbar{display:none}
+.pro-workspace-nav button{flex:0 0 auto;border:1px solid rgba(88,166,255,.32);border-radius:12px;background:#102038;color:#b9cce2;padding:10px 14px;font-weight:800;cursor:pointer}
+.pro-workspace-nav button[aria-selected="true"]{color:#fff;background:linear-gradient(120deg,#0955bd,#087eaa);border-color:#58a6ff;box-shadow:0 3px 18px rgba(20,132,234,.22)}
+.pro-view-hint{font-size:12px;color:#a7b9ce;padding:7px max(15px,4%);background:#0b1729}
+@media(max-width:749px){
+  body.pro-tabs-on main>section[data-pro-view]{display:none}
+  body.pro-tabs-on[data-pro-active="dashboard"] main>section[data-pro-view="dashboard"],
+  body.pro-tabs-on[data-pro-active="markets"] main>section[data-pro-view="markets"],
+  body.pro-tabs-on[data-pro-active="history"] main>section[data-pro-view="history"]{display:block}
+  body.pro-tabs-on #liveChart{padding:12px}
+  body.pro-tabs-on #liveChart .chartwrap{min-height:390px}
+  body.pro-tabs-on #liveChart #tvchart{min-height:365px}
+  body.pro-tabs-on main{padding-top:8px}
+  body.pro-tabs-on .panel{margin-bottom:14px}
+}
+@media(min-width:750px){.pro-workspace-nav,.pro-view-hint{display:none}}
 </style>
 </head>
 
@@ -787,6 +806,12 @@ footer{
   </div>
 </header>
 
+<nav class="pro-workspace-nav" aria-label="YOYO Pro workspace">
+  <button type="button" data-pro-tab="dashboard" aria-selected="true">📈 Dashboard</button>
+  <button type="button" data-pro-tab="markets" aria-selected="false">🔎 Markets &amp; Scan</button>
+  <button type="button" data-pro-tab="history" aria-selected="false">📋 History &amp; Details</button>
+</nav>
+<div class="pro-view-hint">15m entry · 1H trend · EMA21/89 · Confirmed only · No auto trading</div>
 <main>
 
 <section class="panel hero-panel">
@@ -4516,6 +4541,31 @@ document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&marketInfo.has($('market').value))analyze();
 });
 
+</script>
+<script>
+/* Navigation only. Does not change Hyperliquid data, signals, or notifications. */
+(function(){
+  const main=document.querySelector('main');
+  if(!main)return;
+  const panels=Array.from(main.children).filter(el=>el.tagName==='SECTION');
+  panels.forEach((el,index)=>{
+    const view= index===0 || index===3 || index===4 || index===5 ? 'dashboard'
+      : index===1 || index===2 ? 'markets' : 'history';
+    el.dataset.proView=view;
+  });
+  const buttons=Array.from(document.querySelectorAll('[data-pro-tab]'));
+  function choose(view){
+    if(!['dashboard','markets','history'].includes(view))return;
+    document.body.classList.add('pro-tabs-on');
+    document.body.dataset.proActive=view;
+    buttons.forEach(b=>b.setAttribute('aria-selected',String(b.dataset.proTab===view)));
+    if(view==='dashboard'){
+      setTimeout(()=>window.dispatchEvent(new Event('resize')),60);
+    }
+  }
+  buttons.forEach(b=>b.addEventListener('click',()=>choose(b.dataset.proTab)));
+  choose('dashboard');
+})();
 </script>
 </body>
 </html>
