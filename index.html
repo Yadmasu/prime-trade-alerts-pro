@@ -786,6 +786,44 @@ footer{
   body.pro-tabs-on .panel{margin-bottom:14px}
 }
 @media(min-width:750px){.pro-workspace-nav,.pro-view-hint{display:none}}
+
+/* Professional terminal visual system: responsive, accessible, no fabricated data */
+:root{--bg:#070d17;--panel:#101b2b;--edge:#263a52;--fg:#edf5ff;--muted:#a4b7cb;--lime:#d5f668;--green:#28d9a5;--blue:#62acff}
+body{background:radial-gradient(ellipse at 50% -10%,#142b46 0%,#08111f 42%,#070d17 100%);background-attachment:fixed}
+header{padding-top:12px;padding-bottom:12px;border-bottom-color:#2a405b}
+.brand-mark{background:linear-gradient(145deg,#245c9a,#0a1c30);box-shadow:0 0 0 3px rgba(80,153,255,.07)}
+.brand{letter-spacing:-.5px}
+main{max-width:1420px;margin:0 auto}
+main>.panel{border:1px solid rgba(105,155,205,.2);border-radius:17px;background:linear-gradient(160deg,rgba(20,35,55,.97),rgba(12,23,39,.98));box-shadow:0 10px 35px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.025)}
+main>.panel h2{letter-spacing:-.35px}
+#liveChart{border-color:rgba(91,162,255,.43);box-shadow:0 0 0 1px rgba(80,154,255,.07),0 14px 38px rgba(0,0,0,.24)}
+#confirmedEntry{border-color:rgba(41,216,165,.35)}
+#anytimeAnalysis{border-color:rgba(99,157,225,.32)}
+#chartLegend{font-size:12px;line-height:1.5}
+.metric{border-radius:12px}
+button,input,select{transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #80bfff;outline-offset:3px}
+.pro-workspace-nav{max-width:1420px;margin:0 auto}
+.pro-workspace-nav button{letter-spacing:.05px}
+.pro-section-kicker{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#85b8ed;font-weight:900;margin-bottom:7px}
+.pro-section-kicker:before{content:"";width:6px;height:6px;border-radius:50%;background:#43cdb6}
+.pro-privacy-note{color:#9fb1c8;font-size:11px;line-height:1.55;margin:8px 0 0}
+@media(max-width:749px){
+ header{padding:10px 13px}
+ .brand{font-size:17px}
+ .tag{font-size:9px;letter-spacing:.035em}
+ .top-status{padding:7px 8px;font-size:9px}
+ .pro-workspace-nav{top:59px;padding:10px 12px;gap:7px}
+ .pro-workspace-nav button{padding:10px 12px;font-size:12px}
+ .pro-view-hint{padding:8px 13px;font-size:10px;line-height:1.4}
+ body.pro-tabs-on .hero-panel{padding:14px}
+ body.pro-tabs-on .hero-panel h1{font-size:24px;margin:5px 0}
+ body.pro-tabs-on .hero-panel .scanner-strip{gap:6px}
+ body.pro-tabs-on .hero-panel .scanner-stat{padding:8px}
+ body.pro-tabs-on .hero-panel .scanner-stat strong{font-size:11px}
+ body.pro-tabs-on #liveChart #tvchart{min-height:390px}
+ body.pro-tabs-on #liveChart .chartwrap{min-height:410px}
+}
 </style>
 </head>
 
@@ -836,8 +874,8 @@ footer{
   </div>
 
   <div class="scanner-strip">
-    <div class="scanner-stat"><small>Background scanner</small><strong>24/7 ACTIVE</strong></div>
-    <div class="scanner-stat"><small>Scan interval</small><strong>EVERY 15 MIN</strong></div>
+    <div class="scanner-stat"><small>Background scanner</small><strong>SCHEDULED CHECKS</strong></div>
+    <div class="scanner-stat"><small>Scan interval</small><strong>CONFIGURED SCAN</strong></div>
     <div class="scanner-stat"><small>Signal policy</small><strong>CONFIRMED ONLY · BTC EXCLUDED</strong></div>
   </div>
 </section>
@@ -984,7 +1022,7 @@ footer{
 </section>
 
 <section class="panel" id="liveChart">
-  <h2>Live Price Chart</h2>
+  <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -1001,7 +1039,7 @@ footer{
 </section>
 
 <section class="panel signal-panel" id="anytimeAnalysis">
-  <h2>ANYTIME ANALYSIS · LONG / SHORT / NEUTRAL</h2>
+  <div class="pro-section-kicker">Market research · Not a trade alert</div><h2>ANYTIME ANALYSIS · LONG / SHORT / NEUTRAL</h2>
 
   <span class="badge unconfirmed">
     DIRECTIONAL RESEARCH · NOT AN ENTRY ALERT
@@ -1022,7 +1060,7 @@ footer{
 </section>
 
 <section class="panel confirmed-panel" id="confirmedEntry">
-  <h2>CONFIRMED ENTRY · LONG / SHORT / WAIT</h2>
+  <div class="pro-section-kicker">Entry verification · Strict rules</div><h2>CONFIRMED ENTRY · LONG / SHORT / WAIT</h2>
 
   <span id="confirmedBadge" class="badge unconfirmed">
     WAITING
@@ -1035,7 +1073,7 @@ footer{
   <div id="signalQuality" class="quality-grid" aria-label="Signal confirmation checklist"></div>
 
   <p class="muted mini">
-    ENTRY, STOP LOSS and TP1–TP3 appear only after the signal is confirmed.
+    ENTRY, STOP LOSS and TP1–TP3 appear only after the signal is confirmed. A checklist score is not a win probability.
   </p>
 </section>
 
