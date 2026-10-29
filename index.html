@@ -867,7 +867,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .ai-time-grid button{background:#252525;border:2px solid #424242;border-radius:10px;color:#a9a9a9;min-height:61px;font-size:19px;font-weight:650}
 .ai-time-grid button.active{background:#292e18;border-color:#e7ff4c;color:#e7ff4c;box-shadow:none}
 @media(max-width:749px){.ai-analysis-head{margin-top:15px}.ai-analysis-head h2{font-size:21px}.ai-mode-tabs button{min-height:55px}.ai-time-grid button{min-height:64px;font-size:18px}}
-.indicator-settings select{width:100%;margin:8px 0 12px;padding:12px;background:#142338;color:#eef6ff;border:1px solid #49627c;border-radius:10px}.indicator-settings summary{min-height:42px;display:list-item;align-content:center}.indicator-settings{border-color:#dafa4b}.indicator-settings[open]{background:#111d2c}</style>
+.indicator-settings select{width:100%;margin:8px 0 12px;padding:12px;background:#142338;color:#eef6ff;border:1px solid #49627c;border-radius:10px}.indicator-settings summary{min-height:42px;display:list-item;align-content:center}.indicator-settings{border-color:#dafa4b}.indicator-settings[open]{background:#111d2c}.chart-quickbar{display:flex;gap:8px;margin:9px 0}.chart-quickbar button{flex:1;min-height:42px;border:1px solid #38536d;background:#14253a;color:#e5f3ff;border-radius:10px;font-size:13px;font-weight:800}.chart-quickbar button:first-child{border-color:#dafa4b;color:#e6ff83}.chart-oscillators{display:grid;gap:8px;margin-top:9px}.osc-panel{background:#0a1525;border:1px solid #304259;border-radius:10px;padding:7px}.osc-panel canvas{width:100%;height:94px;display:block}.osc-label{display:flex;justify-content:space-between;color:#c9d6e7;font-size:12px;font-weight:800;padding:4px 5px}.osc-label b{color:#dafa4b}.chart-expanded #tvchart,.chart-expanded #interactiveChart{min-height:560px!important;height:560px!important}.chart-expanded .chartwrap{min-height:580px!important}@media(max-width:749px){.chart-expanded #tvchart,.chart-expanded #interactiveChart{min-height:68vh!important;height:68vh!important}.chart-expanded .chartwrap{min-height:70vh!important}}</style>
 </head>
 
 <body>
@@ -1068,7 +1068,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>⚙ Indicators · Chart Settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><p class="muted mini">Display settings only · Confirmed entry still uses EMA21/89 and 15m + 1H.</p></details>
+  <details class="indicator-settings"><summary>⚙ Indicators · Chart Settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><p class="muted mini">Display settings only · Confirmed entry still uses EMA21/89 and 15m + 1H.</p></details>
+  <div class="chart-quickbar"><button type="button" id="chartToolsButton">⚙ Tools</button><button type="button" id="chartCleanButton">◉ Clean</button><button type="button" id="chartExpandButton">⛶ Expand</button></div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
 
@@ -1078,6 +1079,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     </div>
   </div>
 
+  <div class="chart-oscillators"><div class="osc-panel" id="rsiPanel"><div class="osc-label">RSI 14 <b id="rsiValue">—</b></div><canvas id="rsiPlot"></canvas></div><div class="osc-panel" id="macdPanel"><div class="osc-label">MACD 12 / 26 / 9 <b id="macdValue">—</b></div><canvas id="macdPlot"></canvas></div></div>
   <p id="chartcaption" class="muted mini">
     Chart and analysis use the same Hyperliquid feed.
   </p>
@@ -3477,6 +3479,37 @@ function drawCanvasChart(
 
 }
 
+function renderOscillators(candles){
+  const close=candles.map(c=>c.c);
+  const rsiValues=close.map((_,i)=>rsi(close.slice(0,i+1),14));
+  const macdValues=close.map((_,i)=>macdHistogram(close.slice(0,i+1)));
+  const draw=(name,values,color,baseline=null)=>{
+    const canvas=document.getElementById(name+"Plot"),panel=document.getElementById(name+"Panel");
+    if(!canvas||!panel)return;
+    const on=document.querySelector('[data-indicator="'+name+'"]')?.checked!==false;
+    panel.style.display=on?"block":"none";
+    if(!on)return;
+    const val=values.at(-1);
+    const label=document.getElementById(name+"Value");
+    if(label)label.textContent=Number.isFinite(val)?val.toFixed(2):"—";
+    const w=Math.max(180,Math.floor(canvas.getBoundingClientRect().width||300)),h=94,dpr=Math.min(devicePixelRatio||1,2);
+    canvas.width=w*dpr;canvas.height=h*dpr;
+    const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);
+    ctx.fillStyle="#0a1525";ctx.fillRect(0,0,w,h);
+    const data=values.slice(-100),finite=data.filter(Number.isFinite);
+    if(finite.length<2)return;
+    let lo=baseline===50?0:Math.min(0,...finite),hi=baseline===50?100:Math.max(0,...finite);
+    if(hi===lo)hi=lo+1;
+    const y=v=>8+(hi-v)/(hi-lo)*(h-16);
+    if(baseline!==null){ctx.strokeStyle="#53647a";ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(0,y(baseline));ctx.lineTo(w,y(baseline));ctx.stroke();ctx.setLineDash([]);}
+    ctx.strokeStyle=color;ctx.lineWidth=1.8;ctx.beginPath();let started=false;
+    data.forEach((v,i)=>{if(!Number.isFinite(v)){started=false;return;}const x=i*w/Math.max(1,data.length-1);if(!started){ctx.moveTo(x,y(v));started=true;}else ctx.lineTo(x,y(v));});
+    ctx.stroke();
+  };
+  draw("rsi",rsiValues,"#b76bff",50);
+  draw("macd",macdValues,"#53a8ff",0);
+}
+
 let liveChart = null;
 let liveChartObserver = null;
 
@@ -3575,6 +3608,7 @@ function drawChart(
   );
 
   const closes = candleData.map(item=>item.c);
+  renderOscillators(candleData);
   const preset = document.getElementById("chartEmaPreset")?.value || "21,89";
   const emaPeriods = preset === "none" ? [] : preset.split(",").map(Number);
   const fastValues = ema(closes,emaPeriods[0] || analysis.fastN);
@@ -3668,6 +3702,19 @@ function drawChart(
     vwapSeries.setData(vwapData);
   }
 
+  if(visible("bb") && closes.length>=20){
+    const upper=[],lower=[];
+    for(let i=19;i<closes.length;i++){
+      const w=closes.slice(i-19,i+1),avg=w.reduce((a,b)=>a+b,0)/20;
+      const dev=Math.sqrt(w.reduce((a,b)=>a+(b-avg)**2,0)/20);
+      const time=Math.floor(candleData[i].t/1000);
+      upper.push({time,value:avg+2*dev});lower.push({time,value:avg-2*dev});
+    }
+    for(const data of [upper,lower]){
+      const line=liveChart.addLineSeries({color:"#31b7bc",lineWidth:1,priceLineVisible:false,lastValueVisible:false});
+      line.setData(data);
+    }
+  }
   const swingBars = candleData.slice(-96);
   const high = Math.max(...swingBars.map(b=>b.h));
   const low = Math.min(...swingBars.map(b=>b.l));
@@ -4675,6 +4722,12 @@ document.addEventListener('visibilitychange',()=>{
   if(chartPreset)chartPreset.addEventListener('change',()=>{
     if(typeof lastSnapshot!=='undefined' && lastSnapshot)drawChart(lastSnapshot.candles,lastSnapshot.analysis,lastSnapshot.id,lastSnapshot.timeframe,lastSnapshot.confirmed);
   });
+  const toolsButton=document.getElementById('chartToolsButton');
+  if(toolsButton)toolsButton.onclick=()=>{const d=document.querySelector('.indicator-settings');if(d)d.open=!d.open;};
+  const expandButton=document.getElementById('chartExpandButton');
+  if(expandButton)expandButton.onclick=()=>{const panel=document.getElementById('liveChart');panel.classList.toggle('chart-expanded');expandButton.textContent=panel.classList.contains('chart-expanded')?'⊟ Normal':'⛶ Expand';window.dispatchEvent(new Event('resize'));};
+  const cleanButton=document.getElementById('chartCleanButton');
+  if(cleanButton)cleanButton.onclick=()=>{for(const k of ['fib','bb','rsi','macd']){const x=document.querySelector('[data-indicator="'+k+'"]');if(x)x.checked=false;}if(typeof lastSnapshot!=='undefined'&&lastSnapshot)drawChart(lastSnapshot.candles,lastSnapshot.analysis,lastSnapshot.id,lastSnapshot.timeframe,lastSnapshot.confirmed);};
   document.querySelectorAll('[data-indicator]').forEach(input=>{
     input.addEventListener('change',()=>{
       if(typeof lastSnapshot!=='undefined' && lastSnapshot){
