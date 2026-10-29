@@ -778,6 +778,7 @@ footer{
   body.pro-tabs-on main>section[data-pro-view]{display:none}
   body.pro-tabs-on[data-pro-active="dashboard"] main>section[data-pro-view="dashboard"],
   body.pro-tabs-on[data-pro-active="markets"] main>section[data-pro-view="markets"],
+  body.pro-tabs-on[data-pro-active="analysis"] main>section[data-pro-view="analysis"],
   body.pro-tabs-on[data-pro-active="history"] main>section[data-pro-view="history"]{display:block}
   body.pro-tabs-on #liveChart{padding:12px}
   body.pro-tabs-on #liveChart .chartwrap{min-height:390px}
@@ -835,7 +836,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  body.pro-tabs-on #liveChart .chartwrap{min-height:530px}
  #liveChart #chartLegend{font-size:11px;overflow-wrap:anywhere}
 }
-#times{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}#times button{min-height:48px;border-radius:10px;font-weight:800}#times button.active{border-color:#dafa4b;background:rgba(218,250,75,.13);color:#e9ff82}#single,#multi{min-height:46px;font-weight:850}#analyze{background:#dafa4b;color:#07111b;border-color:#dafa4b;font-weight:950;min-height:52px;box-shadow:0 6px 22px rgba(218,250,75,.14)}</style>
+#times{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}#times button{min-height:48px;border-radius:10px;font-weight:800}#times button.active{border-color:#dafa4b;background:rgba(218,250,75,.13);color:#e9ff82}#single,#multi{min-height:46px;font-weight:850}#analyze{background:#dafa4b;color:#07111b;border-color:#dafa4b;font-weight:950;min-height:52px;box-shadow:0 6px 22px rgba(218,250,75,.14)}.indicator-settings{margin:12px 0;padding:11px;border:1px solid #324860;border-radius:12px;background:#0c1828}.indicator-settings summary{cursor:pointer;font-weight:850;color:#d9e8fb}.indicator-switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.indicator-switches label{display:flex;gap:8px;align-items:center;font-size:13px;color:#dbe9f9}.indicator-switches input{accent-color:#dafa4b;width:18px;height:18px}@media(max-width:390px){.indicator-switches{grid-template-columns:1fr}}</style>
 </head>
 
 <body>
@@ -857,6 +858,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 <nav class="pro-workspace-nav" aria-label="YOYO Pro workspace">
   <button type="button" data-pro-tab="dashboard" aria-selected="true">📈 Dashboard</button>
+  <button type="button" data-pro-tab="analysis" aria-selected="false">🧠 Analysis</button>
   <button type="button" data-pro-tab="markets" aria-selected="false">🔎 Markets &amp; Scan</button>
   <button type="button" data-pro-tab="history" aria-selected="false">📋 History &amp; Details</button>
 </nav>
@@ -1035,6 +1037,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
+  <details class="indicator-settings"><summary>⚙ Indicators · Chart Settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib" checked> Fibonacci</label></div><p class="muted mini">RSI14 and MACD values are shown in Signal Details. Display choices do not change entry confirmation.</p></details>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
 
@@ -3456,6 +3459,7 @@ function drawChart(
 
   const host = $('interactiveChart');
   const fallback = $('priceChart');
+  const visible = key => document.querySelector('[data-indicator="'+key+'"]')?.checked !== false;
 
   if(
     !window.LightweightCharts ||
@@ -3569,6 +3573,8 @@ function drawChart(
 
   fastSeries.setData(lineData(fastValues));
   slowSeries.setData(lineData(slowValues));
+  fastSeries.applyOptions({visible:visible("ema")});
+  slowSeries.applyOptions({visible:visible("ema")});
 
   const volumeSeries =
     liveChart.addHistogramSeries({
@@ -3582,6 +3588,7 @@ function drawChart(
     scaleMargins:{top:.80,bottom:0}
   });
 
+  volumeSeries.applyOptions({visible:visible("volume")});
   volumeSeries.setData(
     candleData.map(item=>({
       time:Math.floor(item.t/1000),
@@ -3605,6 +3612,7 @@ function drawChart(
     });
     volumeMA.priceScale().applyOptions({scaleMargins:{top:.80,bottom:0}});
     volumeMA.setData(volumeAverage);
+    volumeMA.applyOptions({visible:visible("volume")});
   }
 
   // Clean overlays: UTC session VWAP and eight recent-swing Fibonacci levels.
@@ -3619,7 +3627,7 @@ function drawChart(
     volumeSum += bar.v;
     vwapData.push({time:Math.floor(bar.t/1000),value:pv/volumeSum});
   }
-  if(vwapData.length > 1){
+  if(visible("vwap") && vwapData.length > 1){
     const vwapSeries = liveChart.addLineSeries({
       color:'#a78bfa',lineWidth:2,priceLineVisible:false,
       lastValueVisible:true,title:'VWAP'
@@ -3631,7 +3639,7 @@ function drawChart(
   const high = Math.max(...swingBars.map(b=>b.h));
   const low = Math.min(...swingBars.map(b=>b.l));
   const range = high-low;
-  if(Number.isFinite(range) && range>0){
+  if(visible("fib") && Number.isFinite(range) && range>0){
     const rising = swingBars.findIndex(b=>b.h===high) >
                    swingBars.findIndex(b=>b.l===low);
     for(const [ratio,color] of [[0,'#dbeafe'],[0.236,'#38bdf8'],[0.382,'#34d399'],[0.5,'#fbbf24'],[0.618,'#c084fc'],[0.786,'#fb7185'],[0.886,'#94a3b8'],[1,'#dbeafe']]){
@@ -4607,19 +4615,19 @@ document.addEventListener('visibilitychange',()=>{
 
 </script>
 <script>
-/* Navigation only. Does not change Hyperliquid data, signals, or notifications. */
+/* Navigation and chart-display controls only. Does not change signal logic. */
 (function(){
   const main=document.querySelector('main');
   if(!main)return;
   const panels=Array.from(main.children).filter(el=>el.tagName==='SECTION');
   panels.forEach((el,index)=>{
     const view= index===0 || index===3 || index===4 || index===5 ? 'dashboard'
-      : index===1 || index===2 ? 'markets' : 'history';
+      : index===1 ? 'markets' : index===2 ? 'analysis' : 'history';
     el.dataset.proView=view;
   });
   const buttons=Array.from(document.querySelectorAll('[data-pro-tab]'));
   function choose(view){
-    if(!['dashboard','markets','history'].includes(view))return;
+    if(!['dashboard','analysis','markets','history'].includes(view))return;
     document.body.classList.add('pro-tabs-on');
     document.body.dataset.proActive=view;
     buttons.forEach(b=>b.setAttribute('aria-selected',String(b.dataset.proTab===view)));
@@ -4629,6 +4637,13 @@ document.addEventListener('visibilitychange',()=>{
   }
   buttons.forEach(b=>b.addEventListener('click',()=>choose(b.dataset.proTab)));
   choose('dashboard');
+  document.querySelectorAll('[data-indicator]').forEach(input=>{
+    input.addEventListener('change',()=>{
+      if(typeof lastSnapshot!=='undefined' && lastSnapshot){
+        drawChart(lastSnapshot.candles,lastSnapshot.analysis,lastSnapshot.id,lastSnapshot.timeframe,lastSnapshot.confirmed);
+      }
+    });
+  });
 })();
 </script>
 </body>
