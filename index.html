@@ -1767,7 +1767,11 @@ function renderHistory(){
             ENTRY ${fmt(item.entry)} ·
             SL ${fmt(item.stop)} ·
             TP1 ${fmt(item.tp1)} ·
+            TP2 ${fmt(item.tp2)} ·
+            TP3 ${fmt(item.tp3)} ·
             VOL ${Number(item.vr).toFixed(2)}×
+            <div><b>STATUS: ${esc(item.status || 'NOT TRACKED')}</b> ·
+            Stored on this device only; TP/SL outcomes are not verified.</div>
 
           </div>
 
@@ -1806,6 +1810,7 @@ function recordSignal(signal,id){
 
   rows.unshift({
     key,
+    status:'OPEN / UNVERIFIED',
     id,
     side:signal.side,
     candle:signal.candle,
@@ -3555,6 +3560,29 @@ function drawChart(
       : null;
 
   if(plan){
+    const atrNow = atr(candleData);
+    const halfWidth = Math.min(
+      Number.isFinite(atrNow) ? atrNow*0.12 : plan.entry*0.0005,
+      plan.entry*0.001
+    );
+    if(Number.isFinite(halfWidth) && halfWidth>0){
+      const entryZone = [
+        {time:Math.floor(candleData[0].t/1000),value:plan.entry-halfWidth},
+        {time:Math.floor(candleData[candleData.length-1].t/1000),value:plan.entry-halfWidth}
+      ];
+      const zoneBottom = liveChart.addLineSeries({
+        color:'rgba(246,201,107,0.45)',lineWidth:1,
+        lineStyle:LightweightCharts.LineStyle.Dotted,
+        priceLineVisible:false,lastValueVisible:false,title:''
+      });
+      zoneBottom.setData(entryZone);
+      const zoneTop = liveChart.addLineSeries({
+        color:'rgba(246,201,107,0.45)',lineWidth:1,
+        lineStyle:LightweightCharts.LineStyle.Dotted,
+        priceLineVisible:false,lastValueVisible:false,title:''
+      });
+      zoneTop.setData(entryZone.map(p=>({...p,value:plan.entry+halfWidth})));
+    }
     [
       ['ENTRY',plan.entry,'#f6c96b'],
       ['SL',plan.stop,'#ff637c'],
