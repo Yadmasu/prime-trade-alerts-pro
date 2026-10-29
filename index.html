@@ -867,7 +867,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .ai-time-grid button{background:#252525;border:2px solid #424242;border-radius:10px;color:#a9a9a9;min-height:61px;font-size:19px;font-weight:650}
 .ai-time-grid button.active{background:#292e18;border-color:#e7ff4c;color:#e7ff4c;box-shadow:none}
 @media(max-width:749px){.ai-analysis-head{margin-top:15px}.ai-analysis-head h2{font-size:21px}.ai-mode-tabs button{min-height:55px}.ai-time-grid button{min-height:64px;font-size:18px}}
-</style>
+.indicator-settings select{width:100%;margin:8px 0 12px;padding:12px;background:#142338;color:#eef6ff;border:1px solid #49627c;border-radius:10px}.indicator-settings summary{min-height:42px;display:list-item;align-content:center}.indicator-settings{border-color:#dafa4b}.indicator-settings[open]{background:#111d2c}</style>
 </head>
 
 <body>
@@ -1068,7 +1068,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>⚙ Indicators · Chart Settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib" checked> Fibonacci</label></div><p class="muted mini">RSI14 and MACD values are shown in Signal Details. Display choices do not change entry confirmation.</p></details>
+  <details class="indicator-settings"><summary>⚙ Indicators · Chart Settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><p class="muted mini">Display settings only · Confirmed entry still uses EMA21/89 and 15m + 1H.</p></details>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
 
@@ -3575,8 +3575,10 @@ function drawChart(
   );
 
   const closes = candleData.map(item=>item.c);
-  const fastValues = ema(closes,analysis.fastN);
-  const slowValues = ema(closes,analysis.slowN);
+  const preset = document.getElementById("chartEmaPreset")?.value || "21,89";
+  const emaPeriods = preset === "none" ? [] : preset.split(",").map(Number);
+  const fastValues = ema(closes,emaPeriods[0] || analysis.fastN);
+  const slowValues = ema(closes,emaPeriods[1] || analysis.slowN);
 
   const fastSeries =
     liveChart.addLineSeries({
@@ -3604,8 +3606,8 @@ function drawChart(
 
   fastSeries.setData(lineData(fastValues));
   slowSeries.setData(lineData(slowValues));
-  fastSeries.applyOptions({visible:visible("ema")});
-  slowSeries.applyOptions({visible:visible("ema")});
+  fastSeries.applyOptions({visible:visible("ema") && emaPeriods.length>0});
+  slowSeries.applyOptions({visible:visible("ema") && emaPeriods.length>1});
 
   const volumeSeries =
     liveChart.addHistogramSeries({
@@ -3748,9 +3750,10 @@ function drawChart(
 
   $('chartLegend').innerHTML =
     `${esc(id)} · ${esc(timeframe)} · ${analysis.side} · `+
-    `<span style="color:#dafa4b">EMA${analysis.fastN}</span> / `+
-    `<span style="color:#58a6ff">EMA${analysis.slowN}</span>`+
-    ' · <span style="color:#a78bfa">VWAP</span> · Vol SMA20 · Fib 0/.236/.382/.5/.618/.786/.886/1'+
+    (visible("ema") && emaPeriods.length ? "EMA"+emaPeriods.join("/") : "EMA hidden")+
+    (visible("vwap") ? " · VWAP" : "")+
+    (visible("volume") ? " · Vol SMA20" : "")+
+    (visible("fib") ? " · Fibonacci" : "")+
     (plan
       ? ' · <span style="color:#21d6a5;font-weight:800">CONFIRMED ENTRY · SL · TP1–TP3</span>'
       : ' · <span style="color:#f6c96b;font-weight:800">WAIT · NO ENTRY</span>');
@@ -4668,6 +4671,10 @@ document.addEventListener('visibilitychange',()=>{
   }
   buttons.forEach(b=>b.addEventListener('click',()=>choose(b.dataset.proTab)));
   choose('dashboard');
+  const chartPreset=document.getElementById('chartEmaPreset');
+  if(chartPreset)chartPreset.addEventListener('change',()=>{
+    if(typeof lastSnapshot!=='undefined' && lastSnapshot)drawChart(lastSnapshot.candles,lastSnapshot.analysis,lastSnapshot.id,lastSnapshot.timeframe,lastSnapshot.confirmed);
+  });
   document.querySelectorAll('[data-indicator]').forEach(input=>{
     input.addEventListener('change',()=>{
       if(typeof lastSnapshot!=='undefined' && lastSnapshot){
