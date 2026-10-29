@@ -2552,7 +2552,11 @@ function confirmEntry(
 
     return{
       reason:
-        'Waiting for EMA21 pullback, structure break and strong candle close',
+        'Missing: '+[
+          !touch ? 'EMA21 pullback' : null,
+          !breakout ? '5-bar structure break' : null,
+          !candleOK ? 'strong candle close' : null
+        ].filter(Boolean).join(', '),
       checks:{
         trend:true,
         risk:true,
@@ -2776,6 +2780,11 @@ function renderConfirmed(
 
       <p class="muted">
         ${esc(signal.reason)}
+      </p>
+      <p class="muted mini">
+        Entry is blocked until all required checks pass.
+        Review the SIGNAL QUALITY checklist below to see the missing confirmation.
+        No estimated entry is presented as executable.
       </p>
 
       ${levelGrid({})}
