@@ -3003,6 +3003,42 @@ function drawCanvasChart(
     candleData.length-
     displayed.length;
 
+  // Clean overlays: UTC session VWAP and three recent-swing Fibonacci levels.
+  // Price values come from the selected market's candles, not market cap.
+  const sessionKey = new Date(candleData[candleData.length-1].t).toISOString().slice(0,10);
+  let pv = 0, volumeSum = 0;
+  const vwapData = [];
+  for(const bar of candleData){
+    if(new Date(bar.t).toISOString().slice(0,10) !== sessionKey) continue;
+    if(!Number.isFinite(bar.v) || bar.v <= 0) continue;
+    pv += ((bar.h+bar.l+bar.c)/3)*bar.v;
+    volumeSum += bar.v;
+    vwapData.push({time:Math.floor(bar.t/1000),value:pv/volumeSum});
+  }
+  if(vwapData.length > 1){
+    const vwapSeries = liveChart.addLineSeries({
+      color:'#a78bfa',lineWidth:2,priceLineVisible:false,
+      lastValueVisible:true,title:'VWAP'
+    });
+    vwapSeries.setData(vwapData);
+  }
+
+  const swingBars = candleData.slice(-96);
+  const high = Math.max(...swingBars.map(b=>b.h));
+  const low = Math.min(...swingBars.map(b=>b.l));
+  const range = high-low;
+  if(Number.isFinite(range) && range>0){
+    const rising = swingBars.findIndex(b=>b.h===high) >
+                   swingBars.findIndex(b=>b.l===low);
+    for(const [ratio,color] of [[0.382,'#34d399'],[0.5,'#fbbf24'],[0.618,'#c084fc']]){
+      const price = rising ? high-range*ratio : low+range*ratio;
+      candleSeries.createPriceLine({
+        price,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dotted,
+        axisLabelVisible:false,title:''
+      });
+    }
+  }
+
   const plan =
     confirmed?.confirmed
       ? confirmed
@@ -3530,6 +3566,7 @@ function drawChart(
     `${esc(id)} · ${esc(timeframe)} · ${analysis.side} · `+
     `<span style="color:#dafa4b">EMA${analysis.fastN}</span> / `+
     `<span style="color:#58a6ff">EMA${analysis.slowN}</span>`+
+    ' · <span style="color:#a78bfa">VWAP</span> · Fib 0.382/0.5/0.618'+
     (plan ? ' · CONFIRMED LEVELS' : ' · DIRECTIONAL ANALYSIS');
 }
 
