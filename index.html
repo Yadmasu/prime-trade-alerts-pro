@@ -855,6 +855,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  body.pro-tabs-on .hero-panel>.muted{font-size:11px}
 }
 .pro-workspace-nav button[aria-selected="true"]{background:#dafa4b;color:#07111b;border-color:#dafa4b;box-shadow:0 4px 20px rgba(218,250,75,.15)}
+
+/* Screenshot-matched AI timeframe analysis workspace */
+.ai-analysis-head{display:flex;align-items:center;gap:12px;margin-top:24px;padding-bottom:16px;border-bottom:1px solid #303030}
+.ai-analysis-head h2{margin:0;font-size:22px;font-weight:850;letter-spacing:-.4px;color:#f7f7f7}
+.ai-analysis-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#e7ff4c;color:#0b0c06;font-size:23px;font-weight:900}
+.ai-mode-tabs{background:#262626;border-radius:13px;padding:7px;gap:5px;margin:18px 0 17px}
+.ai-mode-tabs button{background:transparent;border:0;border-radius:10px;color:#a8a8a8;min-height:53px;font-size:19px;font-weight:650}
+.ai-mode-tabs button.active{background:#454545;color:#fff;border:0}
+.ai-time-grid{gap:11px}
+.ai-time-grid button{background:#252525;border:2px solid #424242;border-radius:10px;color:#a9a9a9;min-height:61px;font-size:19px;font-weight:650}
+.ai-time-grid button.active{background:#292e18;border-color:#e7ff4c;color:#e7ff4c;box-shadow:none}
+@media(max-width:749px){.ai-analysis-head{margin-top:15px}.ai-analysis-head h2{font-size:21px}.ai-mode-tabs button{min-height:55px}.ai-time-grid button{min-height:64px;font-size:18px}}
 </style>
 </head>
 
@@ -1002,14 +1014,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     </div>
   </div>
 
-  <h2 style="margin-top:22px">AI Timeframe Analysis</h2><p class="muted mini">Single / Multi analysis. Confirmed entries still require 15m and 1H agreement.</p>
+  <div class="ai-analysis-head"><span class="ai-analysis-icon">☑</span><h2>AI Timeframe Analysis</h2></div><p class="muted mini">Choose Single or Multi and select timeframes. Entry confirmation remains based on 15m + 1H.</p>
 
-  <div class="tabs">
+  <div class="tabs ai-mode-tabs">
     <button id="single">Single</button>
     <button id="multi" class="active">Multi</button>
   </div>
 
-  <div class="timegrid" id="times">
+  <div class="timegrid ai-time-grid" id="times">
     <button data-tf="1m">1m</button>
     <button data-tf="5m">5m</button>
     <button data-tf="15m" class="active">15m</button>
@@ -1027,7 +1039,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     If the feed is unavailable, no signal or trading level is shown.
   </div>
 
-  <button id="analyze" class="primary">ANALYZE NOW →</button>
+  <button id="analyze" class="primary">⚡ ANALYZE NOW</button>
 
   <div class="notification-card">
     <div class="notification-head">
