@@ -17,6 +17,8 @@ ONESIGNAL_API = "https://api.onesignal.com/notifications"
 APP_URL = "https://yadmasu.github.io/prime-trade-alerts-pro/"
 APP_ID = os.getenv("ONESIGNAL_APP_ID", "79e44e90-939e-4b66-ab64-4012c91d044a")
 REST_KEY = os.getenv("ONESIGNAL_REST_API_KEY", "")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHATS = [c.strip() for c in os.getenv("TELEGRAM_CHAT_IDS", os.getenv("TELEGRAM_CHAT_ID", "")).split(",") if c.strip()]
 STATE_FILE = Path(os.getenv("STATE_FILE", "signal_state.json"))
 SCAN_CONCURRENCY = int(os.getenv("SCAN_CONCURRENCY", "16"))
 MIN_VOLUME_RATIO = max(1.5, float(os.getenv("MIN_VOLUME_RATIO", "1.5")))
@@ -124,7 +126,7 @@ async def candles(session: aiohttp.ClientSession, coin: str, interval: str, days
             "endTime": now,
         },
     })
-    duration = 900_000 if interval == "15m" else 3_600_000
+    duration = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[interval]
     unique = {}
     for item in raw or []:
         row = {key: float(item[key]) for key in ("o", "h", "l", "c", "v")}
@@ -134,16 +136,19 @@ async def candles(session: aiohttp.ClientSession, coin: str, interval: str, days
     return sorted(unique.values(), key=lambda row: row["t"])
 
 
-def confirmed_signal(rows15: list[dict], rows1h: list[dict]) -> dict | None:
-    if len(rows15) < 110 or len(rows1h) < 95:
+def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict]) -> dict | None:
+    if len(rows15) < 110 or len(rows1h) < 95 or len(rows4h) < 95:
         return None
     close15 = [row["c"] for row in rows15]
     close1h = [row["c"] for row in rows1h]
     fast15, slow15 = ema(close15, 21), ema(close15, 89)
     fast1h, slow1h = ema(close1h, 21), ema(close1h, 89)
+    close4h = [row["c"] for row in rows4h]
+    fast4h, slow4h = ema(close4h, 21), ema(close4h, 89)
+    four_hour = rows4h[-1]
     last, hour = rows15[-1], rows1h[-1]
-    long_aligned = last["c"] > fast15[-1] > slow15[-1] and hour["c"] > fast1h[-1] > slow1h[-1]
-    short_aligned = last["c"] < fast15[-1] < slow15[-1] and hour["c"] < fast1h[-1] < slow1h[-1]
+    long_aligned = last["c"] > fast15[-1] > slow15[-1] and hour["c"] > fast1h[-1] > slow1h[-1] and four_hour["c"] > fast4h[-1] > slow4h[-1]
+    short_aligned = last["c"] < fast15[-1] < slow15[-1] and hour["c"] < fast1h[-1] < slow1h[-1] and four_hour["c"] < fast4h[-1] < slow4h[-1]
     if not long_aligned and not short_aligned:
         return None
     side = "LONG" if long_aligned else "SHORT"
@@ -201,11 +206,12 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict]) -> dict | None:
 async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semaphore, market: Market):
     async with semaphore:
         try:
-            rows15, rows1h = await asyncio.gather(
+            rows15, rows1h, rows4h = await asyncio.gather(
                 candles(session, market.coin, "15m", 13),
                 candles(session, market.coin, "1h", 17),
+                candles(session, market.coin, "4h", 45),
             )
-            return market, confirmed_signal(rows15, rows1h)
+            return market, confirmed_signal(rows15, rows1h, rows4h)
         except Exception:
             return market, None
 
@@ -229,7 +235,7 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         print(title, body, flush=True)
         return
     if not REST_KEY:
-        raise RuntimeError("ONESIGNAL_REST_API_KEY is missing")
+        return
     headers = {"Authorization": f"Key {REST_KEY}", "Content-Type": "application/json"}
     payload = {
         "app_id": APP_ID,
@@ -248,6 +254,29 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
             if response.status not in (429, 500, 502, 503, 504) or attempt == 3:
                 raise RuntimeError(f"OneSignal {response.status}: {message}")
         await asyncio.sleep(2 ** attempt)
+
+
+async def send_telegram(session: aiohttp.ClientSession, market: Market, signal: dict) -> None:
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHATS:
+        return
+    message = (f"YOYO CONFIRMED {signal['side']} | {market.coin}\n"
+               f"ENTRY {fmt(signal['entry'])} | SL {fmt(signal['stop'])}\n"
+               f"TP1 {fmt(signal['tp1'])} | TP2 {fmt(signal['tp2'])} | TP3 {fmt(signal['tp3'])}\n"
+               f"VOL {signal['volume']:.2f}x | 15m + 1H + 4H aligned\n"
+               "Alert only; not financial advice.")
+    if DRY_RUN:
+        print("TELEGRAM DRY RUN:", message, flush=True)
+        return
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    for chat in TELEGRAM_CHATS:
+        for attempt in range(4):
+            async with session.post(url, json={"chat_id": chat, "text": message}, timeout=20) as response:
+                data = await response.json(content_type=None)
+                if response.status == 200 and data.get("ok") is True:
+                    break
+                if attempt == 3 or response.status not in (429, 500, 502, 503, 504):
+                    raise RuntimeError(f"Telegram delivery failed: HTTP {response.status}")
+            await asyncio.sleep(2 ** attempt)
 
 
 def load_state() -> dict:
@@ -288,6 +317,9 @@ async def run_cycle() -> None:
             reverse=True,
         )
         for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
+            if not REST_KEY and not (TELEGRAM_TOKEN and TELEGRAM_CHATS) and not DRY_RUN:
+                raise RuntimeError("No notification channel configured")
+            await send_telegram(session, market, signal)
             await send_push(session, market, signal)
             state[key] = now
             save_state(state)
