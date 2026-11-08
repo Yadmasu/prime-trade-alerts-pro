@@ -321,8 +321,9 @@ async def run_cycle() -> None:
                 raise RuntimeError("No notification channel configured")
             await send_telegram(session, market, signal)
             await send_push(session, market, signal)
-            state[key] = now
-            save_state(state)
+            if not DRY_RUN:
+                state[key] = now
+                save_state(state)
 
 
 async def main() -> None:
