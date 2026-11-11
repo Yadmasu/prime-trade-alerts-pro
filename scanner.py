@@ -159,13 +159,11 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     if time.time() * 1000 - (last["t"] + 900_000) > MAX_SIGNAL_AGE * 1000:
         return None
 
-    previous = rows15[-5:-1]
-    start = len(rows15) - 5
-    touch = any(
-        row["l"] <= fast15[start + offset] + average_range * .15
-        and row["h"] >= fast15[start + offset] - average_range * .15
-        for offset, row in enumerate(previous)
-    )
+    previous = rows15[-6:-1]
+    retest = rows15[-2]
+    prior_ema = fast15[-2]
+    touch = (retest["l"] <= prior_ema * 1.002 and retest["h"] >= prior_ema * .998
+             and (retest["c"] >= prior_ema if side == "LONG" else retest["c"] <= prior_ema))
     breakout = (
         last["c"] > max(row["h"] for row in previous)
         if side == "LONG"
@@ -187,7 +185,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
         else max(structure + average_range * .15, entry + average_range * 1.35)
     )
     risk = abs(entry - stop)
-    if risk <= 0 or risk / entry > .07:
+    if risk <= 0 or not .015 <= risk / entry <= .03:
         return None
     direction = 1 if side == "LONG" else -1
     return {
