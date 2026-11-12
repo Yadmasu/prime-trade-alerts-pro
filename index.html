@@ -837,7 +837,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  #liveChart #chartLegend{font-size:11px;overflow-wrap:anywhere}
 }
 #times{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}#times button{min-height:48px;border-radius:10px;font-weight:800}#times button.active{border-color:#dafa4b;background:rgba(218,250,75,.13);color:#e9ff82}#single,#multi{min-height:46px;font-weight:850}#analyze{background:#dafa4b;color:#07111b;border-color:#dafa4b;font-weight:950;min-height:52px;box-shadow:0 6px 22px rgba(218,250,75,.14)}.indicator-settings{margin:12px 0;padding:11px;border:1px solid #324860;border-radius:12px;background:#0c1828}.indicator-settings summary{cursor:pointer;font-weight:850;color:#d9e8fb}.indicator-switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.indicator-switches label{display:flex;gap:8px;align-items:center;font-size:13px;color:#dbe9f9}.indicator-switches input{accent-color:#dafa4b;width:18px;height:18px}@media(max-width:390px){.indicator-switches{grid-template-columns:1fr}}
-/* V4.3 unmistakable mobile redesign: chart-first professional terminal */
+/* V5 mobile layout: chart-first professional terminal */
 @media(max-width:749px){
  body.pro-tabs-on main{display:flex;flex-direction:column}
  body.pro-tabs-on main>section[data-pro-view="dashboard"]#liveChart{order:1}
@@ -3605,20 +3605,20 @@ function drawChart(
   const fallback = $('priceChart');
   const visible = key => document.querySelector('[data-indicator="'+key+'"]')?.checked !== false;
 
-  if(
-    !window.LightweightCharts ||
-    !host ||
-    candleData.length < 5
-  ){
+  if(!Array.isArray(candleData) || candleData.length < 5 || !host || !fallback){
+    if(host)host.style.display = 'none';
+    if(fallback){
+      fallback.style.display = 'block';
+      if(Array.isArray(candleData) && candleData.length >= 5){
+        drawCanvasChart(candleData,analysis,id,timeframe,confirmed);
+      }
+    }
+    return;
+  }
+  if(!window.LightweightCharts){
     host.style.display = 'none';
     fallback.style.display = 'block';
-    drawCanvasChart(
-      candleData,
-      analysis,
-      id,
-      timeframe,
-      confirmed
-    );
+    drawCanvasChart(candleData,analysis,id,timeframe,confirmed);
     return;
   }
 
