@@ -7,6 +7,8 @@ import json
 import math
 import os
 import time
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -136,22 +138,63 @@ async def candles(session: aiohttp.ClientSession, coin: str, interval: str, days
     return sorted(unique.values(), key=lambda row: row["t"])
 
 
+NY = ZoneInfo("America/New_York")
+
+def opening_range_and_vwap(rows: list[dict]) -> tuple[float, float, float] | None:
+    """NY 09:30-10:00 ET range; VWAP anchored to 09:30, completed candles only."""
+    if not rows:
+        return None
+    latest = datetime.fromtimestamp(rows[-1]["t"] / 1000, timezone.utc).astimezone(NY)
+    if latest.weekday() >= 5 or (latest.hour, latest.minute) < (10, 0):
+        return None
+    session = []
+    opening = []
+    for row in rows:
+        dt = datetime.fromtimestamp(row["t"] / 1000, timezone.utc).astimezone(NY)
+        if dt.date() != latest.date():
+            continue
+        if (dt.hour, dt.minute) >= (9, 30):
+            session.append(row)
+        if (9, 30) <= (dt.hour, dt.minute) < (10, 0):
+            opening.append(row)
+    if len(opening) != 2 or len(session) < 3:
+        return None
+    volume = sum(row["v"] for row in session)
+    if volume <= 0:
+        return None
+    vwap = sum((row["h"] + row["l"] + row["c"]) / 3 * row["v"] for row in session) / volume
+    return max(row["h"] for row in opening), min(row["l"] for row in opening), vwap
+
+
 def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict]) -> dict | None:
     if len(rows15) < 110 or len(rows1h) < 95 or len(rows4h) < 95:
         return None
     close15 = [row["c"] for row in rows15]
     close1h = [row["c"] for row in rows1h]
-    fast15, slow15 = ema(close15, 21), ema(close15, 89)
-    fast1h, slow1h = ema(close1h, 21), ema(close1h, 89)
+    ema9_15, ema21_15 = ema(close15, 9), ema(close15, 21)
+    ema9_1h, ema21_1h = ema(close1h, 9), ema(close1h, 21)
     close4h = [row["c"] for row in rows4h]
-    fast4h, slow4h = ema(close4h, 21), ema(close4h, 89)
-    four_hour = rows4h[-1]
-    last, hour = rows15[-1], rows1h[-1]
-    long_aligned = last["c"] > fast15[-1] > slow15[-1] and hour["c"] > fast1h[-1] > slow1h[-1] and four_hour["c"] > fast4h[-1] > slow4h[-1]
-    short_aligned = last["c"] < fast15[-1] < slow15[-1] and hour["c"] < fast1h[-1] < slow1h[-1] and four_hour["c"] < fast4h[-1] < slow4h[-1]
-    if not long_aligned and not short_aligned:
+    ema9_4h, ema21_4h = ema(close4h, 9), ema(close4h, 21)
+    last = rows15[-1]
+    opening = opening_range_and_vwap(rows15)
+    if opening is None:
         return None
-    side = "LONG" if long_aligned else "SHORT"
+    orh, orl, anchored_vwap = opening
+    long_aligned = (ema9_15[-1] > ema21_15[-1] and
+                    rows1h[-1]["c"] > ema9_1h[-1] > ema21_1h[-1] and
+                    rows4h[-1]["c"] > ema9_4h[-1] > ema21_4h[-1])
+    short_aligned = (ema9_15[-1] < ema21_15[-1] and
+                     rows1h[-1]["c"] < ema9_1h[-1] < ema21_1h[-1] and
+                     rows4h[-1]["c"] < ema9_4h[-1] < ema21_4h[-1])
+    cross_up = any(ema9_15[i-1] <= ema21_15[i-1] and ema9_15[i] > ema21_15[i]
+                   for i in range(max(1, len(rows15)-8), len(rows15)))
+    cross_down = any(ema9_15[i-1] >= ema21_15[i-1] and ema9_15[i] < ema21_15[i]
+                     for i in range(max(1, len(rows15)-8), len(rows15)))
+    long_ready = long_aligned and cross_up and last["c"] > anchored_vwap and last["c"] > orh
+    short_ready = short_aligned and cross_down and last["c"] < anchored_vwap and last["c"] < orl
+    if not (long_ready or short_ready):
+        return None
+    side = "LONG" if long_ready else "SHORT"
     average_range = atr(rows15)
     vr = volume_ratio(rows15)
     if not math.isfinite(average_range) or not math.isfinite(vr) or vr < MIN_VOLUME_RATIO:
@@ -160,21 +203,16 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
         return None
 
     previous = rows15[-6:-1]
-    retest = rows15[-2]
-    prior_ema = fast15[-2]
-    touch = (retest["l"] <= prior_ema * 1.002 and retest["h"] >= prior_ema * .998
-             and (retest["c"] >= prior_ema if side == "LONG" else retest["c"] <= prior_ema))
-    breakout = (
-        last["c"] > max(row["h"] for row in previous)
-        if side == "LONG"
-        else last["c"] < min(row["l"] for row in previous)
-    )
+    breakout = (last["c"] > max(row["h"] for row in previous)
+                if side == "LONG" else last["c"] < min(row["l"] for row in previous))
     strong_close = (
-        last["c"] > last["o"] and last["c"] > fast15[-1] and last["c"] - last["o"] >= average_range * .20
-        if side == "LONG"
-        else last["c"] < last["o"] and last["c"] < fast15[-1] and last["o"] - last["c"] >= average_range * .20
+        last["c"] > last["o"] and last["c"] > ema9_15[-1] and
+        last["c"] - last["o"] >= average_range * .20
+        if side == "LONG" else
+        last["c"] < last["o"] and last["c"] < ema9_15[-1] and
+        last["o"] - last["c"] >= average_range * .20
     )
-    if not (touch and breakout and strong_close):
+    if not (breakout and strong_close):
         return None
 
     entry = last["c"]
@@ -197,6 +235,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
         "tp2": entry + direction * 3 * risk,
         "tp3": entry + direction * 4 * risk,
         "volume": vr,
+        "orh": orh, "orl": orl, "anchored_vwap": anchored_vwap,
         "max_drift": min(entry * .005, average_range * .35),
     }
 
@@ -260,7 +299,7 @@ async def send_telegram(session: aiohttp.ClientSession, market: Market, signal: 
     message = (f"YOYO CONFIRMED {signal['side']} | {market.coin}\n"
                f"ENTRY {fmt(signal['entry'])} | SL {fmt(signal['stop'])}\n"
                f"TP1 {fmt(signal['tp1'])} | TP2 {fmt(signal['tp2'])} | TP3 {fmt(signal['tp3'])}\n"
-               f"VOL {signal['volume']:.2f}x | 15m + 1H + 4H aligned\n"
+               f"VOL {signal['volume']:.2f}x | EMA9/21 + NY OR + Anchored VWAP\n"
                "Alert only; not financial advice.")
     if DRY_RUN:
         print("TELEGRAM DRY RUN:", message, flush=True)
