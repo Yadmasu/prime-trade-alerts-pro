@@ -922,6 +922,25 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
  #liveChart .indicator-settings .indicator-switches label{min-height:32px;padding:6px}
  #liveChart .indicator-settings .indicator-switches input{width:17px;height:17px}
 }
+
+/* V5 final visual polish: stable mobile navigation and readable chart */
+.pro-workspace-nav{justify-content:space-between}
+.pro-workspace-nav button{flex:1 1 0;white-space:nowrap;text-align:center}
+.pro-view-hint b{color:#d3ee78}
+#liveChart .chartwrap{position:relative}
+#liveChart #interactiveChart{touch-action:pan-x pan-y}
+#confirmedEntry .notice{border-radius:9px}
+@media(max-width:749px){
+  .pro-workspace-nav{overflow-x:visible}
+  .pro-workspace-nav button{font-size:12px;padding:9px 3px;min-width:0}
+  #liveChart #chartLegend{line-height:1.45}
+  #liveChart .chart-quickbar button{min-width:0}
+  body.pro-tabs-on main>.hero-panel{display:none!important}
+  body.pro-tabs-on #liveChart{order:1}
+  body.pro-tabs-on #confirmedEntry{order:2}
+  body.pro-tabs-on #anytimeAnalysis{order:3}
+  #liveChart .chartwrap{min-height:380px!important}
+}
 </style>
 </head>
 
@@ -943,12 +962,12 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 </header>
 
 <nav class="pro-workspace-nav" aria-label="YOYO Pro workspace">
-  <button type="button" data-pro-tab="dashboard" aria-selected="true">📈 Dashboard</button>
-  <button type="button" data-pro-tab="analysis" aria-selected="false">🧠 Analysis</button>
-  <button type="button" data-pro-tab="markets" aria-selected="false">🔎 Markets &amp; Scan</button>
-  <button type="button" data-pro-tab="history" aria-selected="false">📋 History &amp; Details</button>
+  <button type="button" data-pro-tab="dashboard" aria-selected="true">Chart</button>
+  <button type="button" data-pro-tab="analysis" aria-selected="false">Analysis</button>
+  <button type="button" data-pro-tab="markets" aria-selected="false">Markets</button>
+  <button type="button" data-pro-tab="history" aria-selected="false">History</button>
 </nav>
-<div class="pro-view-hint"><b style="color:#dafa4b">V5 PRO TERMINAL</b> · 15m entry · 1H trend · Confirmed only</div>
+<div class="pro-view-hint"><b>YOYO V5</b> · Hyperliquid market data · Confirmed entries only</div>
 <main>
 
 <section class="panel hero-panel">
@@ -4768,8 +4787,9 @@ document.addEventListener('visibilitychange',()=>{
   if(!main)return;
   const panels=Array.from(main.children).filter(el=>el.tagName==='SECTION');
   panels.forEach((el,index)=>{
-    const view= index===0 || index===3 || index===4 || index===5 ? 'dashboard'
-      : index===1 ? 'markets' : index===2 ? 'analysis' : 'history';
+    const view = el.id==='cryptoMarketPanel' ? 'markets'
+      : el.id==='liveChart' || el.id==='confirmedEntry' || el.id==='anytimeAnalysis' || index===0 ? 'dashboard'
+      : index===2 ? 'analysis' : 'history';
     el.dataset.proView=view;
   });
   const buttons=Array.from(document.querySelectorAll('[data-pro-tab]'));
@@ -4784,6 +4804,12 @@ document.addEventListener('visibilitychange',()=>{
   }
   buttons.forEach(b=>b.addEventListener('click',()=>choose(b.dataset.proTab)));
   choose('dashboard');
+  // Restore tab when returning from another app, without changing any market data.
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden && document.body.dataset.proActive==='dashboard'){
+      window.dispatchEvent(new Event('resize'));
+    }
+  });
   const chartPreset=document.getElementById('chartEmaPreset');
   if(chartPreset)chartPreset.addEventListener('change',()=>{
     if(typeof lastSnapshot!=='undefined' && lastSnapshot)drawChart(lastSnapshot.candles,lastSnapshot.analysis,lastSnapshot.id,lastSnapshot.timeframe,lastSnapshot.confirmed);
