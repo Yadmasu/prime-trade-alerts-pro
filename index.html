@@ -3935,8 +3935,8 @@ function updateV5Sentiment(analysis,data){
   const short=String(analysis.shortTf||'—').toUpperCase();
   const long=String(analysis.longTf||'—').toUpperCase();
   timeframes.textContent='15m '+short+' · 1H '+long+' · 4H '+four;
-  agreement.textContent=Number.isFinite(analysis.agreement)?analysis.agreement+'%':'—';
-  note.textContent='Trend agreement is not win probability. Entry requires separate confirmation and live-price verification.';
+  agreement.textContent=Number.isFinite(analysis.agreement)?analysis.agreement+'% (15m/1H)':'—';
+  note.textContent=four==='—'?'4H research unavailable. 15m/1H entry logic is unchanged.':'Trend agreement is not win probability. Entry requires separate confirmation and live-price verification.';
 }
 
 async function analyze(){
@@ -4001,16 +4001,16 @@ async function analyze(){
 
     const results =
       await Promise.all(
-        [...intervals].map(
-          async timeframe => [
-            timeframe,
-            await candles(
-              info.coin,
-              timeframe,
-              days[timeframe] || 13
-            )
-          ]
-        )
+        [...intervals].map(async timeframe=>{
+          try{
+            return [timeframe,await candles(info.coin,timeframe,days[timeframe]||13)];
+          }catch(error){
+            // 15m and 1H are mandatory; optional 4H research must never
+            // turn an otherwise valid analysis into a false data error.
+            if(timeframe==='15m'||timeframe==='1h')throw error;
+            return [timeframe,null];
+          }
+        })
       );
 
     if(sequence !== analysisSeq){
