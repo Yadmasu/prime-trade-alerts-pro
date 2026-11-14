@@ -27,7 +27,7 @@ MIN_VOLUME_RATIO = max(1.5, float(os.getenv("MIN_VOLUME_RATIO", "1.5")))
 MIN_24H_NOTIONAL = float(os.getenv("MIN_24H_NOTIONAL", "1000000"))
 MAX_SIGNAL_AGE = int(os.getenv("MAX_SIGNAL_AGE_SECONDS", "1800"))
 MAX_ALERTS_PER_RUN = min(1, max(0, int(os.getenv("MAX_ALERTS_PER_RUN", "1"))))
-BTC_EXCLUDED = os.getenv("BTC_EXCLUDED", "true").lower() == "true"
+BTC_EXCLUDED = os.getenv("BTC_EXCLUDED", "false").lower() == "true"
 DRY_RUN = os.getenv("DRY_RUN", "true").lower() not in ("false", "0", "no")
 RUN_ONCE = os.getenv("RUN_ONCE", "false").lower() == "true"
 
