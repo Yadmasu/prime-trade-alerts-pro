@@ -1599,7 +1599,8 @@ function renderCryptoMarket(){
     rows.sort((a,b)=>(b.notional||0)-(a.notional||0));
   }
 
-  rows=rows.slice(0,5);
+  // Show all matching markets; the page remains vertically scrollable.
+  // Preserve existing sorting, filters, search, and watchlist behavior.
 
   $('marketListStatus').textContent=
     `Showing ${rows.length} of ${marketRows.length} live markets.`;
