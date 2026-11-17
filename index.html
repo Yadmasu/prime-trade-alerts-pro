@@ -19,7 +19,7 @@ OneSignalDeferred.push(async function(OneSignal){
     await OneSignal.init({
       appId:"79e44e90-939e-4b66-ab64-4012c91d044a",
       safari_web_id:"web.onesignal.auto.20cc36d3-e742-47b9-8fc8-37c27a32926f",
-      serviceWorkerPath:"prime-trade-alerts-pro/OneSignalSDKWorker.js",
+      serviceWorkerPath:"/prime-trade-alerts-pro/OneSignalSDKWorker.js",
       serviceWorkerParam:{scope:"/prime-trade-alerts-pro/"},
       notifyButton:{enable:false},
       allowLocalhostAsSecureOrigin:true
@@ -973,10 +973,10 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     </div>
   </div>
 
-  <div id="notificationPill" class="top-status">
+  <button type="button" id="notificationPill" class="top-status" aria-label="Open signal notification settings" style="cursor:pointer">
     <span class="status-dot"></span>
     <span id="notificationPillText">ALERTS OFF</span>
-  </div>
+  </button>
 </header>
 
 <nav class="pro-workspace-nav" aria-label="YOYO Pro workspace">
@@ -1144,7 +1144,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
       <span class="live-dot">READY</span>
     </div>
 
-    <b>EMA9/21 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2× · 24H VOLUME ≥ $1M</b>
+    <b>EMA9/21 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.5× · 24H VOLUME ≥ $1M</b>
 
     <p class="muted mini">
       Confirmed entry requires aligned trend, a completed entry candle,
@@ -4353,6 +4353,12 @@ async function syncPushState(){
 
 }
 
+$('notificationPill').onclick = ()=>{
+  const toggle=$('alertsToggle');
+  toggle.scrollIntoView({behavior:'smooth',block:'center'});
+  toggle.focus({preventScroll:true});
+};
+
 window.addEventListener(
   'yoyo-onesignal-ready',
   ()=>{
@@ -4398,7 +4404,7 @@ async()=>{
 
   if(!oneSignal){
     $('alertsStatus').textContent =
-      'Push service is still loading. Try again in a moment.';
+      window.YOYOOneSignalError ? 'Push setup failed. On iPhone install to Home Screen and retry.' : 'Push service is still loading. Try again in a moment.';
     return;
   }
 
@@ -4429,6 +4435,9 @@ async()=>{
     }
 
     await syncPushState();
+    if(!oneSignal.User.PushSubscription.optedIn){
+      $('alertsStatus').textContent = 'Notifications are not enabled. On iPhone, install to Home Screen, open the installed app and allow notifications.';
+    }
 
   }catch(error){
 
