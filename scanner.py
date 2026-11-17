@@ -286,6 +286,7 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         print(title, body, flush=True)
         return
     if not REST_KEY:
+        print("Push delivery unavailable: OneSignal REST key not configured", flush=True)
         return
     headers = {"Authorization": f"Key {REST_KEY}", "Content-Type": "application/json"}
     payload = {
@@ -300,6 +301,12 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
     for attempt in range(4):
         async with session.post(ONESIGNAL_API, headers=headers, json=payload, timeout=20) as response:
             if response.status < 300:
+                receipt = await response.json(content_type=None)
+                notification_id = receipt.get("id") if isinstance(receipt, dict) else None
+                recipients = receipt.get("recipients") if isinstance(receipt, dict) else None
+                print(f"OneSignal accepted: notification_id={notification_id or 'none'} recipients={recipients if recipients is not None else 'unknown'} market={market.coin}", flush=True)
+                if not notification_id or recipients == 0:
+                    raise RuntimeError("OneSignal accepted request without a deliverable notification (no id or zero recipients)")
                 return
             message = await response.text()
             if response.status not in (429, 500, 502, 503, 504) or attempt == 3:
@@ -324,6 +331,7 @@ async def send_telegram(session: aiohttp.ClientSession, market: Market, signal: 
             async with session.post(url, json={"chat_id": chat, "text": message}, timeout=20) as response:
                 data = await response.json(content_type=None)
                 if response.status == 200 and data.get("ok") is True:
+                    print(f"Telegram accepted: market={market.coin} chat_id={chat} message_id={data.get('result', {}).get('message_id', 'unknown')}", flush=True)
                     break
                 if attempt == 3 or response.status not in (429, 500, 502, 503, 504):
                     raise RuntimeError(f"Telegram delivery failed: HTTP {response.status}")
@@ -367,6 +375,7 @@ async def run_cycle() -> None:
             key=lambda item: (item[1]["volume"], item[0].notional),
             reverse=True,
         )
+        print(f"Confirmed fresh signal candidates: {len(candidates)}", flush=True)
         for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
             if not REST_KEY and not (TELEGRAM_TOKEN and TELEGRAM_CHATS) and not DRY_RUN:
                 raise RuntimeError("No notification channel configured")
@@ -383,6 +392,8 @@ async def main() -> None:
             await run_cycle()
         except Exception as error:
             print(f"Scan failed: {error}", flush=True)
+            if RUN_ONCE:
+                raise
         if RUN_ONCE:
             return
         now = time.time()
