@@ -67,20 +67,34 @@ def volume_ratio(rows: list[dict]) -> float:
 
 
 async def post(session: aiohttp.ClientSession, body: dict) -> object:
+    """Retry throttled and transient API requests without relaxing signals."""
+    import random
+    from datetime import datetime, timezone
+    from email.utils import parsedate_to_datetime
+
     for attempt in range(4):
         try:
             async with session.post(HL_API, json=body, timeout=20) as response:
-                if response.status == 429:
-                    await asyncio.sleep(2 ** attempt)
+                if response.status in (429, 500, 502, 503, 504):
+                    if attempt == 3:
+                        response.raise_for_status()
+                    header = response.headers.get("Retry-After", "")
+                    try:
+                        wait = float(header)
+                    except (ValueError, TypeError):
+                        try:
+                            wait = (parsedate_to_datetime(header) - datetime.now(timezone.utc)).total_seconds()
+                        except (ValueError, TypeError, OverflowError):
+                            wait = min(60.0, 2 ** (attempt + 1)) + random.uniform(0, 1)
+                    await asyncio.sleep(max(0.0, min(120.0, wait)))
                     continue
                 response.raise_for_status()
                 return await response.json()
         except (aiohttp.ClientError, asyncio.TimeoutError):
             if attempt == 3:
                 raise
-            await asyncio.sleep(1 + attempt)
+            await asyncio.sleep(min(60.0, 2 ** (attempt + 1)) + random.uniform(0, 1))
     raise RuntimeError("Hyperliquid request failed")
-
 
 async def discover_markets(session: aiohttp.ClientSession) -> list[Market]:
     dexes = [""]

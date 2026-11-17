@@ -1096,7 +1096,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
       <label>Strategy</label>
 
       <select id="strategy">
-        <option value="ema21" selected>EMA21 / EMA89 (Main)</option>
+        <option value="cross" selected>EMA9/21 + Anchored VWAP + Opening Range</option>
       </select>
     </div>
 
@@ -1124,7 +1124,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     <button data-tf="1M">1M</button>
   </div>
 
-  <details class="v5-indicator-panel"><summary>Indicators · 5 selected for research</summary><div class="v5-indicator-grid"><label><input type="checkbox" checked disabled> EMA21 / EMA89</label><label><input type="checkbox" checked disabled> RSI</label><label><input type="checkbox" checked disabled> MACD</label><label><input type="checkbox" checked disabled> Volume</label><label><input type="checkbox" checked disabled> Bollinger Bands</label></div><p class="muted mini">Research indicators are computed from live candles. Chart overlays can be changed in Chart → Tools.</p></details>
+  <details class="v5-indicator-panel"><summary>Indicators · 5 selected for research</summary><div class="v5-indicator-grid"><label><input type="checkbox" checked disabled> EMA9 / EMA21</label><label><input type="checkbox" checked disabled> RSI</label><label><input type="checkbox" checked disabled> MACD</label><label><input type="checkbox" checked disabled> Volume</label><label><input type="checkbox" checked disabled> Bollinger Bands</label></div><p class="muted mini">Research indicators are computed from live candles. Chart overlays can be changed in Chart → Tools.</p></details>
   <div class="v5-sentiment" aria-live="polite"><div class="v5-sentiment-heading">MARKET SENTIMENT <span>Research only · not an entry alert</span></div><div class="v5-sentiment-grid"><div><small>Direction</small><strong id="v5Direction">—</strong></div><div><small>Trend agreement</small><strong id="v5Agreement">—</strong></div><div><small>15m / 1H / 4H</small><strong id="v5Timeframes">—</strong></div></div><p id="v5SentimentNote" class="muted mini">Tap Analyze Now for a fresh analysis.</p></div>
   <div class="status" id="status">Connecting...</div>
 
@@ -1144,7 +1144,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
       <span class="live-dot">READY</span>
     </div>
 
-    <b>EMA21/89 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2× · 24H VOLUME ≥ $1M</b>
+    <b>EMA9/21 · 15m ENTRY + 1H TREND · VOLUME ≥ 1.2× · 24H VOLUME ≥ $1M</b>
 
     <p class="muted mini">
       Confirmed entry requires aligned trend, a completed entry candle,
@@ -1162,7 +1162,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA21 / EMA89</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib" checked> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA21/89 and 15m + 1H.</p></details>
+  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib" checked> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
   <div class="chart-quickbar"><button type="button" id="chartToolsButton">⚙ Tools</button><button type="button" id="chartCleanButton">◉ Clean</button><button type="button" id="chartExpandButton">⛶ Expand</button></div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -2629,184 +2629,77 @@ function evaluate(candles15,candles1h,strategy){
 
 }
 
-function confirmEntry(
-  candles15,
-  analysis
-){
-
-  if(analysis.error){
-
-    return{
-      reason:analysis.error,
-      checks:{}
-    };
-
-  }
-
-  if(
-    !analysis.aligned ||
-    analysis.side !== analysis.shortTf
-  ){
-
-    return{
-      reason:analysis.reason,
-      checks:{trend:false}
-    };
-
-  }
-
-  if(
-    analysis.stop === null ||
-    !Number.isFinite(analysis.riskPct) ||
-    analysis.riskPct > 0.07
-  ){
-
-    return{
-      reason:'Stop-loss risk is invalid or above 7%',
-      checks:{trend:true,risk:false}
-    };
-
-  }
-
-  if(analysis.vr < 1.2){
-
-    return{
-      reason:'Volume is below 1.2×',
-      checks:{trend:true,risk:true,volume:false}
-    };
-
-  }
-
-  const age =
-    Date.now()-analysis.time;
-
-  if(
-    age < 0 ||
-    age > 20*MIN
-  ){
-
-    return{
-      reason:'Last completed 15m candle is stale',
-      checks:{trend:true,risk:true,volume:true,fresh:false}
-    };
-
-  }
-
-  const index =
-    candles15.length-1;
-
-  const fast =
-    analysis.eFast;
-
-  const previous =
-    candles15.slice(-5,-1);
-
-  const isLong =
-    analysis.side === 'LONG';
-
-  const touch =
-    previous.some(
-      (candle,offset) => {
-
-        const fastValue =
-          fast[index-4+offset];
-
-        return isLong
-          ? candle.l <=
-              fastValue+analysis.a*0.15 &&
-            candle.h >=
-              fastValue-analysis.a*0.15
-
-          : candle.h >=
-              fastValue-analysis.a*0.15 &&
-            candle.l <=
-              fastValue+analysis.a*0.15;
-
-      }
-    );
-
-  const breakout =
-    isLong
-      ? analysis.last.c >
-        Math.max(
-          ...previous.map(item=>item.h)
-        )
-      : analysis.last.c <
-        Math.min(
-          ...previous.map(item=>item.l)
-        );
-
-  const candleOK =
-    isLong
-      ? analysis.last.c >
-          analysis.last.o &&
-        analysis.last.c >
-          fast[index] &&
-        (
-          analysis.last.c-
-          analysis.last.o
-        ) >= analysis.a*0.20
-      : analysis.last.c <
-          analysis.last.o &&
-        analysis.last.c <
-          fast[index] &&
-        (
-          analysis.last.o-
-          analysis.last.c
-        ) >= analysis.a*0.20;
-
-  if(
-    !touch ||
-    !breakout ||
-    !candleOK
-  ){
-
-    return{
-      reason:
-        'Missing: '+[
-          !touch ? 'EMA21 pullback' : null,
-          !breakout ? '5-bar structure break' : null,
-          !candleOK ? 'strong candle close' : null
-        ].filter(Boolean).join(', '),
-      checks:{
-        trend:true,
-        risk:true,
-        volume:true,
-        fresh:true,
-        pullback:touch,
-        breakout,
-        candle:candleOK
-      }
-    };
-
-  }
-
-  return{
-    ...analysis,
-    reason:'CONFIRMED',
-    confirmed:true,
-    checks:{
-      trend:true,
-      risk:true,
-      volume:true,
-      fresh:true,
-      pullback:true,
-      breakout:true,
-      candle:true
-    }
+function openingRangeAndVwap(candles15){
+  // New York 09:30-10:00 ET opening range; volume-weighted price from 09:30.
+  if(!candles15.length) return null;
+  const parts = timestamp => {
+    const values = new Intl.DateTimeFormat('en-US',{
+      timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+    }).formatToParts(new Date(timestamp));
+    return Object.fromEntries(values.map(x=>[x.type,x.value]));
   };
+  const latest = parts(candles15.at(-1).t);
+  const date = latest.year+'-'+latest.month+'-'+latest.day;
+  const session=[], opening=[];
+  for(const candle of candles15){
+    const d=parts(candle.t);
+    if(d.year+'-'+d.month+'-'+d.day!==date) continue;
+    const minute=Number(d.hour)*60+Number(d.minute);
+    if(minute>=570) session.push(candle);
+    if(minute>=570 && minute<600) opening.push(candle);
+  }
+  if(opening.length!==2 || session.length<3) return null;
+  const volume=session.reduce((a,c)=>a+c.v,0);
+  if(!(volume>0)) return null;
+  return {
+    orh:Math.max(...opening.map(c=>c.h)),
+    orl:Math.min(...opening.map(c=>c.l)),
+    vwap:session.reduce((a,c)=>a+((c.h+c.l+c.c)/3)*c.v,0)/volume
+  };
+}
 
+function confirmEntry(candles15,analysis){
+  if(analysis.error) return {reason:analysis.error,checks:{}};
+  if(!analysis.aligned || analysis.side!==analysis.shortTf)
+    return {reason:analysis.reason,checks:{trend:false}};
+  if(!Number.isFinite(analysis.riskPct) || analysis.riskPct<0.015 || analysis.riskPct>0.03)
+    return {reason:'Stop-loss risk must be 1.5%–3%',checks:{trend:true,risk:false}};
+  if(analysis.vr<1.5)
+    return {reason:'Volume below 1.5×',checks:{trend:true,risk:true,volume:false}};
+  const age=Date.now()-analysis.time;
+  if(age<0 || age>30*MIN)
+    return {reason:'Completed 15m candle is stale',checks:{trend:true,risk:true,volume:true,fresh:false}};
+  const opening=openingRangeAndVwap(candles15);
+  if(!opening)
+    return {reason:'Waiting for completed NY opening range and VWAP',checks:{trend:true,risk:true,volume:true,fresh:true,opening:false}};
+  const isLong=analysis.side==='LONG', last=analysis.last;
+  const close=candles15.map(c=>c.c), fast=ema(close,9),slow=ema(close,21);
+  const cross=Array.from({length:Math.min(8,close.length-1)},(_,i)=>close.length-1-i)
+    .some(i=>isLong
+      ? fast[i-1]<=slow[i-1] && fast[i]>slow[i]
+      : fast[i-1]>=slow[i-1] && fast[i]<slow[i]);
+  const vwapOK=isLong ? last.c>opening.vwap : last.c<opening.vwap;
+  const rangeOK=isLong ? last.c>opening.orh : last.c<opening.orl;
+  const previous=candles15.slice(-6,-1);
+  const breakout=isLong ? last.c>Math.max(...previous.map(c=>c.h)) : last.c<Math.min(...previous.map(c=>c.l));
+  const candleOK=isLong ? last.c>last.o && last.c>fast.at(-1) && last.c-last.o>=analysis.a*.20
+                         : last.c<last.o && last.c<fast.at(-1) && last.o-last.c>=analysis.a*.20;
+  const checks={trend:true,risk:true,volume:true,fresh:true,opening:rangeOK,vwap:vwapOK,cross,breakout,candle:candleOK};
+  if(!cross||!vwapOK||!rangeOK||!breakout||!candleOK)
+    return {reason:'Waiting for EMA9/21 cross + Anchored VWAP + Opening Range confirmation',checks};
+  return {...analysis,...opening,confirmed:true,reason:'CONFIRMED',checks};
 }
 
 function renderSignalQuality(signal={},info=null,liveValid=null){
   const checks=signal.checks||{};
   const rows=[
     ['15m + 1H trend',checks.trend],
-    ['Volume ≥ 1.2×',checks.volume],
-    ['EMA21 pullback',checks.pullback],
+    ['Volume ≥ 1.5×',checks.volume],
+    ['EMA9/21 cross',checks.cross],['Above/below anchored VWAP',checks.vwap],['Opening range breakout',checks.opening],
     ['Structure break',checks.breakout],
     ['Strong candle close',checks.candle],
-    ['Risk ≤ 7%',checks.risk],
+    ['Risk 1.5%–3%',checks.risk],
     ['Fresh 15m candle',checks.fresh],
     ['24h volume ≥ $1M',info?Number(info.notional)>=MIN_24H_NOTIONAL:null],
     ['Live price verified',liveValid]
@@ -2980,9 +2873,9 @@ function renderConfirmed(
     const checkLabels = {
       trend:'15m / 1H trend alignment',
       risk:'Stop-loss risk',
-      volume:'Volume ≥ 1.2×',
+      volume:'Volume ≥ 1.5×',
       fresh:'Fresh completed 15m candle',
-      pullback:'EMA21 pullback',
+      pullback:'EMA9/21 cross + VWAP + OR',
       breakout:'5-bar structure break',
       candle:'Strong candle close'
     };
