@@ -4328,12 +4328,8 @@ async function syncPushState(){
   const oneSignal =
     window.YOYOOneSignal;
 
-  const active =
-    Boolean(
-      oneSignal?.User
-        ?.PushSubscription
-        ?.optedIn
-    );
+  const subscription = oneSignal?.User?.PushSubscription;
+  const active = Boolean(oneSignal?.Notifications?.permission && subscription?.optedIn && subscription?.id && subscription?.token);
 
   $('alertsToggle').textContent =
     active
@@ -4342,13 +4338,13 @@ async function syncPushState(){
 
   $('alertsStatus').textContent =
     active
-      ? '24/7 app push notifications are enabled on this device.'
+      ? 'Registered on this device · Subscription ending '+subscription.id.slice(-8)
       : 'Enable once to receive confirmed signals while the app is closed.';
 
   setNotificationState(
     active,
     active
-      ? 'PUSH LIVE'
+      ? 'PUSH REGISTERED'
       : 'ALERTS OFF'
   );
 
@@ -4417,7 +4413,7 @@ async()=>{
       oneSignal.User
         .PushSubscription;
 
-    if(subscription.optedIn){
+    if(oneSignal.Notifications.permission && subscription.optedIn && subscription.id && subscription.token){
 
       await subscription.optOut();
 
@@ -4816,3 +4812,4 @@ document.addEventListener('visibilitychange',()=>{
 </script>
 </body>
 </html>
+
