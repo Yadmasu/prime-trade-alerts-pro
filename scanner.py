@@ -262,7 +262,19 @@ async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semapho
                 candles(session, market.coin, "1h", 17),
                 candles(session, market.coin, "4h", 45),
             )
-            return market, confirmed_signal(rows15, rows1h, rows4h)
+            signal = confirmed_signal(rows15, rows1h, rows4h)
+            if signal:
+                import hashlib
+                import struct
+                stamp = datetime.fromtimestamp(signal["candle"]/1000, NY)
+                anchor = stamp.replace(hour=9, minute=30, second=0, microsecond=0)
+                digest = hashlib.sha256()
+                for row in rows15:
+                    digest.update(struct.pack(">6d", *(row[k] for k in ("t","o","h","l","c","v"))))
+                signal.update(first=rows15[0]["t"], anchor=int(anchor.timestamp()*1000),
+                              history_hash=digest.hexdigest(),
+                              chart_id=hashlib.sha256(f"{market.coin}/{signal['candle']}/{signal['side']}".encode()).hexdigest()[:32])
+            return market, signal
         except Exception:
             return market, None
 
@@ -276,7 +288,7 @@ def fmt(value: float) -> str:
 
 
 async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict) -> None:
-    title = f"YOYO · {signal['side']} · {market.coin}"
+    title = f"PRIME TRADE ALERTS PRO · {signal['side']} · {market.coin}"
     body = (
         f"ENTRY {fmt(signal['entry'])} | SL {fmt(signal['stop'])} | "
         f"TP1 {fmt(signal['tp1'])} | TP2 {fmt(signal['tp2'])} | "
@@ -294,8 +306,8 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         "included_segments": ["Subscribed Users"],
         "headings": {"en": title},
         "contents": {"en": body},
-        "url": f"{APP_URL}?market={market.coin}",
-        "web_url": f"{APP_URL}?market={market.coin}",
+        "url": f"{APP_URL}confirmed.html?signal={signal['chart_id']}",
+        "web_url": f"{APP_URL}confirmed.html?signal={signal['chart_id']}",
         "data": {"market": market.coin, **signal},
     }
     for attempt in range(4):
@@ -312,30 +324,6 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
             if response.status not in (429, 500, 502, 503, 504) or attempt == 3:
                 raise RuntimeError(f"OneSignal {response.status}: {message}")
         await asyncio.sleep(2 ** attempt)
-
-
-async def send_telegram(session: aiohttp.ClientSession, market: Market, signal: dict) -> None:
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHATS:
-        return
-    message = (f"YOYO CONFIRMED {signal['side']} | {market.coin}\n"
-               f"ENTRY {fmt(signal['entry'])} | SL {fmt(signal['stop'])}\n"
-               f"TP1 {fmt(signal['tp1'])} | TP2 {fmt(signal['tp2'])} | TP3 {fmt(signal['tp3'])}\n"
-               f"VOL {signal['volume']:.2f}x | EMA9/21 + NY OR + Anchored VWAP\n"
-               "Alert only; not financial advice.")
-    if DRY_RUN:
-        print("TELEGRAM DRY RUN:", message, flush=True)
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    for chat in TELEGRAM_CHATS:
-        for attempt in range(4):
-            async with session.post(url, json={"chat_id": chat, "text": message}, timeout=20) as response:
-                data = await response.json(content_type=None)
-                if response.status == 200 and data.get("ok") is True:
-                    print(f"Telegram accepted: market={market.coin} chat_id={chat} message_id={data.get('result', {}).get('message_id', 'unknown')}", flush=True)
-                    break
-                if attempt == 3 or response.status not in (429, 500, 502, 503, 504):
-                    raise RuntimeError(f"Telegram delivery failed: HTTP {response.status}")
-            await asyncio.sleep(2 ** attempt)
 
 
 def load_state() -> dict:
@@ -377,9 +365,8 @@ async def run_cycle() -> None:
         )
         print(f"Confirmed fresh signal candidates: {len(candidates)}", flush=True)
         for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
-            if not REST_KEY and not (TELEGRAM_TOKEN and TELEGRAM_CHATS) and not DRY_RUN:
+            if not REST_KEY and not DRY_RUN:
                 raise RuntimeError("No notification channel configured")
-            await send_telegram(session, market, signal)
             await send_push(session, market, signal)
             if not DRY_RUN:
                 state[key] = now
@@ -403,3 +390,4 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+
