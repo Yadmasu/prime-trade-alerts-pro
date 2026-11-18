@@ -9,6 +9,7 @@ function digestBytes(rows){
   return buffer;
 }
 function draw(s,rows){
+  const priceText=p=>p.toFixed(Math.max(0,Math.min(6-(s.size_decimals??0),4-Math.floor(Math.log10(p)))));
   const names=["ENTRY","SL","TP1","TP2","TP3"], levels=[s.entry,s.stop,s.tp1,s.tp2,s.tp3];
   requireValue(levels.every(x=>Number.isFinite(x)&&x>0));
   const ordered=[s.stop,s.entry,s.tp1,s.tp2,s.tp3]; if(s.side==="SHORT")ordered.reverse();
@@ -50,7 +51,7 @@ function draw(s,rows){
   for(let i=3;i>=0;i--)labels[i].ty=Math.min(labels[i].ty,labels[i+1].ty-24);
   for(const a of labels){
     line(left,a.py,right,a.py,a.c,"4 5");line(right,a.py,right+9,a.ty,a.c);
-    const el=item("text",{x:right+13,y:a.ty+4,fill:a.c,"font-size":compact?13:15},a.name+" "+a.p);
+    const el=item("text",{x:right+13,y:a.ty+4,fill:a.c,"font-size":compact?13:15},a.name+" "+priceText(a.p));
     const avail=W-right-17;if(el.getComputedTextLength()>avail){el.setAttribute("textLength",avail);el.setAttribute("lengthAdjust","spacingAndGlyphs");}
   }
   for(const [i,align] of [[0,"start"],[Math.floor(bars.length/2),"middle"],[bars.length-1,"end"]]){
@@ -58,7 +59,7 @@ function draw(s,rows){
   }
   byId("levels").replaceChildren();
   for(const [i,p] of levels.entries()){
-    const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=names[i];dd.textContent=String(p);byId("levels").append(dt,dd);
+    const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=names[i];dd.textContent=priceText(p);byId("levels").append(dt,dd);
   }
 }
 async function openSignal(){
