@@ -37,6 +37,7 @@ class Market:
     coin: str
     notional: float
     mid: float
+    size_decimals: int = 0
 
 
 def ema(values: list[float], period: int) -> list[float]:
@@ -127,7 +128,7 @@ async def discover_markets(session: aiohttp.ClientSession) -> list[Market]:
             mid = float(context.get("midPx") or context.get("markPx") or 0)
             notional = float(context.get("dayNtlVlm") or 0)
             if mid > 0 and notional >= MIN_24H_NOTIONAL:
-                markets.append(Market(coin, notional, mid))
+                markets.append(Market(coin, notional, mid, int(asset["szDecimals"])))
     return markets
 
 
@@ -271,7 +272,7 @@ async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semapho
                 digest = hashlib.sha256()
                 for row in rows15:
                     digest.update(struct.pack(">6d", *(row[k] for k in ("t","o","h","l","c","v"))))
-                signal.update(first=rows15[0]["t"], anchor=int(anchor.timestamp()*1000),
+                signal.update(size_decimals=market.size_decimals, first=rows15[0]["t"], anchor=int(anchor.timestamp()*1000),
                               history_hash=digest.hexdigest(),
                               chart_id=hashlib.sha256(f"{market.coin}/{signal['candle']}/{signal['side']}".encode()).hexdigest()[:32])
             return market, signal
@@ -279,20 +280,19 @@ async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semapho
             return market, None
 
 
-def fmt(value: float) -> str:
-    if value >= 100:
-        return f"{value:.2f}"
-    if value >= 1:
-        return f"{value:.4f}"
-    return f"{value:.6f}"
+def fmt(value: float, size_decimals:int) -> str:
+    from decimal import Decimal
+    price = Decimal(str(value))
+    places = max(0, min(6 - size_decimals, 4 - price.adjusted()))
+    return format(price, f".{places}f")
 
 
 async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict) -> None:
     title = f"PRIME TRADE ALERTS PRO · {signal['side']} · {market.coin}"
     body = (
-        f"ENTRY {fmt(signal['entry'])} | SL {fmt(signal['stop'])} | "
-        f"TP1 {fmt(signal['tp1'])} | TP2 {fmt(signal['tp2'])} | "
-        f"TP3 {fmt(signal['tp3'])} | VOL {signal['volume']:.2f}×"
+        f"ENTRY {fmt(signal['entry'], market.size_decimals)} | SL {fmt(signal['stop'], market.size_decimals)} | "
+        f"TP1 {fmt(signal['tp1'], market.size_decimals)} | TP2 {fmt(signal['tp2'], market.size_decimals)} | "
+        f"TP3 {fmt(signal['tp3'], market.size_decimals)} | VOL {signal['volume']:.2f}×"
     )
     if DRY_RUN:
         print(title, body, flush=True)
@@ -390,4 +390,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-
