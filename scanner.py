@@ -304,7 +304,8 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
     headers = {"Authorization": f"Key {REST_KEY}", "Content-Type": "application/json"}
     payload = {
         "app_id": APP_ID,
-        "included_segments": ["Subscribed Users"],
+        "target_channel": "push",
+        "included_segments": ["Total Subscriptions"],
         "idempotency_key": str(uuid.UUID(signal["chart_id"], version=4)),
         "headings": {"en": title},
         "contents": {"en": body},
