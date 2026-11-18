@@ -7,6 +7,7 @@ import json
 import math
 import os
 import time
+import uuid
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass
@@ -304,6 +305,7 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
     payload = {
         "app_id": APP_ID,
         "included_segments": ["Subscribed Users"],
+        "idempotency_key": str(uuid.UUID(signal["chart_id"], version=4)),
         "headings": {"en": title},
         "contents": {"en": body},
         "url": f"{APP_URL}confirmed.html?signal={signal['chart_id']}",
@@ -334,7 +336,9 @@ def load_state() -> dict:
 
 
 def save_state(state: dict) -> None:
-    STATE_FILE.write_text(json.dumps(state, separators=(",", ":")))
+    temp = STATE_FILE.with_suffix(".tmp")
+    temp.write_text(json.dumps(state, separators=(",", ":")))
+    temp.replace(STATE_FILE)
 
 
 async def run_cycle() -> None:
