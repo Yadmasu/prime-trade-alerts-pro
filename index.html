@@ -1162,7 +1162,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> VWAP</label><label><input type="checkbox" data-indicator="fib" checked> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="21,89">EMA 21 / 89</option><option value="9,21">EMA 9 / 21</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
+  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap" checked> Anchored VWAP (session)</label><label><input type="checkbox" data-indicator="or" checked> Opening Range (NY 09:30–10:00)</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label><label><input type="checkbox" data-indicator="rsi" checked> RSI Panel</label><label><input type="checkbox" data-indicator="macd" checked> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="9,21" selected>EMA 9 / 21</option><option value="21,89">EMA 21 / 89</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
   <div class="chart-quickbar"><button type="button" id="chartToolsButton">⚙ Tools</button><button type="button" id="chartCleanButton">◉ Clean</button><button type="button" id="chartExpandButton">⛶ Expand</button></div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -3455,10 +3455,10 @@ function drawCanvasChart(
     `${esc(timeframe)} · `+
     `${analysis.side} · `+
     `<span style="color:#dafa4b">`+
-    `EMA${analysis.fastN}`+
+    `EMA${periods[0]||analysis.fastN}`+
     `</span> / `+
     `<span style="color:#58a6ff">`+
-    `EMA${analysis.slowN}`+
+    `EMA${periods[1]||analysis.slowN}`+
     `</span>`+
     (
       plan
@@ -3471,7 +3471,7 @@ function drawCanvasChart(
 function chartEmaPeriods(){
   const raw=document.getElementById('customEmaPeriods')?.dataset.applied;
   if(raw)return raw.split(',').map(Number);
-  const preset=document.getElementById('chartEmaPreset')?.value||'21,89';
+  const preset=document.getElementById('chartEmaPreset')?.value||'9,21';
   return preset==='none'?[]:preset.split(',').map(Number);
 }
 function renderOscillators(candles){
@@ -3611,7 +3611,7 @@ function drawChart(
 
   const fastSeries =
     liveChart.addLineSeries({
-      color:'#dafa4b',
+      color:'#58a6ff',
       lineWidth:2,
       priceLineVisible:false,
       lastValueVisible:false
@@ -3619,7 +3619,7 @@ function drawChart(
 
   const slowSeries =
     liveChart.addLineSeries({
-      color:'#58a6ff',
+      color:'#fb923c',
       lineWidth:2,
       priceLineVisible:false,
       lastValueVisible:false
@@ -3653,7 +3653,7 @@ function drawChart(
     });
 
   volumeSeries.priceScale().applyOptions({
-    scaleMargins:{top:.80,bottom:0}
+    scaleMargins:{top:.76,bottom:0}
   });
 
   volumeSeries.applyOptions({visible:visible("volume")});
@@ -3697,10 +3697,26 @@ function drawChart(
   }
   if(visible("vwap") && vwapData.length > 1){
     const vwapSeries = liveChart.addLineSeries({
-      color:'#a78bfa',lineWidth:2,priceLineVisible:false,
+      color:'#b76bff',lineWidth:2,priceLineVisible:false,
       lastValueVisible:true,title:'VWAP'
     });
     vwapSeries.setData(vwapData);
+  }
+
+  // Display-only opening range overlay. Uses the existing NY session
+  // definition and never changes evaluate() or confirmEntry().
+  const opening = timeframe==='15m' ? openingRangeAndVwap(candleData) : null;
+  if(visible('or') && opening && Number.isFinite(opening.orh) && Number.isFinite(opening.orl)){
+    for(const [title,price,color] of [
+      ['ORH',opening.orh,'#21d6a5'],
+      ['ORL',opening.orl,'#ff637c']
+    ]){
+      candleSeries.createPriceLine({
+        price,color,lineWidth:1,
+        lineStyle:LightweightCharts.LineStyle.Dashed,
+        axisLabelVisible:true,title
+      });
+    }
   }
 
   if(visible("bb") && closes.length>=20){
@@ -4786,8 +4802,8 @@ document.addEventListener('visibilitychange',()=>{
   });
   document.getElementById('resetCustomEma')?.addEventListener('click',()=>{
     customEma.value='';delete customEma.dataset.applied;
-    document.getElementById('chartEmaPreset').value='21,89';
-    emaStatus.textContent='Reset to EMA 21 / 89';
+    document.getElementById('chartEmaPreset').value='9,21';
+    emaStatus.textContent='Reset to EMA 9 / 21';
     rerenderEma();
   });
   document.getElementById('chartEmaPreset')?.addEventListener('change',()=>{
