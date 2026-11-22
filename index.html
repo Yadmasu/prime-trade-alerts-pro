@@ -3509,6 +3509,27 @@ function renderOscillators(candles){
 let liveChart = null;
 let liveChartObserver = null;
 
+function crossBiasMarkers(bars, timeframe, now=Date.now()){
+  if(!['15m','1h'].includes(timeframe)) return [];
+  const duration=tfMs[timeframe];
+  const markers=[];
+  const closes=bars.map(bar=>bar.c);
+  const fast=ema(closes,9), slow=ema(closes,21);
+  for(let i=21;i<bars.length;i++){
+    const bar=bars[i];
+    if(bar.t+duration>now) break;
+    if(bar.t-bars[i-1].t!==duration) continue;
+    const up=fast[i-1]<=slow[i-1] && fast[i]>slow[i];
+    const down=fast[i-1]>=slow[i-1] && fast[i]<slow[i];
+    if(up || down){
+      markers.push({time:Math.floor(bar.t/1000),position:up?'belowBar':'aboveBar',
+        color:up?'#21d6a5':'#ff637c',shape:'circle',size:0.5,
+        text:up?'CROSS BUY BIAS':'CROSS SELL BIAS'});
+    }
+  }
+  return markers;
+}
+
 function drawChart(
   candleData,
   analysis,
@@ -3603,6 +3624,7 @@ function drawChart(
     }))
   );
 
+  candleSeries.setMarkers(crossBiasMarkers(candleData,timeframe));
   const closes = candleData.map(item=>item.c);
   renderOscillators(candleData);
   const emaPeriods = chartEmaPeriods();
@@ -4828,4 +4850,3 @@ document.addEventListener('visibilitychange',()=>{
 </script>
 </body>
 </html>
-
