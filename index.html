@@ -4356,25 +4356,16 @@ $('notificationPill').onclick = ()=>{
   toggle.focus({preventScroll:true});
 };
 
-window.addEventListener(
-  'yoyo-onesignal-ready',
-  ()=>{
-
-    const subscription =
-      window.YOYOOneSignal
-        ?.User
-        ?.PushSubscription;
-
-    subscription
-      ?.addEventListener(
-        'change',
-        syncPushState
-      );
-
-    syncPushState();
-
+let observedPushSubscription;
+function bindPushSubscription(){
+  const subscription = window.YOYOOneSignal?.User?.PushSubscription;
+  if(subscription && subscription !== observedPushSubscription){
+    subscription.addEventListener('change', syncPushState);
+    observedPushSubscription = subscription;
   }
-);
+  syncPushState();
+}
+window.addEventListener('yoyo-onesignal-ready', bindPushSubscription);
 
 window.addEventListener(
   'yoyo-onesignal-error',
@@ -4390,7 +4381,7 @@ window.addEventListener(
 );
 
 if(window.YOYOOneSignal){
-  syncPushState();
+  bindPushSubscription();
 }
 
 $('alertsToggle').onclick =
