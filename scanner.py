@@ -63,7 +63,7 @@ def atr(rows: list[dict], period: int = 14) -> float:
 
 
 def volume_ratio(rows: list[dict]) -> float:
-    prior = [row["v"] for row in rows[-22:-1]]
+    prior = [row["v"] for row in rows[-21:-1]]
     average = sum(prior) / len(prior) if prior else 0
     return rows[-1]["v"] / average if average > 0 else math.nan
 
@@ -103,6 +103,8 @@ async def discover_markets(session: aiohttp.ClientSession) -> list[Market]:
     try:
         rows = await post(session, {"type": "perpDexs"})
         for row in rows or []:
+            if not row or not isinstance(row, (dict, list, str)):
+                continue
             name = row if isinstance(row, str) else row[0] if isinstance(row, list) else row.get("name")
             if name and name != "default" and name not in dexes:
                 dexes.append(name)
@@ -128,7 +130,9 @@ async def discover_markets(session: aiohttp.ClientSession) -> list[Market]:
             coin = f"{dex}:{name}" if dex and ":" not in name else name
             mid = float(context.get("midPx") or context.get("markPx") or 0)
             notional = float(context.get("dayNtlVlm") or 0)
-            if mid > 0 and notional >= MIN_24H_NOTIONAL:
+            mark = float(context.get("markPx") or 0)
+            oi_usd = float(context.get("openInterest") or 0) * mark
+            if mid > 0 and notional >= MIN_24H_NOTIONAL and math.isfinite(oi_usd) and oi_usd >= 100_000:
                 markets.append(Market(coin, notional, mid, int(asset["szDecimals"])))
     return markets
 
@@ -218,7 +222,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     if time.time() * 1000 - (last["t"] + 900_000) > MAX_SIGNAL_AGE * 1000:
         return None
 
-    previous = rows15[-6:-1]
+    previous = rows15[-7:-1]
     breakout = (last["c"] > max(row["h"] for row in previous)
                 if side == "LONG" else last["c"] < min(row["l"] for row in previous))
     strong_close = (
@@ -232,11 +236,15 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
         return None
 
     entry = last["c"]
-    structure = min(row["l"] for row in rows15[-6:]) if side == "LONG" else max(row["h"] for row in rows15[-6:])
+    hourly_atr = atr(rows1h)
+    if not math.isfinite(hourly_atr) or hourly_atr <= 0:
+        return None
+    swing = rows1h[-6:]
+    structure = min(row["l"] for row in swing) if side == "LONG" else max(row["h"] for row in swing)
     stop = (
-        min(structure - average_range * .15, entry - average_range * 1.35)
+        min(structure - hourly_atr * .10, entry - hourly_atr * 1.50)
         if side == "LONG"
-        else max(structure + average_range * .15, entry + average_range * 1.35)
+        else max(structure + hourly_atr * .10, entry + hourly_atr * 1.50)
     )
     risk = abs(entry - stop)
     if risk <= 0 or not .015 <= risk / entry <= .03:
@@ -299,13 +307,15 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         print(title, body, flush=True)
         return
     if not REST_KEY:
-        print("Push delivery unavailable: OneSignal REST key not configured", flush=True)
-        return
+        raise RuntimeError("Push delivery unavailable: OneSignal REST key not configured")
+    subscription_id = os.getenv("ONESIGNAL_SUBSCRIPTION_ID", "").strip()
+    audience = ({"include_subscription_ids": [str(uuid.UUID(subscription_id))]}
+                if subscription_id else {"included_segments": ["Total Subscriptions"]})
     headers = {"Authorization": f"Key {REST_KEY}", "Content-Type": "application/json"}
     payload = {
         "app_id": APP_ID,
         "target_channel": "push",
-        "included_segments": ["Total Subscriptions"],
+        **audience,
         "idempotency_key": str(uuid.UUID(signal["chart_id"], version=4)),
         "headings": {"en": title},
         "contents": {"en": body},
@@ -359,9 +369,6 @@ async def run_cycle() -> None:
             key = f"{market.coin}:{signal['side']}:{signal['candle']}"
             if key in state:
                 continue
-            if abs(market.mid - signal["entry"]) > signal["max_drift"]:
-                print(f"Skip stale price {market.coin}", flush=True)
-                continue
             candidates.append((market, signal, key))
 
         candidates.sort(
@@ -369,10 +376,27 @@ async def run_cycle() -> None:
             reverse=True,
         )
         print(f"Confirmed fresh signal candidates: {len(candidates)}", flush=True)
-        for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
+        delivered = 0
+        for market, signal, key in candidates:
+            if delivered >= MAX_ALERTS_PER_RUN:
+                break
             if not REST_KEY and not DRY_RUN:
                 raise RuntimeError("No notification channel configured")
+            dex, separator, _ = market.coin.partition(":")
+            request = {"type": "allMids"}
+            if separator:
+                request["dex"] = dex
+            mids = await post(session, request)
+            try:
+                mid = float(mids[market.coin])
+            except (KeyError, TypeError, ValueError):
+                continue
+            age = time.time() - (signal["candle"] + 900_000) / 1000
+            if (not math.isfinite(mid) or mid <= 0 or not 0 <= age <= MAX_SIGNAL_AGE
+                    or abs(mid - signal["entry"]) > signal["max_drift"]):
+                continue
             await send_push(session, market, signal)
+            delivered += 1
             if not DRY_RUN:
                 state[key] = now
                 save_state(state)
