@@ -25,8 +25,9 @@ def test_phone(prefix, app_id, key, run_id):
         page = api("players?" + urlencode({"app_id":app_id,"limit":300,"offset":offset}),key)
         players = page["players"]
         matches.extend(p["id"] for p in players if p["id"].startswith(prefix)
-                       and p.get("device_type") == 7 and "iphone" in str(p.get("device_model","")).lower()
-                       and not p.get("invalid_identifier") and p.get("notification_types") == 1)
+                       and p.get("device_type") in (7, 17) and "iphone" in str(p.get("device_model","")).lower()
+                       and p.get("identifier") and not p.get("invalid_identifier")
+                       and p.get("notification_types") in (None, 1))
         offset += len(players)
         if not players or offset >= page["total_count"]:
             break
