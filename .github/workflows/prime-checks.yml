@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - scanner.py
+      - index.html
+      - ema-cross.js
       - tests/**
       - .github/workflows/prime-checks.yml
   push:
@@ -15,6 +17,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - run: node --check ema-cross.js
+      - run: node --test tests/ema-cross.test.cjs
+      - name: Validate inline application scripts
+        run: |
+          python - <<'PY'
+          import subprocess
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.active = False
+                  self.sections = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == 'script':
+                      self.active = not any(k == 'src' for k, _ in attrs)
+                      if self.active:
+                          self.sections.append('')
+              def handle_data(self, data):
+                  if self.active:
+                      self.sections[-1] += data
+              def handle_endtag(self, tag):
+                  if tag == 'script':
+                      self.active = False
+          doc = Scripts()
+          doc.feed(Path('index.html').read_text())
+          assert doc.sections, 'No inline scripts found'
+          for source in doc.sections:
+              subprocess.run(['node', '--check'], input=source, text=True, check=True)
+          print(f'Validated {len(doc.sections)} inline scripts')
+          PY
       - run: python -m py_compile scanner.py
       - run: python -m pip install aiohttp==3.12.15
       - run: python -m unittest discover -s tests -v

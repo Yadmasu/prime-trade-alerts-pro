@@ -451,6 +451,15 @@ button:active{transform:translateY(1px)}
   margin:12px 0;
 }
 
+.mover-tabs [data-mover="cross"]{grid-column:span 4}
+.cross-controls{padding:10px 0}
+.cross-timeframes{display:flex;gap:8px;flex-wrap:wrap}
+.cross-timeframes button{flex:1;min-width:78px;padding:10px 8px;border-radius:9px;border:1px solid #47627b;background:#101f34;color:#d9e7f9;font-weight:800}
+.cross-timeframes button.active{border-color:var(--lime);background:#27321d;color:var(--lime)}
+.cross-cross{font-weight:800;font-size:12px}
+.cross-cross.up{color:var(--green)}
+.cross-cross.down{color:var(--red)}
+@media(max-width:540px){.mover-tabs [data-mover="cross"]{grid-column:span 2}}
 .market-list{
   display:grid;
   gap:8px;
@@ -1049,6 +1058,15 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     <button data-mover="gainers">Gainers</button>
     <button data-mover="losers">Losers</button>
     <button data-mover="watchlist">★ Watchlist</button>
+    <button data-mover="cross">EMA CROSS</button>
+  </div>
+  <div id="crossControls" class="cross-controls hidden" aria-label="EMA Cross discovery settings">
+    <div class="cross-timeframes" role="group" aria-label="Cross timeframe">
+      <button type="button" data-cross-tf="15m" class="active" aria-pressed="true">15m</button>
+      <button type="button" data-cross-tf="1h" aria-pressed="false">1H</button>
+      <button type="button" id="crossRefresh">Refresh crosses</button>
+    </div>
+    <p class="muted mini">EMA9/21 BUY/SELL CROSS · recently closed candles · preliminary discovery only, NOT a confirmed trade.</p>
   </div>
 
   <input
@@ -1304,6 +1322,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 </footer>
 
 <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="ema-cross.js"></script>
 <script>
 'use strict';
 
@@ -1342,6 +1361,15 @@ let markets=['SOL'];
 let marketRows=[];
 let marketFilter='all';
 let moverFilter='all';
+let crossTimeframe='15m';
+let crossResults=[];
+let crossScanBusy=false;
+let crossScanned=0;
+let crossFailed=0;
+let crossScanDone=false;
+let crossToken=0;
+const crossCache=new Map();
+
 let mode='multi';
 let selected=new Set(['15m','1h','4h']);
 let analysisSeq=0;
@@ -1563,8 +1591,110 @@ function updateMarkets(){
   }
 }
 
+/* Cross discovery is separate from all confirmed-entry and notification logic. */
+function renderCrossList(query=''){
+  const rows=crossResults
+    .filter(item=>(item.id+' '+item.asset).toUpperCase().includes(query))
+    .sort((a,b)=>b.time-a.time || (b.notional||0)-(a.notional||0));
+  const suffix=crossScanBusy?' · scanning '+crossScanned+'/'+crossExpected:
+    crossScanDone?' · scanned '+crossScanned+' markets'+(crossFailed?' · '+crossFailed+' unavailable':''):
+    ' · select Refresh to scan';
+  $('marketListStatus').textContent=
+    rows.length+' recent '+crossTimeframe+' EMA9/21 crosses'+suffix;
+  if(!rows.length){
+    $('cryptoMarketList').innerHTML='<div class="empty-state">'+
+      (crossScanBusy?'Checking completed Hyperliquid candles…':
+       crossScanDone?'No recent EMA9/21 crosses found in checked markets.':
+       'Loading EMA cross discoveries…')+'</div>';
+    return;
+  }
+  $('cryptoMarketList').innerHTML=rows.map(item=>`
+    <div class="market-row" data-market-id="${esc(item.id)}">
+      <button class="star ${watchlist.has(item.id)?'saved':''}"
+        data-watch-id="${esc(item.id)}" aria-label="Toggle watchlist">★</button>
+      <div>
+        <div class="market-symbol">${esc(item.id)}</div>
+        <div class="market-sub">${esc(crossTimeframe.toUpperCase())}
+          · ${esc(ny(item.time))} · Cross $${fmt(item.crossPrice)} · VOL ${Number.isFinite(item.volumeRatio)?item.volumeRatio.toFixed(2)+'×':'—'}
+          · preliminary only</div>
+      </div>
+      <div class="market-price">${fmt(item.price)}</div>
+      <div class="market-change ${item.direction==='BUY CROSS'?'up':'down'}">
+        ${esc(item.direction)}
+      </div>
+    </div>`).join('');
+}
+let crossExpected=0;
+async function scanCrosses(force=false){
+  if(!window.PrimeCross){
+    $('marketListStatus').textContent='EMA CROSS logic unavailable. Reload the app.';
+    return;
+  }
+  const tf=crossTimeframe;
+  const saved=crossCache.get(tf);
+  if(!force&&saved&&Date.now()-saved.savedAt<5*60*1000){
+    crossResults=saved.results;crossScanned=saved.scanned;
+    crossFailed=saved.failed;crossExpected=saved.expected;
+    crossScanBusy=false;crossScanDone=true;renderCryptoMarket();return;
+  }
+  const token=++crossToken;
+  crossScanBusy=true;crossScanDone=false;crossResults=[];
+  crossScanned=0;crossFailed=0;
+  const eligible=marketRows.filter(item=>Number.isFinite(item.price)&&item.price>0);
+  crossExpected=eligible.length;
+  renderCryptoMarket();
+  let next=0;
+  const worker=async()=>{
+    while(next<eligible.length&&token===crossToken){
+      const item=eligible[next++];
+      try{
+        // One timeframe per scan; completed candle data, bounded concurrent requests.
+        const rows=await candles(item.id,tf,tf==='15m'?3:9);
+        if(token!==crossToken)return;
+        const result=window.PrimeCross.detect(rows,tfMs[tf],Date.now(),4);
+        if(result){
+          crossResults.push({id:item.id,asset:item.asset,notional:item.notional,
+            ...result,crossPrice:result.price,price:item.price});
+        }
+      }catch(error){
+        crossFailed++;
+      }
+      if(token!==crossToken)return;
+      crossScanned++;
+      if(crossScanned%5===0||crossScanned===crossExpected)renderCryptoMarket();
+      // Reduce burst pressure on Hyperliquid without hiding partial results.
+      await new Promise(resolve=>setTimeout(resolve,250));
+    }
+  };
+  try{
+    await Promise.all(Array.from({length:Math.min(4,eligible.length)},worker));
+  }finally{
+    if(token===crossToken){
+      crossScanBusy=false;crossScanDone=true;
+      crossCache.set(tf,{savedAt:Date.now(),results:[...crossResults],
+        scanned:crossScanned,failed:crossFailed,expected:crossExpected});
+      renderCryptoMarket();
+    }
+  }
+}
+function setCrossTimeframe(tf){
+  if(!['15m','1h'].includes(tf))return;
+  crossTimeframe=tf;
+  document.querySelectorAll('[data-cross-tf]').forEach(button=>{
+    const active=button.dataset.crossTf===tf;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+  crossToken++;
+  crossScanBusy=false;
+  crossScanDone=false;
+  crossResults=[];
+  scanCrosses();
+}
+
 function renderCryptoMarket(){
   const query=$('cryptoSearch').value.toUpperCase().trim();
+  $('crossControls').classList.toggle('hidden',moverFilter!=='cross');
 
   const rising=marketRows.filter(item=>item.change>0).length;
   const falling=marketRows.filter(item=>item.change<0).length;
@@ -1578,6 +1708,8 @@ function renderCryptoMarket(){
   $('risingCount').textContent=rising;
   $('fallingCount').textContent=falling;
   $('marketNotional').textContent='$'+compact(total);
+
+  if(moverFilter==='cross'){renderCrossList(query);return;}
 
   let rows=marketRows.filter(item=>
     (item.id+' '+item.asset).toUpperCase().includes(query)
@@ -4505,9 +4637,15 @@ $('moverTabs')
       );
 
     renderCryptoMarket();
+    if(moverFilter==='cross')scanCrosses();
 
   }
 );
+$('crossControls').addEventListener('click',event=>{
+  const timeframe=event.target.closest('[data-cross-tf]');
+  if(timeframe){setCrossTimeframe(timeframe.dataset.crossTf);return;}
+  if(event.target.closest('#crossRefresh'))scanCrosses(true);
+});
 
 $('cryptoSearch')
 .addEventListener(
@@ -4717,7 +4855,11 @@ loadMarkets()
 
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&marketInfo.has($('market').value))analyze();
+  if(!document.hidden&&moverFilter==='cross'&&!crossScanBusy)scanCrosses();
 });
+setInterval(()=>{
+  if(moverFilter==='cross'&&!document.hidden&&!crossScanBusy)scanCrosses();
+},5*MIN);
 
 </script>
 <script>
