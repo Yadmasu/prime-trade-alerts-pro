@@ -2803,14 +2803,15 @@ function evaluate(candles15,candles1h,strategy){
 function openingRangeAndVwap(candles15){
   // New York 09:30-10:00 ET opening range; volume-weighted price from 09:30.
   if(!candles15.length) return null;
-  const parts = timestamp => {
-    const values = new Intl.DateTimeFormat('en-US',{
-      timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',
-      hour:'2-digit',minute:'2-digit',hourCycle:'h23'
-    }).formatToParts(new Date(timestamp));
-    return Object.fromEntries(values.map(x=>[x.type,x.value]));
-  };
+  const formatter = new Intl.DateTimeFormat('en-US',{
+    timeZone:'America/New_York',weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+  });
+  const parts = timestamp => Object.fromEntries(
+    formatter.formatToParts(new Date(timestamp)).map(x=>[x.type,x.value])
+  );
   const latest = parts(candles15.at(-1).t);
+  if(latest.weekday==='Sat'||latest.weekday==='Sun') return null;
   const date = latest.year+'-'+latest.month+'-'+latest.day;
   const session=[], opening=[];
   for(const candle of candles15){
