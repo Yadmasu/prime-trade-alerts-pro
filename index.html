@@ -5034,6 +5034,81 @@ setInterval(()=>{
       redrawChart();
     };
   }
+
+  // Pro view changes display settings only. Clean / Restore remains independent.
+  const proButton=document.getElementById('chartProButton');
+  let savedProSettings=null;
+  if(proButton)proButton.onclick=()=>{
+    const inputs=[...document.querySelectorAll('[data-indicator]')];
+    if(!savedProSettings){
+      savedProSettings=Object.fromEntries(inputs.map(x=>[x.dataset.indicator,x.checked]));
+      inputs.forEach(x=>{
+        x.checked=['ema','volume','vwap','rsi'].includes(x.dataset.indicator);
+      });
+      proButton.textContent='◈ Pro ON';
+      proButton.setAttribute('aria-pressed','true');
+    }else{
+      inputs.forEach(x=>{x.checked=Boolean(savedProSettings[x.dataset.indicator]);});
+      savedProSettings=null;
+      proButton.textContent='◈ Pro';
+      proButton.setAttribute('aria-pressed','false');
+    }
+    rerenderEma();
+    if(typeof lastSnapshot!=='undefined'&&lastSnapshot)renderOscillators(lastSnapshot.candles);
+  };
+
+  // The user chooses Telegram or WhatsApp in the native image share sheet.
+  // No false claim that an external app received an attachment.
+  async function shareCurrentChart(preferred){
+    const status=document.getElementById('chartShareStatus');
+    if(!lastSnapshot){status.textContent='Load a chart before sharing.';return;}
+    const coin=lastSnapshot.id;
+    const canvas=liveChart&&typeof liveChart.takeScreenshot==='function'
+      ?liveChart.takeScreenshot():document.getElementById('priceChart');
+    if(!canvas||!canvas.width||!canvas.height){
+      status.textContent='Chart image is not ready.';return;
+    }
+    let blob;
+    try{blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));}
+    catch(error){status.textContent='Image export unavailable. Check browser permissions.';return;}
+    if(!blob){status.textContent='Image export failed.';return;}
+    const file=new File([blob],'PRIME-'+coin.replace(/[^a-zA-Z0-9_-]/g,'_')+'.png',{type:'image/png'});
+    const title='PRIME TRADE ALERTS PRO · '+coin+' · '+lastSnapshot.timeframe.toUpperCase();
+    const payload={files:[file],title,text:title+' · research chart; not a trade instruction'};
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      status.textContent='Choose '+preferred+' in the share sheet to send the actual chart image.';
+      try{await navigator.share(payload);status.textContent='Share sheet closed. Confirm delivery in '+preferred+'.';}
+      catch(error){status.textContent=error.name==='AbortError'
+        ?'Image share cancelled.': 'Native image sharing failed: '+error.message;}
+      return;
+    }
+    const objectURL=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=objectURL;link.download=file.name;
+    document.body.appendChild(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(objectURL),5000);
+    status.textContent='PNG saved. Attach it manually in '+preferred+' (browser cannot share images directly).';
+  }
+  document.getElementById('shareChartTelegram')?.addEventListener('click',()=>{
+    shareCurrentChart('Telegram');
+  });
+  document.getElementById('shareChartWhatsapp')?.addEventListener('click',()=>{
+    shareCurrentChart('WhatsApp');
+  });
+  document.getElementById('openChartHyperliquid')?.addEventListener('click',()=>{
+    const id=lastSnapshot?.id;
+    if(!id||!marketInfo.has(id)){
+      document.getElementById('chartShareStatus').textContent='Select a valid Hyperliquid market first.';
+      return;
+    }
+    window.open('https://app.hyperliquid.xyz/trade/'+encodeURIComponent(id),'_blank','noopener,noreferrer');
+  });
+
+  // Timer is based on time boundaries, not synthetic market prices.
+  setInterval(()=>{
+    if(document.hidden||!lastSnapshot)return;
+    updateChartStatus(lastSnapshot.analysis,lastSnapshot.confirmed,lastSnapshot.timeframe);
+  },1000);
   document.querySelectorAll('[data-indicator]').forEach(input=>{
     input.addEventListener('change',()=>{
       if(typeof lastSnapshot!=='undefined' && lastSnapshot){
