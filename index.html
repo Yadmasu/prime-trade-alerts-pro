@@ -1012,7 +1012,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
   <div class="scanner-strip">
     <div class="scanner-stat"><small>Background scanner</small><strong>SCHEDULED CHECKS</strong></div>
     <div class="scanner-stat"><small>Scan interval</small><strong>CONFIGURED SCAN</strong></div>
-    <div class="scanner-stat"><small>Signal policy</small><strong>CONFIRMED ONLY · BTC EXCLUDED</strong></div>
+    <div class="scanner-stat"><small>Signal policy</small><strong>CONFIRMED ONLY · BTC INCLUDED</strong></div>
   </div>
 </section>
 
@@ -1048,9 +1048,14 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     <button data-mover="all" class="active">Most Active</button>
     <button data-mover="gainers">Gainers</button>
     <button data-mover="losers">Losers</button>
+    <button data-mover="cross">EMA CROSS</button>
     <button data-mover="watchlist">★ Watchlist</button>
   </div>
 
+  <div id="crossControls" hidden>
+    <label>Timeframe <select id="crossTf"><option>15m</option><option>1h</option></select></label>
+    <label>Direction <select id="crossSide"><option>All</option><option>Bullish</option><option>Bearish</option></select></label>
+  </div>
   <input
     id="cryptoSearch"
     placeholder="Search Hyperliquid markets..."
@@ -1473,7 +1478,7 @@ async function loadMarkets(){
       for(let index=0;index<universe.length;index++){
         const asset=universe[index];
 
-        if(asset.isDelisted||asset.name==='BTC')continue;
+        if(asset.isDelisted)continue;
 
         const id=
           dex&&!asset.name.includes(':')
@@ -1524,6 +1529,7 @@ async function loadMarkets(){
 
   updateMarkets();
   renderCryptoMarket();
+  if(moverFilter==='cross')scanCrossMarkets();
 
   $('status').textContent=
     `${marketRows.length} Hyperliquid perpetual markets · `+
@@ -1537,7 +1543,7 @@ function updateMarkets(){
   const filtered=markets.filter(id=>{
     const info=marketInfo.get(id);
 
-    if(marketFilter==='perp'&&info.kind!=='perp')return false;
+    if(marketFilter==='perp'&&(info.kind!=='perp'||info.dex))return false;
 
     return(
       id.toUpperCase().includes(query)||
@@ -1563,6 +1569,68 @@ function updateMarkets(){
   }
 }
 
+const crossCache=new Map();
+let crossGeneration=0, crossStatus='';
+function renderCrossMarkets(query){
+  const tf=$('crossTf').value, filter=$('crossSide').value;
+  const rows=marketRows.flatMap(item=>{
+    const record=crossCache.get(tf+'/'+item.id);
+    if(!record?.event || !item.id.toUpperCase().includes(query) ||
+       item.notional<MIN_24H_NOTIONAL || !(item.openInterest>=100000)) return [];
+    const {event}=record;
+    if(Date.now()-event.time>DAY || (filter!=='All' && filter!==event.side)) return [];
+    return [{item,record,event}];
+  }).sort((a,b)=>b.event.time-a.event.time);
+  $('marketListStatus').textContent=crossStatus;
+  $('cryptoMarketList').innerHTML=rows.map(({item,record,event})=>{
+    const age=Math.floor((Date.now()-event.time)/MIN);
+    const fresh=Date.now()-record.closeTime<tfMs[tf];
+    return `<button class="market-row" data-market-id="${esc(item.id)}"><b>${esc(item.id)}</b>
+      <span>PRELIMINARY · ${event.side} · ${tf} · ${age}m ago<br>${esc(ny(event.time))}</span>
+      <span>${fmt(record.price)} · ${fresh?'Latest close':'Delayed'}${event.volume==null?'':' · Vol '+event.volume.toFixed(2)+'×'}</span></button>`;
+  }).join('');
+}
+async function scanCrossMarkets(){
+  const generation=++crossGeneration, tf=$('crossTf').value, step=tfMs[tf];
+  const rows=marketRows.filter(m=>m.notional>=MIN_24H_NOTIONAL && m.openInterest>=100000)
+                       .sort((a,b)=>b.notional-a.notional);
+  let done=0,failed=0;
+  const update=()=>{
+    crossStatus=`PRELIMINARY · past 24h · ${done}/${rows.length} checked · ${failed} unavailable`;
+    renderCrossMarkets($('cryptoSearch').value.toUpperCase().trim());
+  };
+  update();
+  for(const item of rows){
+    if(generation!==crossGeneration || moverFilter!=='cross' || document.hidden) return;
+    const key=tf+'/'+item.id, cached=crossCache.get(key);
+    if(!cached || cached.closeTime<Math.floor(Date.now()/step)*step){
+      try{
+        const bars=await candles(item.id,tf,tf==='15m'?3:8);
+        if(generation!==crossGeneration) return;
+        if(!bars.length) throw Error('No completed candles');
+        const mark=crossBiasMarkers(bars,tf).at(-1);
+        let event=null;
+        if(mark){
+          const i=bars.findIndex(bar=>bar.t===mark.time*1000);
+          const base=bars.slice(i-20,i).reduce((v,b)=>v+b.v,0)/20;
+          event={side:mark.position==='belowBar'?'Bullish':'Bearish',time:bars[i].t+step,
+                 volume:tf==='15m' && base>0?bars[i].v/base:null};
+        }
+        crossCache.set(key,{closeTime:bars.at(-1).t+step,price:bars.at(-1).c,event});
+      }catch{
+        if(generation!==crossGeneration) return;
+        failed++;
+        crossCache.delete(key);
+      }
+      done++;
+      update();
+      await new Promise(resolve=>setTimeout(resolve,1600));
+    }else{done++;}
+  }
+  if(generation===crossGeneration) update();
+}
+$('crossTf').addEventListener('change',scanCrossMarkets);
+$('crossSide').addEventListener('change',()=>renderCryptoMarket());
 function renderCryptoMarket(){
   const query=$('cryptoSearch').value.toUpperCase().trim();
 
@@ -1579,6 +1647,8 @@ function renderCryptoMarket(){
   $('fallingCount').textContent=falling;
   $('marketNotional').textContent='$'+compact(total);
 
+  $('crossControls').hidden=moverFilter!=='cross';
+  if(moverFilter==='cross'){renderCrossMarkets(query);return;}
   let rows=marketRows.filter(item=>
     (item.id+' '+item.asset).toUpperCase().includes(query)
   );
@@ -2630,27 +2700,33 @@ function evaluate(candles15,candles1h,strategy){
 
 }
 
+const nyClock=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',
+  weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',
+  hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+function nySessionBars(bars){
+  if(!bars.length) return [];
+  const clock=t=>Object.fromEntries(nyClock.formatToParts(new Date(t)).map(p=>[p.type,p.value]));
+  const end=clock(bars.at(-1).t);
+  if(['Sat','Sun'].includes(end.weekday)) return [];
+  let session=[];
+  for(const bar of bars){
+    const d=clock(bar.t);
+    if(d.year!==end.year || d.month!==end.month || d.day!==end.day) continue;
+    const minute=Number(d.hour)*60+Number(d.minute);
+    if(minute<570) continue;
+    if(!session.length && minute!==570) return [];
+    if(session.length && bar.t-session.at(-1).t!==15*MIN) return [];
+    session.push(bar);
+  }
+  return session;
+}
+
 function openingRangeAndVwap(candles15){
   // New York 09:30-10:00 ET opening range; volume-weighted price from 09:30.
   if(!candles15.length) return null;
-  const parts = timestamp => {
-    const values = new Intl.DateTimeFormat('en-US',{
-      timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',
-      hour:'2-digit',minute:'2-digit',hourCycle:'h23'
-    }).formatToParts(new Date(timestamp));
-    return Object.fromEntries(values.map(x=>[x.type,x.value]));
-  };
-  const latest = parts(candles15.at(-1).t);
-  const date = latest.year+'-'+latest.month+'-'+latest.day;
-  const session=[], opening=[];
-  for(const candle of candles15){
-    const d=parts(candle.t);
-    if(d.year+'-'+d.month+'-'+d.day!==date) continue;
-    const minute=Number(d.hour)*60+Number(d.minute);
-    if(minute>=570) session.push(candle);
-    if(minute>=570 && minute<600) opening.push(candle);
-  }
-  if(opening.length!==2 || session.length<3) return null;
+  const session=nySessionBars(candles15);
+  if(session.length<3) return null;
+  const opening=session.slice(0,2);
   const volume=session.reduce((a,c)=>a+c.v,0);
   if(!(volume>0)) return null;
   return {
@@ -2662,33 +2738,37 @@ function openingRangeAndVwap(candles15){
 
 function confirmEntry(candles15,analysis){
   if(analysis.error) return {reason:analysis.error,checks:{}};
-  if(!analysis.aligned || analysis.side!==analysis.shortTf)
-    return {reason:analysis.reason,checks:{trend:false}};
-  if(!Number.isFinite(analysis.riskPct) || analysis.riskPct<0.015 || analysis.riskPct>0.03)
-    return {reason:'Stop-loss risk must be 1.5%–3%',checks:{trend:true,risk:false}};
-  if(analysis.vr<1.5)
-    return {reason:'Volume below 1.5×',checks:{trend:true,risk:true,volume:false}};
+  const trend=analysis.aligned && analysis.side===analysis.shortTf;
   const age=Date.now()-analysis.time;
-  if(age<0 || age>30*MIN)
-    return {reason:'Completed 15m candle is stale',checks:{trend:true,risk:true,volume:true,fresh:false}};
+  const checks={
+    trend,
+    volume:Number.isFinite(analysis.vr)?analysis.vr>=1.5:null,
+    risk:Number.isFinite(analysis.riskPct)?analysis.riskPct>=.015 && analysis.riskPct<=.03:null,
+    fresh:Number.isFinite(age)?age>=0 && age<=30*MIN:null
+  };
   const opening=openingRangeAndVwap(candles15);
-  if(!opening)
-    return {reason:'Waiting for completed NY opening range and VWAP',checks:{trend:true,risk:true,volume:true,fresh:true,opening:false}};
-  const isLong=analysis.side==='LONG', last=analysis.last;
-  const close=candles15.map(c=>c.c), fast=ema(close,9),slow=ema(close,21);
-  const cross=Array.from({length:Math.min(8,close.length-1)},(_,i)=>close.length-1-i)
-    .some(i=>isLong
-      ? fast[i-1]<=slow[i-1] && fast[i]>slow[i]
-      : fast[i-1]>=slow[i-1] && fast[i]<slow[i]);
-  const vwapOK=isLong ? last.c>opening.vwap : last.c<opening.vwap;
-  const rangeOK=isLong ? last.c>opening.orh : last.c<opening.orl;
-  const previous=candles15.slice(-6,-1);
-  const breakout=isLong ? last.c>Math.max(...previous.map(c=>c.h)) : last.c<Math.min(...previous.map(c=>c.l));
-  const candleOK=isLong ? last.c>last.o && last.c>fast.at(-1) && last.c-last.o>=analysis.a*.20
-                         : last.c<last.o && last.c<fast.at(-1) && last.o-last.c>=analysis.a*.20;
-  const checks={trend:true,risk:true,volume:true,fresh:true,opening:rangeOK,vwap:vwapOK,cross,breakout,candle:candleOK};
-  if(!cross||!vwapOK||!rangeOK||!breakout||!candleOK)
-    return {reason:'Waiting for EMA9/21 cross + Anchored VWAP + Opening Range confirmation',checks};
+  const close=candles15.map(bar=>bar.c);
+  const fast=ema(close,9), slow=ema(close,21);
+  const last=analysis.last, previous=candles15.slice(-7,-1);
+  const direction=analysis.shortTf==='MIXED'?analysis.longTf:analysis.shortTf;
+  if((direction==='LONG'||direction==='SHORT') && close.length>=22){
+    const long=direction==='LONG';
+    checks.cross=false;
+    for(let i=Math.max(21,close.length-8);i<close.length;i++){
+      if(long ? fast[i-1]<=slow[i-1] && fast[i]>slow[i]
+              : fast[i-1]>=slow[i-1] && fast[i]<slow[i]) checks.cross=true;
+    }
+    checks.vwap=opening ? (long?last.c>opening.vwap:last.c<opening.vwap):null;
+    checks.opening=opening ? (long?last.c>opening.orh:last.c<opening.orl):null;
+    checks.breakout=long?last.c>Math.max(...previous.map(c=>c.h)):last.c<Math.min(...previous.map(c=>c.l));
+    checks.candle=long?last.c>last.o && last.c>fast.at(-1) && last.c-last.o>=analysis.a*.20
+                      :last.c<last.o && last.c<fast.at(-1) && last.o-last.c>=analysis.a*.20;
+  }
+  const mandatory=['trend','volume','risk','fresh','cross','vwap','opening','breakout','candle'];
+  if(!mandatory.every(gate=>checks[gate]===true)){
+    const watch=checks.fresh && checks.cross && checks.trend && (checks.vwap || checks.opening);
+    return {checks,watch:!!watch,time:analysis.time,reason:trend?'Waiting for all entry conditions':analysis.reason};
+  }
   return {...analysis,...opening,confirmed:true,reason:'CONFIRMED',checks};
 }
 
@@ -2708,9 +2788,9 @@ function renderSignalQuality(signal={},info=null,liveValid=null){
 
   $('signalQuality').innerHTML=rows.map(([label,value])=>{
     const state=value===true?'pass':value===false?'fail':'';
-    const text=value===true?'PASS':value===false?'WAIT':'PENDING';
+    const text=value===true?'PASS':value===false?'FAIL':'PENDING';
     return `<div class="quality-item ${state}"><span>${esc(label)}</span><b>${text}</b></div>`;
-  }).join('');
+  }).join('')+(Number.isFinite(signal.time)?'<small>15m close · '+esc(ny(signal.time))+'</small>':'');
 }
 
 function levelGrid(signal={}){
@@ -2876,20 +2956,20 @@ function renderConfirmed(
       risk:'Stop-loss risk',
       volume:'Volume ≥ 1.5×',
       fresh:'Fresh completed 15m candle',
-      pullback:'EMA9/21 cross + VWAP + OR',
-      breakout:'5-bar structure break',
+      cross:'EMA9/21 cross', vwap:'Anchored VWAP', opening:'NY opening range',
+      breakout:'6-bar structure break',
       candle:'Strong candle close'
     };
     const missing = Object.entries(checkLabels)
-      .filter(([key])=>signal.checks?.[key]===false)
+      .filter(([key])=>signal.checks?.[key]!==true)
       .map(([,label])=>label);
     const missingHtml = missing.length
-      ? '<p class="muted mini"><b>BLOCKING CHECKS:</b> '+
-        missing.map(esc).join(' · ')+'</p>'
+      ? '<details><summary>Missing conditions</summary><p class="muted mini">'+
+        missing.map(esc).join(' · ')+'</p></details>'
       : '';
 
     $('confirmedBadge').textContent =
-      'NOT CONFIRMED';
+      signal.watch?'EARLY CONFIRMATION — WATCH':'NOT CONFIRMED';
 
     $('confirmedBadge').className =
       'badge unconfirmed';
@@ -2897,7 +2977,7 @@ function renderConfirmed(
     $('confirmedResult').innerHTML=`
 
       <div class="signalhead">
-        ⚪ WAIT — NO CONFIRMED ENTRY
+        ${signal.watch?'🟡 EARLY CONFIRMATION — WATCH':'⚪ WAIT — NO CONFIRMED ENTRY'}
       </div>
 
       <p class="muted">
@@ -3624,7 +3704,11 @@ function drawChart(
     }))
   );
 
-  candleSeries.setMarkers(crossBiasMarkers(candleData,timeframe));
+  const markers=crossBiasMarkers(candleData,timeframe);
+  if(confirmed?.watch && timeframe==='15m' && candleData.at(-1).t+15*MIN===confirmed.time){
+    markers.push({time:candleData.at(-1).t/1000,position:'aboveBar',color:'#e8ae49',shape:'circle',size:.5,text:'WATCH'});
+  }
+  candleSeries.setMarkers(markers);
   const closes = candleData.map(item=>item.c);
   renderOscillators(candleData);
   const emaPeriods = chartEmaPeriods();
@@ -3705,13 +3789,9 @@ function drawChart(
     volumeMA.applyOptions({visible:visible("volume")});
   }
 
-  // Clean overlays: UTC session VWAP and eight recent-swing Fibonacci levels.
-  // Price values come from the selected market's candles, not market cap.
-  const sessionKey = new Date(candleData[candleData.length-1].t).toISOString().slice(0,10);
   let pv = 0, volumeSum = 0;
   const vwapData = [];
-  for(const bar of candleData){
-    if(new Date(bar.t).toISOString().slice(0,10) !== sessionKey) continue;
+  for(const bar of timeframe==='15m'?nySessionBars(candleData):[]){
     if(!Number.isFinite(bar.v) || bar.v <= 0) continue;
     pv += ((bar.h+bar.l+bar.c)/3)*bar.v;
     volumeSum += bar.v;
@@ -3720,7 +3800,7 @@ function drawChart(
   if(visible("vwap") && vwapData.length > 1){
     const vwapSeries = liveChart.addLineSeries({
       color:'#b76bff',lineWidth:2,priceLineVisible:false,
-      lastValueVisible:true,title:'VWAP'
+      lastValueVisible:true,title:'NY AVWAP'
     });
     vwapSeries.setData(vwapData);
   }
@@ -4536,8 +4616,9 @@ $('moverTabs')
       return;
     }
 
-    moverFilter =
-      button.dataset.mover;
+    crossGeneration++;
+    moverFilter = button.dataset.mover;
+    if(moverFilter==='cross') scanCrossMarkets();
 
     document
       .querySelectorAll(
@@ -4590,7 +4671,7 @@ $('cryptoMarketList')
       );
 
     if(row){
-
+      if(moverFilter==='cross'){selectCryptoMarket(row.dataset.marketId,true);return;}
       showCryptoDetail(
         row.dataset.marketId
       );
