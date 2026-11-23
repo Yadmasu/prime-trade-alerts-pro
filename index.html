@@ -1354,6 +1354,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <script src="ema-cross.js"></script>
 <script src="chart-extras.js"></script>
+<script src="share-card.js"></script>
 <script>
 'use strict';
 
@@ -5084,23 +5085,23 @@ setInterval(()=>{
     const status=document.getElementById('chartShareStatus');
     if(!lastSnapshot){status.textContent='Load a chart before sharing.';return;}
     const coin=lastSnapshot.id;
-    let canvas;
+    let canvas,shareCanvas;
     try{
       canvas=liveChart&&typeof liveChart.takeScreenshot==='function'
         ?liveChart.takeScreenshot():document.getElementById('priceChart');
+      if(!canvas||!canvas.width||!canvas.height)throw new Error('Chart image is not ready');
+      if(!window.PrimeShareCard)throw new Error('Professional image renderer not loaded');
+      shareCanvas=window.PrimeShareCard.drawShareCard(lastSnapshot,canvas,window.PrimeChartExtras);
     }catch(error){
-      status.textContent='Chart screenshot unavailable: '+error.message;
+      status.textContent='Professional chart export unavailable: '+error.message;
       return;
     }
-    if(!canvas||!canvas.width||!canvas.height){
-      status.textContent='Chart image is not ready.';return;
-    }
     let blob;
-    try{blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));}
+    try{blob=await new Promise(resolve=>shareCanvas.toBlob(resolve,'image/png'));}
     catch(error){status.textContent='Image export unavailable. Check browser permissions.';return;}
     if(!blob){status.textContent='Image export failed.';return;}
     const file=new File([blob],'PRIME-'+coin.replace(/[^a-zA-Z0-9_-]/g,'_')+'.png',{type:'image/png'});
-    const title='PRIME TRADE ALERTS PRO · '+coin+' · '+lastSnapshot.timeframe.toUpperCase();
+    const title='PRIME TRADE ALERTS PRO · '+coin+' · '+lastSnapshot.timeframe.toUpperCase()+' · PROFESSIONAL CHART';
     const payload={files:[file],title,text:title+' · research chart; not a trade instruction'};
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       status.textContent='Choose '+preferred+' in the share sheet to send the actual chart image.';
