@@ -2,12 +2,14 @@
 
 ## Completed
 
-Bot 2 source commit `dc2eb4a` shares the chart image without an extra caption. This is the last verified source change before this checkpoint.
+- Bot 2 resumed from `dc2eb4a`, the image-only chart sharing commit.
+- `59f73d8` retries timed-out and disconnected OneSignal requests with the original notification key and logs acceptance only after validating the receipt.
+- Seven simulated sender cases passed locally, covering timeout recovery, disconnection recovery, retry exhaustion, rate limiting, unauthorized requests, zero recipients, and missing notification IDs.
 
-## Pending and blockers
+## Blockers and pending work
 
-Bot 2 live confirmed signal and OneSignal iPhone delivery require verification. No VPS SSH configuration is available in this workspace. Bot 3 Telegram image verification follows Bot 2. Bot 1 is outside scope.
+This session had GitHub access. No configured VPS SSH connection, local OneSignal credentials, or open delivery console was available. Production deployment, live confirmed signal generation, and receipt on the original iPhone subscription remain unverified. Bot 3 is queued after Bot 2. Bot 1 is outside scope.
 
 ## Exact next action
 
-Read this file first when a Work session starts. Inspect the existing Bot 2 push sender and its latest available delivery evidence. Test and commit each correction, then update this checkpoint. Record provider acceptance and device receipt separately.
+At the start of the next Work session read this file. On the existing VPS, inspect the running yoyo-prime.service unit and its scanner revision. Back up its deployed scanner before applying the tested change if needed. Verify a live scan and correlate an accepted notification ID with delivery to the original iPhone subscription. Record the evidence here before advancing to Bot 3 Telegram chart-image delivery. Commit each tested improvement and refresh this handoff before stopping.
