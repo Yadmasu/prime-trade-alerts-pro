@@ -307,13 +307,15 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         print(title, body, flush=True)
         return
     if not REST_KEY:
-        print("Push delivery unavailable: OneSignal REST key not configured", flush=True)
-        return
+        raise RuntimeError("Push delivery unavailable: OneSignal REST key not configured")
+    subscription_id = os.getenv("ONESIGNAL_SUBSCRIPTION_ID", "").strip()
+    audience = ({"include_subscription_ids": [str(uuid.UUID(subscription_id))]}
+                if subscription_id else {"included_segments": ["Total Subscriptions"]})
     headers = {"Authorization": f"Key {REST_KEY}", "Content-Type": "application/json"}
     payload = {
         "app_id": APP_ID,
         "target_channel": "push",
-        "included_segments": ["Total Subscriptions"],
+        **audience,
         "idempotency_key": str(uuid.UUID(signal["chart_id"], version=4)),
         "headings": {"en": title},
         "contents": {"en": body},
@@ -367,9 +369,6 @@ async def run_cycle() -> None:
             key = f"{market.coin}:{signal['side']}:{signal['candle']}"
             if key in state:
                 continue
-            if abs(market.mid - signal["entry"]) > signal["max_drift"]:
-                print(f"Skip stale price {market.coin}", flush=True)
-                continue
             candidates.append((market, signal, key))
 
         candidates.sort(
@@ -377,10 +376,27 @@ async def run_cycle() -> None:
             reverse=True,
         )
         print(f"Confirmed fresh signal candidates: {len(candidates)}", flush=True)
-        for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
+        delivered = 0
+        for market, signal, key in candidates:
+            if delivered >= MAX_ALERTS_PER_RUN:
+                break
             if not REST_KEY and not DRY_RUN:
                 raise RuntimeError("No notification channel configured")
+            dex, separator, _ = market.coin.partition(":")
+            request = {"type": "allMids"}
+            if separator:
+                request["dex"] = dex
+            mids = await post(session, request)
+            try:
+                mid = float(mids[market.coin])
+            except (KeyError, TypeError, ValueError):
+                continue
+            age = time.time() - (signal["candle"] + 900_000) / 1000
+            if (not math.isfinite(mid) or mid <= 0 or not 0 <= age <= MAX_SIGNAL_AGE
+                    or abs(mid - signal["entry"]) > signal["max_drift"]):
+                continue
             await send_push(session, market, signal)
+            delivered += 1
             if not DRY_RUN:
                 state[key] = now
                 save_state(state)
