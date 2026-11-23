@@ -36,6 +36,26 @@
     }
     return markers.slice(-Math.min(2,Math.max(0,max)));
   }
+  // Two nearest *confirmed* swing levels, computed from closed market candles.
+  // The last 3 candles are not eligible as pivot centers (need right-side bars).
+  function supportResistance(candles,lookback=120){
+    if(!Array.isArray(candles)||candles.length<24)return {support:null,resistance:null};
+    const valid=candles.filter(c=>Number.isFinite(Number(c.h))&&Number.isFinite(Number(c.l))&&
+      Number.isFinite(Number(c.c))&&Number(c.h)>=Number(c.l)&&Number(c.c)>0).slice(-lookback);
+    if(valid.length<24)return {support:null,resistance:null};
+    const price=Number(valid[valid.length-1].c),left=3,right=3;
+    const highs=[],lows=[];
+    for(let i=left;i<valid.length-right;i++){
+      const hi=Number(valid[i].h),lo=Number(valid[i].l);
+      const before=valid.slice(i-left,i),after=valid.slice(i+1,i+right+1);
+      if(before.every(x=>hi>Number(x.h))&&after.every(x=>hi>=Number(x.h)))highs.push(hi);
+      if(before.every(x=>lo<Number(x.l))&&after.every(x=>lo<=Number(x.l)))lows.push(lo);
+    }
+    // Do not invent levels when no confirmed swing exists on the appropriate side.
+    const support=lows.filter(v=>v<price).sort((a,b)=>b-a)[0]??null;
+    const resistance=highs.filter(v=>v>price).sort((a,b)=>a-b)[0]??null;
+    return {support,resistance};
+  }
   function signalStatus(analysis,confirmed){
     if(confirmed&&confirmed.confirmed===true){
       return {label:'CONFIRMED '+(confirmed.side==='SHORT'?'SHORT':'LONG'),kind:'confirmed'};
@@ -56,5 +76,5 @@
       String(Math.floor((seconds%3600)/60)).padStart(2,'0')+':'+
       String(seconds%60).padStart(2,'0')};
   }
-  return {crossMarkers,signalStatus,candleCountdown};
+  return {crossMarkers,supportResistance,signalStatus,candleCountdown};
 });
