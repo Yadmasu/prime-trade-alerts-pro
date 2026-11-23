@@ -5,6 +5,7 @@ on:
       - scanner.py
       - index.html
       - ema-cross.js
+      - chart-extras.js
       - tests/**
       - .github/workflows/prime-checks.yml
   push:
@@ -18,6 +19,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: node --check ema-cross.js
+      - run: node --check chart-extras.js
+      - run: node --test tests/chart-extras.test.cjs
       - run: node --test tests/ema-cross.test.cjs
       - name: Validate inline application scripts
         run: |
