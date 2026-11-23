@@ -32,3 +32,24 @@ test('countdown is on candle close boundary',()=>{
  assert.equal(extras.candleCountdown('1h',t).label,'00:52:30');
  assert.equal(extras.candleCountdown('unknown',t),null);
 });
+
+test('support and resistance come from confirmed local swing pivots',()=>{
+ const values=Array.from({length:36},(_,i)=>({t:i*900000,o:100,h:101,l:99,c:100,v:10}));
+ values[10]={...values[10],l:90};
+ values[22]={...values[22],h:112};
+ const levels=extras.supportResistance(values);
+ assert.equal(levels.support,90);
+ assert.equal(levels.resistance,112);
+});
+test('support/resistance does not fabricate a level from insufficient history',()=>{
+ assert.deepEqual(extras.supportResistance([]),{support:null,resistance:null});
+ assert.deepEqual(extras.supportResistance([bar(1,100)]),{support:null,resistance:null});
+});
+test('unconfirmed last-candle spike is not labeled resistance',()=>{
+ const rows=Array.from({length:36},(_,i)=>({t:i*900000,h:101,l:99,c:100}));
+ rows[12]={...rows[12],l:90};
+ rows[35]={...rows[35],h:130};
+ const levels=extras.supportResistance(rows);
+ assert.equal(levels.resistance,null);
+ assert.equal(levels.support,90);
+});
