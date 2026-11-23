@@ -180,7 +180,7 @@ function drawShareCard(snapshot,source,extras){
   text('CANDLE TIME  '+stamp.toISOString().slice(0,16).replace('T',' ')+' UTC',
     52,814,17,COLOR.white,'600');
   text('S/R = confirmed swing pivots  •  Price is latest chart candle',52,844,14,COLOR.muted);
-  text('I’m not a financial advisor. For educational purposes only.',1342,842,14,COLOR.muted,'600','right');
+  text('No financial advice.',1342,842,12,COLOR.muted,'500','right');
   return cv;
 }
 return {cardMeta,formatPrice,validatedCandles,drawingModel,drawShareCard};
