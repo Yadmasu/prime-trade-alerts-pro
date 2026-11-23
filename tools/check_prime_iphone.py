@@ -35,7 +35,7 @@ def test_phone(prefix, app_id, key, run_id):
         offset += len(players)
         if not players or offset >= page["total_count"]:
             break
-    if len(matches) != 1:
+    if matched_ids != 1 or len(matches) != 1:
         raise RuntimeError(f"Matched {matched_ids} of {seen} subscription IDs, {len(matches)} eligible iPhones")
     notification = api("notifications", key, {
         "app_id":app_id, "target_channel":"push","include_subscription_ids":matches,
