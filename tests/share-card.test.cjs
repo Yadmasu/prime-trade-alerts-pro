@@ -54,7 +54,7 @@ test('rendering creates a complete landscape PNG layout without depending on scr
   assert.equal(canvas.width,1400);
   assert.equal(canvas.height,900);
   assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1]).includes('WAIT')));
-  assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1]).includes('financial advisor')));
+  assert.ok(drawn.some(x=>x[0]==='text'&&x[1]==='No financial advice.'));
   assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1])==='SUPPORT'));
  }finally{global.document=oldDocument;}
 });

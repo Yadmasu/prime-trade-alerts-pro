@@ -103,8 +103,15 @@ async def discover_markets(session: aiohttp.ClientSession) -> list[Market]:
     try:
         rows = await post(session, {"type": "perpDexs"})
         for row in rows or []:
-            name = row if isinstance(row, str) else row[0] if isinstance(row, list) else row.get("name")
-            if name and name != "default" and name not in dexes:
+            if isinstance(row, dict):
+                name = row.get("name")
+            elif isinstance(row, list) and row:
+                name = row[0]
+            elif isinstance(row, str):
+                name = row
+            else:
+                continue
+            if isinstance(name, str) and name and name != "default" and name not in dexes:
                 dexes.append(name)
     except Exception:
         pass
