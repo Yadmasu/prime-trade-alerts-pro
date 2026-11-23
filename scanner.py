@@ -314,18 +314,22 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         "data": {"market": market.coin, **signal},
     }
     for attempt in range(4):
-        async with session.post(ONESIGNAL_API, headers=headers, json=payload, timeout=20) as response:
-            if response.status < 300:
-                receipt = await response.json(content_type=None)
-                notification_id = receipt.get("id") if isinstance(receipt, dict) else None
-                recipients = receipt.get("recipients") if isinstance(receipt, dict) else None
-                print(f"OneSignal accepted: notification_id={notification_id or 'none'} recipients={recipients if recipients is not None else 'unknown'} market={market.coin}", flush=True)
-                if not notification_id or recipients == 0:
-                    raise RuntimeError("OneSignal accepted request without a deliverable notification (no id or zero recipients)")
-                return
-            message = await response.text()
-            if response.status not in (429, 500, 502, 503, 504) or attempt == 3:
-                raise RuntimeError(f"OneSignal {response.status}: {message}")
+        try:
+            async with session.post(ONESIGNAL_API, headers=headers, json=payload, timeout=20) as response:
+                if response.status < 300:
+                    receipt = await response.json(content_type=None)
+                    notification_id = receipt.get("id") if isinstance(receipt, dict) else None
+                    recipients = receipt.get("recipients") if isinstance(receipt, dict) else None
+                    if not notification_id or recipients == 0:
+                        raise RuntimeError("OneSignal accepted request without a deliverable notification (no id or zero recipients)")
+                    print(f"OneSignal accepted: notification_id={notification_id} recipients={recipients if recipients is not None else 'unknown'} market={market.coin}", flush=True)
+                    return
+                message = await response.text()
+                if response.status not in (429, 500, 502, 503, 504) or attempt == 3:
+                    raise RuntimeError(f"OneSignal {response.status}: {message}")
+        except (aiohttp.ClientConnectionError, asyncio.TimeoutError):
+            if attempt == 3:
+                raise
         await asyncio.sleep(2 ** attempt)
 
 
