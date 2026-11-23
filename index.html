@@ -5102,7 +5102,7 @@ setInterval(()=>{
     if(!blob){status.textContent='Image export failed.';return;}
     const file=new File([blob],'PRIME-'+coin.replace(/[^a-zA-Z0-9_-]/g,'_')+'.png',{type:'image/png'});
     const title='PRIME TRADE ALERTS PRO · '+coin+' · '+lastSnapshot.timeframe.toUpperCase()+' · PROFESSIONAL CHART';
-    const payload={files:[file],title,text:title+' · research chart; not a trade instruction'};
+    const payload={files:[file],title,text:title+'\nI’m not a financial advisor. For educational purposes only — not financial advice.'};
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       status.textContent='Choose '+preferred+' in the share sheet to send the actual chart image.';
       try{await navigator.share(payload);status.textContent='Share sheet closed. Confirm delivery in '+preferred+'.';}
