@@ -9,10 +9,18 @@
 - Bot 3 `e3bb2a0` validates image-only Telegram receipts, saves per-channel success, and retries only missing recipients on a repeated signal. Local tests rendered a PNG and exercised partial failure, restart, and invalid receipts.
 - Bot 3 `f483b6f` routes the watermarked original-channel test through the same sender. Its local fixture uploaded a 1650 × 1155 PNG to a mocked transport.
 
-## Blockers and pending work
+## Latest progress
 
-Bot 2 deployment and iPhone receipt still require authorized production access. Vultr and OneSignal both showed sign-in screens. The workspace had no configured SSH host or agent. Bot 3 GitHub Actions run [45213460456](https://github.com/Yadmasu/-yoyo-smart-whale-pro/actions/runs/45213460456) finished with failure. GitHub’s run annotations identify an account billing or spending-limit restriction. Both jobs had runner ID 0 and executed zero steps. The runner produced no Telegram photo receipt. Bot 1 is outside scope.
+- User reports Bot 3 already delivered a Telegram chart image. Treat delivery as observed by the user. Actual VPS source, service logs and corresponding receipt remain to be inspected.
+- Removed automatic schedule and push triggers from Bot 3 smart-whale.yml. Manual dispatch remains available.
+- Added source path filters to Bot 2 and Bot 3 check workflows so checkpoint-only commits do not run these checks. Three modified workflow files passed local YAML parsing and trigger assertions.
+- Bot 2's scanner workflow was already manual-only.
+- These edits apply to GitHub workflows. Production source and services were not accessed.
+
+## Blockers
+
+Bot 2 VPS revision and original iPhone delivery remain unverified. No local configured SSH connection or agent was available. Last console observations required Vultr and OneSignal sign-in. GitHub Actions previously reported a billing or spending-limit restriction before executing any steps.
 
 ## Exact next action
 
-Read this checkpoint when the next Work session starts. After the account owner resolves the Actions restriction under Billing & plans, rerun only `verify-original-photo` from run 45213460456 and inspect its receipt. An authenticated Bot 3 VPS session using the original channel configuration is an alternative. Avoid duplicate test sends. Verify its positive Telegram message ID. The current GitHub scanner identifies EMA21/89, so verify the VPS entry point before applying any sender change to production. For Bot 2, verify yoyo-prime.service's deployed scanner revision and correlate an accepted notification ID with iPhone receipt. Preserve deployed strategy code and back up before production edits.
+Prioritize authenticated access to Bot 2. Inspect yoyo-prime.service and its timer, resolve ExecStart to the deployed source, compare with commit 59f73d8, and inspect recent OneSignal receipt logs without exposing secrets. Correlate the notification with the original iPhone subscription and device receipt. Then inspect Bot 3's actual running service, source path and logs against the chart already received. Back up deployed files before any edit. Avoid additional test photos until checking that existing delivery. Keep Bot 1 outside scope.
