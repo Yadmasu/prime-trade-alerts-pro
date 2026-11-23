@@ -581,6 +581,11 @@ button:active{transform:translateY(1px)}
 .chart-state.confirmed{color:#21d6a5}
 .chart-timer{font-variant-numeric:tabular-nums;font-size:12px;color:#e3eefb;font-weight:800}
 .chart-prelim{font-size:10px;color:#aebfd0;letter-spacing:.02em}
+.chart-sr-info{flex-basis:100%;font-size:12px;font-variant-numeric:tabular-nums;color:#c8d5e5;font-weight:700}
+.chart-sr-info .s{color:#34caaa}.chart-sr-info .r{color:#f39aa0}
+.sr-left-tag{position:absolute;z-index:7;left:7px;transform:translateY(-50%);font-size:10px;font-weight:900;line-height:1;border:1px solid;border-radius:4px;padding:3px 5px;pointer-events:none;background:rgba(7,18,30,.92);font-family:system-ui,sans-serif}
+.sr-left-tag.s{color:#34caaa;border-color:rgba(52,202,170,.55)}
+.sr-left-tag.r{color:#f39aa0;border-color:rgba(243,154,160,.55)}
 .cross-up-symbol{color:#21d6a5;font-size:11px}
 .cross-down-symbol{color:#ff637c;font-size:11px}
 .chart-share-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:11px 0 5px}
@@ -1205,6 +1210,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     <span id="chartSignalStatus" class="chart-state">WAIT · NO ENTRY</span>
     <span id="chartCandleTimer" class="chart-timer">Candle close —</span>
     <span class="chart-prelim">EMA CROSS discoveries: Markets tab · not trade entries</span>
+    <span id="chartSRInfo" class="chart-sr-info" aria-label="Support and resistance levels">S —  ·  R —</span>
   </div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -3280,6 +3286,7 @@ function drawCanvasChart(
   }
 
   updateChartStatus(analysis,confirmed,timeframe);
+  renderSRInfo(candleData);
   const closes =
     candleData.map(
       item=>item.c
@@ -3529,8 +3536,11 @@ function drawCanvasChart(
       context.moveTo(padding.l,y(price));
       context.lineTo(width-padding.r,y(price));context.stroke();
       context.setLineDash([]);
+      context.fillStyle='#07121e';
+      const cy=y(price);
+      context.fillRect(padding.l+2,cy-9,16,17);
       context.fillStyle=color;context.font='bold 11px system-ui';
-      context.fillText(label,width-padding.r+6,y(price)-5);
+      context.fillText(label,padding.l+6,cy+4);
     }
   }
   if(shown('fib')){
@@ -3682,6 +3692,16 @@ function renderOscillators(candles){
 let liveChart = null;
 let liveChartObserver = null;
 let lastChartCandleSeries = null;
+function renderSRInfo(candles){
+  const el=document.getElementById('chartSRInfo');
+  if(!el||!window.PrimeChartExtras)return;
+  const enabled=document.querySelector('[data-indicator="sr"]')?.checked!==false;
+  if(!enabled){el.textContent='Support / Resistance hidden';return;}
+  const sr=window.PrimeChartExtras.supportResistance(candles);
+  const format=value=>Number.isFinite(value)?fmt(value):'—';
+  el.innerHTML='<span class="s">SUPPORT '+format(sr.support)+'</span>'+
+    ' · <span class="r">RESISTANCE '+format(sr.resistance)+'</span>';
+}
 function updateChartStatus(analysis,confirmed,timeframe){
   if(!window.PrimeChartExtras)return;
   const state=window.PrimeChartExtras.signalStatus(analysis,confirmed);
@@ -3714,6 +3734,7 @@ function drawChart(
   const host = $('interactiveChart');
   const fallback = $('priceChart');
   updateChartStatus(analysis,confirmed,timeframe);
+  renderSRInfo(candleData);
   const visible = key => document.querySelector('[data-indicator="'+key+'"]')?.checked !== false;
 
   if(!Array.isArray(candleData) || candleData.length < 5 || !host || !fallback){
@@ -3913,20 +3934,38 @@ function drawChart(
       line.setData(data);
     }
   }
-  // Verified pivot levels: at most one support and one resistance.
+  // Left-edge compact badges avoid covering the latest candles and price scale.
+  const srLabels=[];
   if(visible('sr')&&window.PrimeChartExtras){
     const levels=window.PrimeChartExtras.supportResistance(candleData);
-    for(const [name,price,color] of [
-      ['SUPPORT',levels.support,'#27bda1'],
-      ['RESIST',levels.resistance,'#ef8e87']
+    for(const [name,price,color,kind] of [
+      ['S',levels.support,'#27bda1','s'],
+      ['R',levels.resistance,'#ef8e87','r']
     ]){
       if(Number.isFinite(price)){
         candleSeries.createPriceLine({
           price,color,lineWidth:1,
           lineStyle:LightweightCharts.LineStyle.Dashed,
-          axisLabelVisible:true,title:name
+          axisLabelVisible:false,title:''
         });
+        srLabels.push({name,price,kind});
       }
+    }
+  }
+  function placeSRLabels(){
+    host.querySelectorAll('.sr-left-tag').forEach(el=>el.remove());
+    const ordered=srLabels.map(level=>({...level,y:candleSeries.priceToCoordinate(level.price)}))
+      .filter(level=>Number.isFinite(level.y)&&level.y>=24&&level.y<host.clientHeight-24)
+      .sort((a,b)=>a.y-b.y);
+    let lastY=-999;
+    for(const level of ordered){
+      if(level.y-lastY<24)continue;
+      const label=document.createElement('div');
+      label.className='sr-left-tag '+level.kind;
+      label.textContent=level.name;
+      label.style.top=level.y+'px';
+      host.appendChild(label);
+      lastY=level.y;
     }
   }
 
@@ -3998,6 +4037,8 @@ function drawChart(
   }
 
   liveChart.timeScale().fitContent();
+  requestAnimationFrame(placeSRLabels);
+  liveChart.timeScale().subscribeVisibleLogicalRangeChange(placeSRLabels);
 
   liveChartObserver =
     new ResizeObserver(entries=>{
@@ -4007,6 +4048,7 @@ function drawChart(
           width:Math.floor(size.width),
           height:Math.floor(size.height)
         });
+        requestAnimationFrame(placeSRLabels);
       }
     });
 
