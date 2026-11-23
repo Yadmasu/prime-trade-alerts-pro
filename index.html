@@ -1199,12 +1199,12 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="vwap"> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label><label><input type="checkbox" data-indicator="rsi"> RSI Panel</label><label><input type="checkbox" data-indicator="macd"> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="9,21" selected>EMA 9 / 21</option><option value="21,89">EMA 21 / 89</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
+  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="sr" checked> Support / Resistance</label><label><input type="checkbox" data-indicator="vwap"> VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci</label><label><input type="checkbox" data-indicator="rsi"> RSI Panel</label><label><input type="checkbox" data-indicator="macd"> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="9,21" selected>EMA 9 / 21</option><option value="21,89">EMA 21 / 89</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
   <div class="chart-quickbar"><button type="button" id="chartToolsButton">⚙ Tools</button><button type="button" id="chartCleanButton">◉ Clean</button><button type="button" id="chartProButton" aria-pressed="false">◈ Pro</button><button type="button" id="chartExpandButton">⛶ Expand</button></div>
   <div class="chart-status-strip" aria-live="polite">
     <span id="chartSignalStatus" class="chart-state">WAIT · NO ENTRY</span>
     <span id="chartCandleTimer" class="chart-timer">Candle close —</span>
-    <span class="chart-prelim"><span class="cross-up-symbol">▲</span> Bull cross · <span class="cross-down-symbol">▼</span> Bear cross · discovery only</span>
+    <span class="chart-prelim">EMA CROSS discoveries: Markets tab · not trade entries</span>
   </div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -3514,9 +3514,24 @@ function drawCanvasChart(
 
   }
 
-  if(shown('ema')&&periods.length>0)drawLine(fast,'#dafa4b');
-  if(shown('ema')&&periods.length>1)drawLine(slow,'#58a6ff');
+  if(shown('ema')&&periods.length>0)drawLine(fast,'#58a6ff');
+  if(shown('ema')&&periods.length>1)drawLine(slow,'#f59e0b');
   if(shown('ema'))periods.slice(2).forEach((period,i)=>drawLine(ema(closes,period),['#f59e0b','#c084fc','#f472b6','#2dd4bf'][i]));
+  if(shown('sr')&&window.PrimeChartExtras){
+    const levels=window.PrimeChartExtras.supportResistance(candleData);
+    for(const [label,price,color] of [
+      ['S',levels.support,'#27bda1'],['R',levels.resistance,'#ef8e87']
+    ]){
+      if(!Number.isFinite(price)||price<low||price>high)continue;
+      context.strokeStyle=color;context.lineWidth=1;
+      context.setLineDash([6,5]);context.beginPath();
+      context.moveTo(padding.l,y(price));
+      context.lineTo(width-padding.r,y(price));context.stroke();
+      context.setLineDash([]);
+      context.fillStyle=color;context.font='bold 11px system-ui';
+      context.fillText(label,width-padding.r+6,y(price)-5);
+    }
+  }
   if(shown('fib')){
     const bars=candleData.slice(-96),top=Math.max(...bars.map(b=>b.h)),bottom=Math.min(...bars.map(b=>b.l)),range=top-bottom;
     if(Number.isFinite(range)&&range>0){
@@ -3779,10 +3794,7 @@ function drawChart(
   );
 
   lastChartCandleSeries=candleSeries;
-  if(window.PrimeChartExtras&&['15m','1h'].includes(timeframe)){
-    const markers=window.PrimeChartExtras.crossMarkers(candleData,2);
-    candleSeries.setMarkers(markers);
-  }
+  // Cross discoveries stay in the Markets tab; no overlapping text/arrows on price candles.
   const closes = candleData.map(item=>item.c);
   renderOscillators(candleData);
   const emaPeriods = chartEmaPeriods();
@@ -3896,6 +3908,23 @@ function drawChart(
       line.setData(data);
     }
   }
+  // Verified pivot levels: at most one support and one resistance.
+  if(visible('sr')&&window.PrimeChartExtras){
+    const levels=window.PrimeChartExtras.supportResistance(candleData);
+    for(const [name,price,color] of [
+      ['SUPPORT',levels.support,'#27bda1'],
+      ['RESIST',levels.resistance,'#ef8e87']
+    ]){
+      if(Number.isFinite(price)){
+        candleSeries.createPriceLine({
+          price,color,lineWidth:1,
+          lineStyle:LightweightCharts.LineStyle.Dashed,
+          axisLabelVisible:true,title:name
+        });
+      }
+    }
+  }
+
   const swingBars = candleData.slice(-96);
   const high = Math.max(...swingBars.map(b=>b.h));
   const low = Math.min(...swingBars.map(b=>b.l));
@@ -4991,7 +5020,7 @@ setInterval(()=>{
   };
   if(cleanButton){
     cleanButton.setAttribute('aria-pressed','false');
-    cleanButton.title='Show only price candles, EMA9/21 and volume; tap again to restore';
+    cleanButton.title='Clean chart: candles, EMA9/21, volume, support and resistance; tap again to restore';
     cleanButton.onclick=()=>{
       const inputs=[...document.querySelectorAll('[data-indicator]')];
       const preset=document.getElementById('chartEmaPreset');
@@ -5002,7 +5031,7 @@ setInterval(()=>{
           preset:preset?.value,
           custom:custom?.dataset.applied||null
         };
-        inputs.forEach(x=>{x.checked=x.dataset.indicator==='ema'||x.dataset.indicator==='volume';});
+        inputs.forEach(x=>{x.checked=['ema','volume','sr'].includes(x.dataset.indicator);});
         if(preset)preset.value='9,21';
         if(custom)delete custom.dataset.applied;
         const details=document.querySelector('#liveChart .indicator-settings');
@@ -5035,7 +5064,7 @@ setInterval(()=>{
     if(!savedProSettings){
       savedProSettings=Object.fromEntries(inputs.map(x=>[x.dataset.indicator,x.checked]));
       inputs.forEach(x=>{
-        x.checked=['ema','volume','vwap','rsi'].includes(x.dataset.indicator);
+        x.checked=['ema','volume','sr','vwap','rsi'].includes(x.dataset.indicator);
       });
       proButton.textContent='◈ Pro ON';
       proButton.setAttribute('aria-pressed','true');
