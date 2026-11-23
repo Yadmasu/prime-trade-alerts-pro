@@ -82,7 +82,7 @@
     const stamp=Number.isFinite(m.candleTime)?new Date(m.candleTime).toISOString().slice(0,16).replace('T',' ')+' UTC':'Time unavailable';
     txt('Candle: '+stamp,54,825,'600 17px system-ui','#a4b7c8');
     txt('EMA9  /  EMA21  ·  Volume  ·  Support  /  Resistance',54,852,'500 16px system-ui','#90abc3');
-    txt('DATA: HYPERLIQUID  ·  NOT FINANCIAL ADVICE',1342,850,'600 15px system-ui','#a4b7c8','right');
+    txt('I’m not a financial advisor · For educational purposes only',1342,850,'600 14px system-ui','#a4b7c8','right');
     return c;
   }
   return {cardMeta,formatPrice,drawShareCard};
