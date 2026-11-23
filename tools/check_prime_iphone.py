@@ -20,19 +20,23 @@ def test_phone(prefix, app_id, key, run_id):
     if not key:
         raise RuntimeError("OneSignal REST key unavailable")
     matches = []
+    seen = 0
+    matched_ids = 0
     offset = 0
     while True:
         page = api("players?" + urlencode({"app_id":app_id,"limit":300,"offset":offset}),key)
         players = page["players"]
-        matches.extend(p["id"] for p in players if p["id"].startswith(prefix)
-                       and p.get("device_type") in (7, 17) and "iphone" in str(p.get("device_model","")).lower()
+        seen += len(players)
+        candidates = [p for p in players if p["id"].startswith(prefix) or p["id"].endswith(prefix)]
+        matched_ids += len(candidates)
+        matches.extend(p["id"] for p in candidates if p.get("device_type") in (7, 17) and "iphone" in str(p.get("device_model","")).lower()
                        and p.get("identifier") and not p.get("invalid_identifier")
                        and p.get("notification_types") in (None, 1))
         offset += len(players)
         if not players or offset >= page["total_count"]:
             break
     if len(matches) != 1:
-        raise RuntimeError("Expected exactly one active matching iPhone subscription")
+        raise RuntimeError(f"Matched {matched_ids} of {seen} subscription IDs, {len(matches)} eligible iPhones")
     notification = api("notifications", key, {
         "app_id":app_id, "target_channel":"push","include_subscription_ids":matches,
         "idempotency_key":str(uuid.UUID(bytes=hashlib.sha256(("prime-phone-check/"+run_id).encode()).digest()[:16],version=4)),
