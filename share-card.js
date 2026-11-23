@@ -1,89 +1,187 @@
-/* PRIME TRADE ALERTS PRO — share-only PNG compositor.
- * Never changes analysis, trading signals, or the live chart. */
+/* PRIME TRADE ALERTS PRO | independently rendered, data-faithful share PNG.
+   Presentation only; never modifies live charts, signals, or notification flow. */
 (function(root,factory){
   const api=factory();
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.PrimeShareCard=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
-  'use strict';
-  function cardMeta(snapshot){
-    if(!snapshot||!Array.isArray(snapshot.candles)||!snapshot.candles.length)throw Error('Chart data unavailable');
-    const last=snapshot.candles.at(-1);
-    const confirmed=snapshot.confirmed?.confirmed===true;
-    const side=confirmed?snapshot.confirmed.side:snapshot.analysis?.side;
-    const direction=side==='LONG'?'BULLISH':side==='SHORT'?'BEARISH':'NEUTRAL';
-    const price=Number(last.c);
-    if(!Number.isFinite(price)||price<=0)throw Error('Valid market price unavailable');
-    return {
-      id:String(snapshot.id||'MARKET'),tf:String(snapshot.timeframe||'—').toUpperCase(),
-      price,candleTime:Number(last.t),confirmed,direction,
-      headline:confirmed?'CONFIRMED '+(side==='SHORT'?'SHORT':'LONG'):'WAIT · NO CONFIRMED ENTRY',
-      levels:confirmed?snapshot.confirmed:null
-    };
+'use strict';
+const COLOR={bg:'#081321',panel:'#0c1b2b',grid:'#20364a',white:'#edf5ff',
+  muted:'#9db1c6',up:'#21c99e',down:'#f57682',blue:'#58a6ff',
+  orange:'#f6a23a',support:'#2dc5a4',resistance:'#f28b91',gold:'#efc36d'};
+const formatPrice=p=>{
+  if(!Number.isFinite(p))return '—';
+  if(p>=1000)return p.toLocaleString('en-US',{maximumFractionDigits:2});
+  if(p>=1)return p.toFixed(3);
+  if(p>=.01)return p.toFixed(4);
+  return p.toFixed(6);
+};
+function validatedCandles(rows){
+  if(!Array.isArray(rows)||rows.length<30)throw Error('At least 30 valid candles are required to share');
+  const arr=rows.map(c=>({t:Number(c.t),o:Number(c.o),h:Number(c.h),
+    l:Number(c.l),c:Number(c.c),v:Number(c.v)}));
+  if(arr.some(c=>!Object.values(c).every(Number.isFinite)||c.c<=0||
+      c.l<=0||c.h<c.l||Math.max(c.o,c.c)>c.h||Math.min(c.o,c.c)<c.l||
+      c.v<0))throw Error('Invalid market candle data');
+  for(let i=1;i<arr.length;i++){
+    if(arr[i].t<=arr[i-1].t)throw Error('Candle timestamps not in order');
   }
-  function formatPrice(p){
-    if(!Number.isFinite(p))return '—';
-    return p>=1000?p.toLocaleString('en-US',{maximumFractionDigits:2}):
-      p>=1?p.toFixed(3):p>=.01?p.toFixed(4):p.toFixed(6);
+  return arr;
+}
+function cardMeta(snapshot){
+  if(!snapshot)throw Error('Chart data unavailable');
+  const candles=validatedCandles(snapshot.candles);
+  const last=candles.at(-1);
+  const confirmed=snapshot.confirmed?.confirmed===true;
+  const side=confirmed?snapshot.confirmed.side:snapshot.analysis?.side;
+  if(confirmed&& !['LONG','SHORT'].includes(side))throw Error('Confirmed direction unavailable');
+  const direction=side==='LONG'?'BULLISH':side==='SHORT'?'BEARISH':'NEUTRAL';
+  const tf=String(snapshot.timeframe||'').toLowerCase();
+  if(!['15m','1h','4h','1d','5m','1m'].includes(tf))throw Error('Chart timeframe unavailable');
+  return {
+    id:String(snapshot.id||'MARKET'),tf:tf.toUpperCase(),price:last.c,
+    candleTime:last.t,confirmed,direction, candles,
+    headline:confirmed?'CONFIRMED '+side:'WAIT · NO CONFIRMED ENTRY',
+    levels:confirmed?snapshot.confirmed:null
+  };
+}
+function ema(prices,period){
+  const values=Array(prices.length).fill(null);
+  if(prices.length<period)return values;
+  let prior=prices.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  values[period-1]=prior;
+  for(let i=period;i<prices.length;i++){
+    prior=prior+(prices[i]-prior)*2/(period+1);values[i]=prior;
   }
-  function drawShareCard(snapshot,source,extras){
-    const m=cardMeta(snapshot);
-    if(!source||!source.width||!source.height)throw Error('Rendered chart unavailable');
-    const c=document.createElement('canvas');c.width=1400;c.height=900;
-    const ctx=c.getContext('2d');
-    if(!ctx)throw Error('Canvas not supported');
-    const background=ctx.createLinearGradient(0,0,1400,900);
-    background.addColorStop(0,'#101d31');background.addColorStop(1,'#07111f');
-    ctx.fillStyle=background;ctx.fillRect(0,0,1400,900);
-    ctx.fillStyle='#0b1727';ctx.fillRect(28,24,1344,852);
-    ctx.strokeStyle='#273f58';ctx.lineWidth=2;ctx.strokeRect(28,24,1344,852);
-    const txt=(value,x,y,font,color,align='left')=>{
-      ctx.font=font;ctx.textAlign=align;ctx.fillStyle=color;ctx.fillText(String(value),x,y);
-      ctx.textAlign='left';
-    };
-    ctx.fillStyle='#2ed0a5';ctx.fillRect(52,46,7,53);
-    txt('PRIME',76,83,'800 35px system-ui','#eef6ff');
-    txt('TRADE ALERTS PRO',208,83,'800 35px system-ui','#2ed0a5');
-    txt('HYPERLIQUID · MARKET CHART',54,122,'600 17px system-ui','#9daec1');
-    txt(m.id+'  /  '+m.tf,54,173,'800 34px system-ui','#edf5ff');
-    const stateColor=m.confirmed?(m.direction==='BULLISH'?'#31d1a3':'#f97888'):'#f4c36e';
-    txt(m.headline,1342,170,'800 23px system-ui',stateColor,'right');
-    ctx.fillStyle='#101e30';ctx.fillRect(52,194,1025,595);
-    ctx.strokeStyle='#314963';ctx.strokeRect(52,194,1025,595);
-    // Fills the frame without stretching the price-to-time proportions.
-    const scale=Math.min(1023/source.width,593/source.height);
-    const dw=source.width*scale,dh=source.height*scale;
-    ctx.drawImage(source,52+(1025-dw)/2,194+(595-dh)/2,dw,dh);
-    ctx.fillStyle='#14243a';ctx.fillRect(1092,194,244,595);
-    const divider=y=>{ctx.strokeStyle='#29415c';ctx.beginPath();ctx.moveTo(1114,y);ctx.lineTo(1315,y);ctx.stroke();};
-    txt('MARKET PRICE',1114,231,'700 15px system-ui','#90abc3');
-    txt(formatPrice(m.price),1114,271,'800 32px system-ui','#edf5ff');
-    divider(299);
-    txt('TREND',1114,337,'700 15px system-ui','#90abc3');
-    txt(m.direction,1114,375,'800 25px system-ui',m.direction==='BULLISH'?'#31d1a3':m.direction==='BEARISH'?'#f97888':'#e6bb6b');
-    divider(401);
-    const sr=extras?.supportResistance?.(snapshot.candles)||{support:null,resistance:null};
-    txt('SUPPORT',1114,440,'700 15px system-ui','#90abc3');
-    txt(formatPrice(sr.support),1114,477,'800 26px system-ui','#31d1a3');
-    divider(500);
-    txt('RESISTANCE',1114,540,'700 15px system-ui','#90abc3');
-    txt(formatPrice(sr.resistance),1114,577,'800 26px system-ui','#f97888');
-    divider(603);
-    if(m.confirmed&&m.levels){
-      txt('ENTRY / SL / TP1',1114,640,'700 15px system-ui','#90abc3');
-      txt(formatPrice(Number(m.levels.entry)),1114,676,'700 20px system-ui','#f4c36e');
-      txt(formatPrice(Number(m.levels.stop))+' / '+formatPrice(Number(m.levels.tp1)),1114,706,'650 17px system-ui','#edf5ff');
-      txt('TP2  '+formatPrice(Number(m.levels.tp2)),1114,735,'600 17px system-ui','#90abc3');
-      txt('TP3  '+formatPrice(Number(m.levels.tp3)),1114,764,'600 17px system-ui','#90abc3');
-    }else{
-      txt('RESEARCH ONLY',1114,663,'800 20px system-ui','#f4c36e');
-      txt('NOT A TRADE SIGNAL',1114,693,'650 16px system-ui','#d1dce8');
+  return values;
+}
+function drawingModel(snapshot,extras){
+  const m=cardMeta(snapshot);
+  const data=m.candles.slice(-68),all=m.candles;
+  const sr=extras?.supportResistance?.(all)||{support:null,resistance:null};
+  const price=m.price,levels=[];
+  if(Number.isFinite(sr.support)&&sr.support>0&&sr.support<price)
+    levels.push({name:'S',price:sr.support,color:COLOR.support});
+  if(Number.isFinite(sr.resistance)&&sr.resistance>price)
+    levels.push({name:'R',price:sr.resistance,color:COLOR.resistance});
+  if(m.confirmed&&m.levels){
+    for(const [name,key,color] of [
+      ['ENTRY','entry',COLOR.gold],['SL','stop',COLOR.down],
+      ['TP1','tp1',COLOR.up],['TP2','tp2',COLOR.up],['TP3','tp3',COLOR.up]]){
+      const value=Number(m.levels[key]);
+      if(!Number.isFinite(value)||value<=0)throw Error('Incomplete confirmed trade levels');
+      levels.push({name,price:value,color});
     }
-    const stamp=Number.isFinite(m.candleTime)?new Date(m.candleTime).toISOString().slice(0,16).replace('T',' ')+' UTC':'Time unavailable';
-    txt('Candle: '+stamp,54,825,'600 17px system-ui','#a4b7c8');
-    txt('EMA9  /  EMA21  ·  Volume  ·  Support  /  Resistance',54,852,'500 16px system-ui','#90abc3');
-    txt('I’m not a financial advisor · For educational purposes only',1342,850,'600 14px system-ui','#a4b7c8','right');
-    return c;
   }
-  return {cardMeta,formatPrice,drawShareCard};
+  // S/R must not change the price scale for distant, off-screen swings.
+  let low=Math.min(...data.map(x=>x.l)),high=Math.max(...data.map(x=>x.h));
+  const range=Math.max(high-low,price*.003);
+  low-=range*.12;high+=range*.12;
+  return {...m,data,all,levels,sr,low,high,
+    ema9:ema(all.map(x=>x.c),9).slice(-data.length),
+    ema21:ema(all.map(x=>x.c),21).slice(-data.length)};
+}
+function drawShareCard(snapshot,source,extras){
+  // Always render our own price/volume/EMA chart from source candles. A screenshot
+  // can carry cropped overlays, toolbars, cross labels and incorrect aspect ratios.
+  const m=drawingModel(snapshot,extras);
+  if(typeof document==='undefined')throw Error('Canvas rendering needs a browser');
+  const cv=document.createElement('canvas');
+  cv.width=1400;cv.height=900;
+  const g=cv.getContext('2d');
+  if(!g)throw Error('PNG renderer unavailable');
+  const rect=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(x,y,w,h);};
+  const text=(value,x,y,size,color,weight='600',align='left')=>{
+    g.font=weight+' '+size+'px system-ui,-apple-system,sans-serif';
+    g.textAlign=align;g.fillStyle=color;g.fillText(String(value),x,y);
+    g.textAlign='left';
+  };
+  rect(0,0,1400,900,COLOR.bg);
+  rect(24,24,1352,852,COLOR.panel);
+  g.strokeStyle='#2c4359';g.lineWidth=2;g.strokeRect(24,24,1352,852);
+  rect(50,48,7,47,COLOR.support);
+  text('PRIME',76,82,34,COLOR.white,'800');
+  text('TRADE ALERTS PRO',205,82,34,COLOR.support,'800');
+  text('HYPERLIQUID  •  MARKET CHART',52,120,16,COLOR.muted,'600');
+  text(m.id+'  ·  '+m.tf,52,167,30,COLOR.white,'800');
+  text(m.headline,1342,165,21,m.confirmed?
+    (m.direction==='BULLISH'?COLOR.up:COLOR.down):COLOR.gold,'800','right');
+  const frame={x:52,y:194,w:1008,h:574},plot={x:72,y:220,w:870,h:451};
+  rect(frame.x,frame.y,frame.w,frame.h,'#0a1929');
+  g.strokeStyle='#334860';g.strokeRect(frame.x,frame.y,frame.w,frame.h);
+  const x=i=>plot.x+(i+.5)*plot.w/m.data.length;
+  const y=p=>plot.y+(m.high-p)/(m.high-m.low)*plot.h;
+  g.lineWidth=1;g.strokeStyle=COLOR.grid;
+  for(let i=0;i<=5;i++){
+    const py=plot.y+(plot.h*i/5);
+    g.beginPath();g.moveTo(plot.x,py);g.lineTo(plot.x+plot.w,py);g.stroke();
+    text(formatPrice(m.high-(m.high-m.low)*i/5),plot.x+plot.w+11,py+4,14,COLOR.muted,'500');
+  }
+  for(let i=0;i<5;i++){
+    const px=plot.x+plot.w*i/4;
+    g.beginPath();g.moveTo(px,plot.y);g.lineTo(px,plot.y+plot.h);g.stroke();
+  }
+  const barw=Math.max(3,Math.min(10,plot.w/m.data.length*.68));
+  m.data.forEach((b,i)=>{
+    const color=b.c>=b.o?COLOR.up:COLOR.down;
+    g.strokeStyle=color;g.fillStyle=color;
+    g.beginPath();g.moveTo(x(i),y(b.h));g.lineTo(x(i),y(b.l));g.stroke();
+    const top=y(Math.max(b.o,b.c)),bot=y(Math.min(b.o,b.c));
+    g.fillRect(x(i)-barw/2,top,barw,Math.max(1,bot-top));
+  });
+  const drawEma=(array,color)=>{
+    g.strokeStyle=color;g.lineWidth=2.5;g.beginPath();let first=true;
+    array.forEach((v,i)=>{if(!Number.isFinite(v))return;
+      if(first){g.moveTo(x(i),y(v));first=false;}else g.lineTo(x(i),y(v));
+    });if(!first)g.stroke();
+  };
+  drawEma(m.ema9,COLOR.blue);drawEma(m.ema21,COLOR.orange);
+  // Pivot lines are intentionally thin; numeric tags live in the dedicated sidebar.
+  for(const l of m.levels){
+    if(l.price<m.low||l.price>m.high)continue;
+    g.lineWidth=1;g.strokeStyle=l.color;g.setLineDash([6,7]);
+    g.beginPath();g.moveTo(plot.x,y(l.price));g.lineTo(plot.x+plot.w,y(l.price));g.stroke();
+    g.setLineDash([]);
+  }
+  rect(plot.x,689,plot.w,50,'#0c1a29');
+  const peak=Math.max(1,...m.data.map(b=>b.v));
+  m.data.forEach((b,i)=>{
+    rect(x(i)-barw/2,738-45*b.v/peak,barw,45*b.v/peak,
+      b.c>=b.o?'#2b8779':'#8e4b5a');
+  });
+  // Avoid extrapolating a real-time market price from the last candle close.
+  text('EMA 9',plot.x,756,14,COLOR.blue,'700');
+  text('EMA 21',plot.x+85,756,14,COLOR.orange,'700');
+  text('VOLUME',plot.x+195,756,14,COLOR.muted,'700');
+  rect(1076,194,272,574,'#142439');
+  const divider=q=>{g.strokeStyle='#30465e';g.beginPath();
+    g.moveTo(1098,q);g.lineTo(1326,q);g.stroke();};
+  text('LAST CHART PRICE',1098,235,15,COLOR.muted,'700');
+  text(formatPrice(m.price),1098,279,34,COLOR.white,'800');divider(300);
+  text('TREND',1098,340,15,COLOR.muted,'700');
+  text(m.direction,1098,378,23,m.direction==='BULLISH'?COLOR.up:
+    m.direction==='BEARISH'?COLOR.down:COLOR.gold,'800');divider(400);
+  text('SUPPORT',1098,441,15,COLOR.muted,'700');
+  text(formatPrice(m.sr.support),1098,478,27,COLOR.support,'800');divider(500);
+  text('RESISTANCE',1098,541,15,COLOR.muted,'700');
+  text(formatPrice(m.sr.resistance),1098,578,27,COLOR.resistance,'800');divider(600);
+  if(m.confirmed){
+    text('ENTRY',1098,635,14,COLOR.muted);
+    text(formatPrice(Number(m.levels.entry)),1098,663,21,COLOR.gold,'800');
+    text('SL  '+formatPrice(Number(m.levels.stop)),1098,693,16,COLOR.down);
+    text('TP1  '+formatPrice(Number(m.levels.tp1)),1098,717,16,COLOR.up);
+    text('TP2  '+formatPrice(Number(m.levels.tp2))+'  |  TP3  '+formatPrice(Number(m.levels.tp3)),1098,744,13,COLOR.muted);
+  }else{
+    text('RESEARCH ONLY',1098,670,20,COLOR.gold,'800');
+    text('NOT AN ENTRY SIGNAL',1098,705,13,COLOR.white);
+  }
+  const stamp=new Date(m.candleTime);
+  if(!Number.isFinite(stamp.getTime()))throw Error('Invalid candle time');
+  text('CANDLE TIME  '+stamp.toISOString().slice(0,16).replace('T',' ')+' UTC',
+    52,814,17,COLOR.white,'600');
+  text('S/R = confirmed swing pivots  •  Price is latest chart candle',52,844,14,COLOR.muted);
+  text('I’m not a financial advisor. For educational purposes only.',1342,842,14,COLOR.muted,'600','right');
+  return cv;
+}
+return {cardMeta,formatPrice,validatedCandles,drawingModel,drawShareCard};
 });

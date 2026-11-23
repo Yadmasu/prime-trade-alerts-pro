@@ -22,3 +22,39 @@ test('unusable data fails closed',()=>{
  assert.throws(()=>card.cardMeta({candles:[]}));
  assert.equal(card.formatPrice(NaN),'—');
 });
+
+test('reject invalid OHLC and out-of-order dates instead of drawing fabricated charts',()=>{
+ const bad=snapshot();bad.candles[4].h=.90;
+ assert.throws(()=>card.cardMeta(bad),/Invalid market candle/);
+ const reversed=snapshot();reversed.candles[3].t=reversed.candles[2].t;
+ assert.throws(()=>card.cardMeta(reversed),/timestamps not in order/);
+});
+test('drawing model computes prices and valid scale from actual candles',()=>{
+ const model=card.drawingModel(snapshot(),{supportResistance:()=>({support:.91,resistance:.96})});
+ assert.equal(model.data.length,40);
+ assert.equal(model.ema9.length,40);
+ assert.equal(model.price,.94);
+ assert.ok(model.low<.91 && model.high>.95);
+ assert.equal(model.levels.length,2);
+ assert.equal(model.levels[0].name,'S');
+});
+test('rendering creates a complete landscape PNG layout without depending on screenshots',()=>{
+ const drawn=[];
+ const ctx={
+  fillRect:(...args)=>drawn.push(['rect',...args]),
+  strokeRect:()=>{},beginPath:()=>{},moveTo:()=>{},lineTo:()=>{},
+  stroke:()=>{},fillText:(...args)=>drawn.push(['text',...args]),
+  setLineDash:()=>{}
+ };
+ const oldDocument=global.document;
+ global.document={createElement:tag=>{assert.equal(tag,'canvas');return {
+   width:0,height:0,getContext:()=>ctx};}};
+ try{
+  const canvas=card.drawShareCard(snapshot(),null,{supportResistance:()=>({support:.91,resistance:.96})});
+  assert.equal(canvas.width,1400);
+  assert.equal(canvas.height,900);
+  assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1]).includes('WAIT')));
+  assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1]).includes('financial advisor')));
+  assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1])==='SUPPORT'));
+ }finally{global.document=oldDocument;}
+});
