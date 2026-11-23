@@ -5085,13 +5085,11 @@ setInterval(()=>{
     const status=document.getElementById('chartShareStatus');
     if(!lastSnapshot){status.textContent='Load a chart before sharing.';return;}
     const coin=lastSnapshot.id;
-    let canvas,shareCanvas;
+    let shareCanvas;
     try{
-      canvas=liveChart&&typeof liveChart.takeScreenshot==='function'
-        ?liveChart.takeScreenshot():document.getElementById('priceChart');
-      if(!canvas||!canvas.width||!canvas.height)throw new Error('Chart image is not ready');
+      // Export independently from the validated candle array, not an iPhone screenshot.
       if(!window.PrimeShareCard)throw new Error('Professional image renderer not loaded');
-      shareCanvas=window.PrimeShareCard.drawShareCard(lastSnapshot,canvas,window.PrimeChartExtras);
+      shareCanvas=window.PrimeShareCard.drawShareCard(lastSnapshot,null,window.PrimeChartExtras);
     }catch(error){
       status.textContent='Professional chart export unavailable: '+error.message;
       return;
