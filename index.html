@@ -1615,7 +1615,7 @@ function renderCrossList(query=''){
       <div>
         <div class="market-symbol">${esc(item.id)}</div>
         <div class="market-sub">${esc(crossTimeframe.toUpperCase())}
-          · ${esc(ny(item.time))} · VOL ${Number.isFinite(item.volumeRatio)?item.volumeRatio.toFixed(2)+'×':'—'}
+          · ${esc(ny(item.time))} · Cross $${fmt(item.crossPrice)} · VOL ${Number.isFinite(item.volumeRatio)?item.volumeRatio.toFixed(2)+'×':'—'}
           · preliminary only</div>
       </div>
       <div class="market-price">${fmt(item.price)}</div>
@@ -1654,7 +1654,7 @@ async function scanCrosses(force=false){
         const result=window.PrimeCross.detect(rows,tfMs[tf],Date.now(),4);
         if(result){
           crossResults.push({id:item.id,asset:item.asset,notional:item.notional,
-            ...result});
+            ...result,crossPrice:result.price,price:item.price});
         }
       }catch(error){
         crossFailed++;
@@ -4855,7 +4855,11 @@ loadMarkets()
 
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&marketInfo.has($('market').value))analyze();
+  if(!document.hidden&&moverFilter==='cross'&&!crossScanBusy)scanCrosses();
 });
+setInterval(()=>{
+  if(moverFilter==='cross'&&!document.hidden&&!crossScanBusy)scanCrosses();
+},5*MIN);
 
 </script>
 <script>
