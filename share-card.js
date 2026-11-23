@@ -102,7 +102,7 @@ function drawShareCard(snapshot,source,extras){
   rect(50,48,7,47,COLOR.support);
   text('PRIME',76,82,34,COLOR.white,'800');
   text('TRADE ALERTS PRO',205,82,34,COLOR.support,'800');
-  text('HYPERLIQUID PERPETUALS  •  CHART RESEARCH',52,120,16,COLOR.muted,'600');
+  text('HYPERLIQUID  •  MARKET CHART',52,120,16,COLOR.muted,'600');
   text(m.id+'  ·  '+m.tf,52,167,30,COLOR.white,'800');
   text(m.headline,1342,165,21,m.confirmed?
     (m.direction==='BULLISH'?COLOR.up:COLOR.down):COLOR.gold,'800','right');
@@ -156,7 +156,7 @@ function drawShareCard(snapshot,source,extras){
   rect(1076,194,272,574,'#142439');
   const divider=q=>{g.strokeStyle='#30465e';g.beginPath();
     g.moveTo(1098,q);g.lineTo(1326,q);g.stroke();};
-  text('LAST CANDLE CLOSE',1098,235,15,COLOR.muted,'700');
+  text('LAST CHART PRICE',1098,235,15,COLOR.muted,'700');
   text(formatPrice(m.price),1098,279,34,COLOR.white,'800');divider(300);
   text('TREND',1098,340,15,COLOR.muted,'700');
   text(m.direction,1098,378,23,m.direction==='BULLISH'?COLOR.up:
@@ -179,7 +179,7 @@ function drawShareCard(snapshot,source,extras){
   if(!Number.isFinite(stamp.getTime()))throw Error('Invalid candle time');
   text('CANDLE TIME  '+stamp.toISOString().slice(0,16).replace('T',' ')+' UTC',
     52,814,17,COLOR.white,'600');
-  text('S/R = confirmed swing pivots  •  Price is latest candle close',52,844,14,COLOR.muted);
+  text('S/R = confirmed swing pivots  •  Price is latest chart candle',52,844,14,COLOR.muted);
   text('I’m not a financial advisor. For educational purposes only.',1342,842,14,COLOR.muted,'600','right');
   return cv;
 }
