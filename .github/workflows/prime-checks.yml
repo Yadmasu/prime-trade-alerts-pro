@@ -11,6 +11,15 @@ on:
       - .github/workflows/prime-checks.yml
   push:
     branches: [main]
+    paths:
+      - scanner.py
+      - index.html
+      - ema-cross.js
+      - chart-extras.js
+      - share-card.js
+      - tests/**
+      - tools/check_prime_iphone.py
+      - .github/workflows/prime-checks.yml
 jobs:
   check:
     runs-on: ubuntu-latest
