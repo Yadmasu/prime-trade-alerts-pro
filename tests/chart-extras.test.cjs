@@ -6,8 +6,16 @@ test('bull/bear crosses are labeled preliminary',()=>{
  const up=Array.from({length:34},(_,i)=>bar(i,120-i));
  const bars=[...up,...Array.from({length:16},(_,i)=>bar(i+34,86+i*3))];
  const marks=extras.crossMarkers(bars);
- assert.ok(marks.some(x=>x.text==='BULL CROSS'));
- assert.ok(marks.every(x=>!x.text.includes('CONFIRMED')));
+ assert.ok(marks.some(x=>x.shape==='arrowUp'&&x.color==='#21d6a5'));
+ assert.ok(marks.length<=2);
+ assert.ok(marks.every(x=>!Object.hasOwn(x,'text')));
+ assert.ok(marks.every(x=>x.position==='belowBar'||x.position==='aboveBar'));
+});
+test('no more than two arrows, even with repeated oscillating crosses',()=>{
+ const values=Array.from({length:120},(_,i)=>100+Math.sin(i*.8)*15);
+ const marks=extras.crossMarkers(values.map((v,i)=>bar(i,v)),7);
+ assert.ok(marks.length<=2);
+ assert.ok(marks.every(m=>!m.text));
 });
 test('no markers for flat or insufficient candles',()=>{
  assert.deepEqual(extras.crossMarkers(Array.from({length:50},(_,i)=>bar(i,100))),[]);

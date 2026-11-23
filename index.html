@@ -580,7 +580,9 @@ button:active{transform:translateY(1px)}
 .chart-state.early{color:#dafa4b}
 .chart-state.confirmed{color:#21d6a5}
 .chart-timer{font-variant-numeric:tabular-nums;font-size:12px;color:#e3eefb;font-weight:800}
-.chart-prelim{font-size:10px;color:#9cb0c6}
+.chart-prelim{font-size:10px;color:#aebfd0;letter-spacing:.02em}
+.cross-up-symbol{color:#21d6a5;font-size:11px}
+.cross-down-symbol{color:#ff637c;font-size:11px}
 .chart-share-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:11px 0 5px}
 .chart-share-actions button{font-size:12px;font-weight:800;border-radius:9px;border:1px solid #47627d;color:#dceafe;background:#13263d;min-height:43px;padding:8px}
 .chart-share-actions button:last-child{border-color:#7b9a58;color:#dafa4b}
@@ -1202,7 +1204,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
   <div class="chart-status-strip" aria-live="polite">
     <span id="chartSignalStatus" class="chart-state">WAIT · NO ENTRY</span>
     <span id="chartCandleTimer" class="chart-timer">Candle close —</span>
-    <span class="chart-prelim">CROSS markers = discovery, not entries</span>
+    <span class="chart-prelim"><span class="cross-up-symbol">▲</span> Bull cross · <span class="cross-down-symbol">▼</span> Bear cross · discovery only</span>
   </div>
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
@@ -3613,20 +3615,9 @@ function drawCanvasChart(
   }
 
   $('chartLegend').innerHTML =
-    `${esc(id)} · `+
-    `${esc(timeframe)} · `+
-    `${analysis.side} · `+
-    `<span style="color:#dafa4b">`+
-    `EMA${analysis.fastN}`+
-    `</span> / `+
-    `<span style="color:#58a6ff">`+
-    `EMA${analysis.slowN}`+
-    `</span>`+
-    (
-      plan
-        ? ' · CONFIRMED LEVELS'
-        : ' · DIRECTIONAL ANALYSIS'
-    );
+    esc(id)+' · '+esc(timeframe.toUpperCase())+
+    ' · TREND '+esc(analysis.side==='LONG'?'BULLISH':analysis.side==='SHORT'?'BEARISH':'MIXED')+
+    (plan?' · CONFIRMED ENTRY':' · WAIT · NO ENTRY');
 
 }
 
@@ -3789,7 +3780,7 @@ function drawChart(
 
   lastChartCandleSeries=candleSeries;
   if(window.PrimeChartExtras&&['15m','1h'].includes(timeframe)){
-    const markers=window.PrimeChartExtras.crossMarkers(candleData,7);
+    const markers=window.PrimeChartExtras.crossMarkers(candleData,2);
     candleSeries.setMarkers(markers);
   }
   const closes = candleData.map(item=>item.c);
@@ -3987,10 +3978,11 @@ function drawChart(
 
   $('chartLegend').innerHTML =
     '<span style="color:#edf5ff;font-weight:900">'+esc(id)+'</span> · '+
-    esc(timeframe.toUpperCase())+' · '+
-    '<span style="color:'+(analysis.side==='SHORT'?'#ff637c':analysis.side==='LONG'?'#21d6a5':'#a7b9ce')+'">'+esc(analysis.side)+'</span>'+
+    esc(timeframe.toUpperCase())+
+    ' · <span style="color:#aebfd0">TREND:</span> '+
+    '<span style="color:'+(analysis.side==='SHORT'?'#ff637c':analysis.side==='LONG'?'#21d6a5':'#a7b9ce')+'">'+
+    esc(analysis.side==='LONG'?'BULLISH':analysis.side==='SHORT'?'BEARISH':'MIXED')+'</span>'+
     (visible("ema")&&emaPeriods.length?' · EMA'+emaPeriods.join('/'):'')+
-    (visible("vwap")?' · VWAP':'')+
     (plan
       ? ' · <span style="color:#21d6a5">CONFIRMED ENTRY</span>'
       : ' · <span style="color:#f6c96b">WAIT · NO ENTRY</span>');
