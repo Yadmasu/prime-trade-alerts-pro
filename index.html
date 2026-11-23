@@ -5063,8 +5063,14 @@ setInterval(()=>{
     const status=document.getElementById('chartShareStatus');
     if(!lastSnapshot){status.textContent='Load a chart before sharing.';return;}
     const coin=lastSnapshot.id;
-    const canvas=liveChart&&typeof liveChart.takeScreenshot==='function'
-      ?liveChart.takeScreenshot():document.getElementById('priceChart');
+    let canvas;
+    try{
+      canvas=liveChart&&typeof liveChart.takeScreenshot==='function'
+        ?liveChart.takeScreenshot():document.getElementById('priceChart');
+    }catch(error){
+      status.textContent='Chart screenshot unavailable: '+error.message;
+      return;
+    }
     if(!canvas||!canvas.width||!canvas.height){
       status.textContent='Chart image is not ready.';return;
     }
