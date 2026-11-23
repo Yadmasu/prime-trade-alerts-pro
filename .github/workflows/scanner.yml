@@ -1,8 +1,7 @@
 name: YOYO 24-7 Signal Scanner
 
 on:
-  schedule:
-    - cron: "2,17,32,47 * * * *"
+  # The production yoyo-prime.timer owns live delivery.
   workflow_dispatch:
 
 permissions:
@@ -33,7 +32,7 @@ jobs:
         env:
           ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
           RUN_ONCE: "true"
-          DRY_RUN: "false" # Enable actual OneSignal delivery for confirmed signals
+          DRY_RUN: "true" # Manual diagnostic runs never notify subscribers
         run: python scanner.py
       - uses: actions/cache/save@v4
         if: always()
