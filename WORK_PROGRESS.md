@@ -11,8 +11,8 @@
 
 ## Blockers and pending work
 
-Bot 2 deployment and iPhone receipt still require authorized production access. No local SSH configuration or OneSignal credentials were available. Bot 3 original-channel verification was requested via the existing GitHub workflow. Bot 1 is outside scope.
+Bot 2 deployment and iPhone receipt still require authorized production access. No local SSH configuration or OneSignal credentials were available. Bot 3 GitHub Actions run [45213460456](https://github.com/Yadmasu/-yoyo-smart-whale-pro/actions/runs/45213460456) finished with failure. Both jobs report zero executed steps. The runner produced no Telegram photo receipt. Bot 1 is outside scope.
 
 ## Exact next action
 
-Read this checkpoint when the next Work session starts. Check the Bot 3 verification job for commit `f483b6fb23c8b9fcb9ce7ee362059ef9f740e35b` before sending any further test. For Bot 2, verify yoyo-prime.service's deployed scanner revision and correlate an accepted notification ID with iPhone receipt. Preserve deployed strategy code and back up before production edits.
+Read this checkpoint when the next Work session starts. Restore a working Actions runner or use the authorized Bot 3 VPS environment to run the watermarked test once with the original channel configuration. Verify its positive Telegram message ID. The current GitHub scanner identifies EMA21/89, so verify the VPS entry point before applying any sender change to production. For Bot 2, verify yoyo-prime.service's deployed scanner revision and correlate an accepted notification ID with iPhone receipt. Preserve deployed strategy code and back up before production edits.
