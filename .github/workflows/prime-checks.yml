@@ -24,6 +24,7 @@ jobs:
       - run: node --check share-card.js
       - run: node --test tests/share-card.test.cjs
       - run: node --test tests/fib-display.test.cjs
+      - run: node --test tests/sr-layout.test.cjs
       - run: node --test tests/chart-extras.test.cjs
       - run: node --test tests/ema-cross.test.cjs
       - name: Validate inline application scripts
