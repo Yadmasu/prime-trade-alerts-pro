@@ -10,6 +10,9 @@ function digestBytes(rows){
 }
 function draw(s,rows){
   const priceText=p=>p.toFixed(Math.max(0,Math.min(6-(s.size_decimals??0),4-Math.floor(Math.log10(p)))));
+  const pivots=PrimeChartExtras.supportResistance(rows);
+  byId("pivots").textContent=["support","resistance"].map(name=>
+    name.toUpperCase()+" "+(Number.isFinite(pivots[name])?priceText(pivots[name]):"—")).join("   ·   ");
   const names=["ENTRY","SL","TP1","TP2","TP3"], levels=[s.entry,s.stop,s.tp1,s.tp2,s.tp3];
   requireValue(levels.every(x=>Number.isFinite(x)&&x>0));
   const ordered=[s.stop,s.entry,s.tp1,s.tp2,s.tp3]; if(s.side==="SHORT")ordered.reverse();
@@ -62,6 +65,54 @@ function draw(s,rows){
     const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=names[i];dd.textContent=priceText(p);byId("levels").append(dt,dd);
   }
 }
+async function prepareSharing(signal){
+  const svg=byId("plot").cloneNode(true);
+  const {width,height}=svg.viewBox.baseVal;
+  svg.setAttribute("width",width);
+  svg.setAttribute("height",height);
+  const image=new Image();
+  const source=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:"image/svg+xml"}));
+  const canvas=document.createElement("canvas");
+  canvas.width=width*2;canvas.height=(height+140)*2;
+  const ctx=canvas.getContext("2d");
+  try{
+    image.src=source;
+    await image.decode();
+    ctx.scale(2,2);
+    ctx.fillStyle="#101722";ctx.fillRect(0,0,width,height+140);
+    ctx.fillStyle="#edf1f5";ctx.font="bold 16px system-ui";
+    ctx.fillText("PRIME TRADE ALERTS PRO",10,22);
+    ctx.fillStyle=signal.side==="LONG"?colors.teal:colors.red;
+    ctx.fillText(signal.market+" / 15m · CONFIRMED "+signal.side,10,47,width-20);
+    ctx.fillStyle=colors.muted;ctx.font="13px system-ui";
+    ctx.fillText(byId("pivots").textContent,10,69,width-20);
+    ctx.fillText("EMA9 · EMA21 · AVWAP · ORH / ORL",10,89);
+    ctx.drawImage(image,0,96,width,height);
+    ctx.fillText(byId("time").textContent,10,height+124);
+    ctx.textAlign="right";ctx.fillText("No financial advice.",width-10,height+124);
+  }finally{URL.revokeObjectURL(source);}
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+  if(!blob)throw Error("PNG export unavailable.");
+  const file=new File([blob],"PRIME-"+signal.market.replace(/[^a-z0-9_-]/gi,"_")+".png",{type:"image/png"});
+  for(const button of document.querySelectorAll("[data-share]")){
+    button.disabled=false;
+    button.onclick=async()=>{
+      const status=byId("shareStatus");
+      try{
+        if(navigator.canShare?.({files:[file]})&&navigator.share){
+          status.textContent="Choose "+button.dataset.share+" in the share sheet.";
+          await navigator.share({files:[file]});
+        }else{
+          const link=document.createElement("a");
+          link.href=URL.createObjectURL(file);link.download=file.name;
+          document.body.append(link);link.click();link.remove();
+          setTimeout(()=>URL.revokeObjectURL(link.href),5000);
+          status.textContent="Attach the downloaded PNG in "+button.dataset.share+".";
+        }
+      }catch(error){status.textContent=error.name==="AbortError"?"Sharing cancelled.":"Image sharing failed.";}
+    };
+  }
+}
 async function openSignal(){
   const id=new URLSearchParams(location.search).get("signal");requireValue(/^[a-f0-9]{32}$/.test(id||""));
   const key=new URL("signal-cache/"+id,location.href);
@@ -92,6 +143,8 @@ async function openSignal(){
   }
   document.querySelector("main").hidden=false;
   draw(s,rows);byId("status").hidden=true;
+  byId("exchange").href="https://app.hyperliquid.xyz/trade/"+encodeURIComponent(s.market);
+  prepareSharing(s).catch(()=>{byId("shareStatus").textContent="Chart image export unavailable.";});
   if(!saved)await cache.put(historyKey.href,new Response(JSON.stringify(raw))).catch(()=>{});
   window.addEventListener("resize",()=>draw(s,rows));
 }
