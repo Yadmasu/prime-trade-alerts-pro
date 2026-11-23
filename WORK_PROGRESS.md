@@ -38,4 +38,8 @@ GitHub's scanner checks passed on 6f48174. Push chart revision 4e6a8c5 is on mai
 
 On November 23 at 18:29 ET job 138093555227 on 453dc3f succeeded. OneSignal accepted one targeted test for the original matched iPhone subscription. Provider notification ID 34ffd7ce-edc7-4361-9418-8d894199d530. Asked the user for on-device receipt. Do not resend merely to verify this result. Published confirmed.html returned HTTP 200 with both image-sharing buttons and the exchange link. Also corrected the Markets page allowing weekend opening-range confirmations when scanner.py rejects them. Local winter/summer weekday and weekend fixtures passed, plus all 31 existing tests.
 
-Resume with the user's iPhone receipt or OneSignal delivery record for the ID above. Then inspect the deployed Prime scanner revision and Bot 3 enablement, recent logs, and Telegram photo receipt on the original VPS. Bot 3 source and service were not changed in this session.
+## Confirmed iPhone receipt — November 23, 2026
+
+The owner personally received “PRIME TRADE ALERTS PRO • TEST” on the original iPhone. This completes the targeted test from job 138093555227. No repeat test is needed.
+
+Production verification remains open. The Vultr console requires sign-in, and the workspace has no configured SSH identity or agent. Next, inspect the deployed source revision and effective service/timer for yoyo-prime.service. Correlate a genuine strategy-qualified LONG or SHORT with its market, closed candle, OneSignal notification ID and device receipt. For Bot 3, verify yoyo-whales.service enablement, uptime and logs, then match a post-schedule-removal Telegram photo receipt to the original channel. The earlier Telegram image was user-observed. No runtime changes were made.
