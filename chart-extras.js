@@ -17,11 +17,11 @@
     }
     return results;
   }
-  function crossMarkers(candles,max=8){
+  function crossMarkers(candles,max=2){
     if(!Array.isArray(candles)||candles.length<22)return [];
     const close=candles.map(x=>Number(x.c)),a=ema(close,9),b=ema(close,21);
     const markers=[];
-    for(let i=21;i<candles.length;i++){
+    for(let i=Math.max(21,candles.length-60);i<candles.length;i++){
       const t=Number(candles[i].t);
       if(!Number.isFinite(t)||!Number.isFinite(close[i]))continue;
       const bullish=a[i-1]<=b[i-1]&&a[i]>b[i];
@@ -31,11 +31,10 @@
         time:Math.floor(t/1000),
         position:bullish?'belowBar':'aboveBar',
         color:bullish?'#21d6a5':'#ff637c',
-        shape:bullish?'arrowUp':'arrowDown',
-        text:bullish?'BULL CROSS':'BEAR CROSS'
+        shape:bullish?'arrowUp':'arrowDown'
       });
     }
-    return markers.slice(-Math.max(0,max));
+    return markers.slice(-Math.min(2,Math.max(0,max)));
   }
   function signalStatus(analysis,confirmed){
     if(confirmed&&confirmed.confirmed===true){
