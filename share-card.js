@@ -136,25 +136,6 @@ function drawShareCard(snapshot,source,extras){
     });if(!first)g.stroke();
   };
   drawEma(m.ema9,COLOR.blue);drawEma(m.ema21,COLOR.orange);
-  // Centered confirmed levels in exported Telegram/WhatsApp PNG only.
-  if(m.confirmed){
-    const trades=[
-      ['ENTRY',Number(m.levels.entry),COLOR.gold],
-      ['SL',Number(m.levels.stop),COLOR.down],
-      ['TP1',Number(m.levels.tp1),COLOR.up],
-      ['TP2',Number(m.levels.tp2),COLOR.up],
-      ['TP3',Number(m.levels.tp3),COLOR.up]
-    ];
-    const box={x:222,y:236,w:568,h:138};
-    g.save();g.globalAlpha=.94;rect(box.x,box.y,box.w,box.h,'#081321');g.restore();
-    g.strokeStyle='#3e5970';g.lineWidth=2;g.strokeRect(box.x,box.y,box.w,box.h);
-    const slots=[[95,27],[284,27],[473,27],[190,95],[378,95]];
-    trades.forEach(([label,price,color],i)=>{
-      const [dx,dy]=slots[i],px=box.x+dx,py=box.y+dy;
-      text(label,px,py,17,color,'800','center');
-      text(formatPrice(price),px,py+28,23,COLOR.white,'800','center');
-    });
-  }
   // Pivot lines are intentionally thin; numeric tags live in the dedicated sidebar.
   for(const l of m.levels){
     if(l.price<m.low||l.price>m.high)continue;
@@ -193,6 +174,25 @@ function drawShareCard(snapshot,source,extras){
   }else{
     text('RESEARCH ONLY',1098,670,20,COLOR.gold,'800');
     text('NOT AN ENTRY SIGNAL',1098,705,13,COLOR.white);
+  }
+  // Centered confirmed levels in exported Telegram/WhatsApp PNG only.
+  if(m.confirmed){
+    const trades=[
+      ['ENTRY',Number(m.levels.entry),COLOR.gold],
+      ['SL',Number(m.levels.stop),COLOR.down],
+      ['TP1',Number(m.levels.tp1),COLOR.up],
+      ['TP2',Number(m.levels.tp2),COLOR.up],
+      ['TP3',Number(m.levels.tp3),COLOR.up]
+    ];
+    const box={x:222,y:236,w:568,h:138};
+    g.save();g.globalAlpha=.94;rect(box.x,box.y,box.w,box.h,'#081321');g.restore();
+    g.strokeStyle='#3e5970';g.lineWidth=2;g.strokeRect(box.x,box.y,box.w,box.h);
+    const slots=[[95,27],[284,27],[473,27],[190,95],[378,95]];
+    trades.forEach(([label,price,color],i)=>{
+      const [dx,dy]=slots[i],px=box.x+dx,py=box.y+dy;
+      text(label,px,py,17,color,'800','center');
+      text(formatPrice(price),px,py+28,23,COLOR.white,'800','center');
+    });
   }
   const stamp=new Date(m.candleTime);
   if(!Number.isFinite(stamp.getTime()))throw Error('Invalid candle time');
