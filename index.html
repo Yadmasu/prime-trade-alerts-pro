@@ -1128,6 +1128,8 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
         autocomplete="off"
       >
 
+      <button type="button" id="showBtcChart" style="margin-top:10px;width:100%;border:1px solid #4d8e9e;color:#41d3bc;background:#14263a;border-radius:8px;padding:11px;font-weight:800">BTC · Chart + Analysis Only</button>
+
       <label style="margin-top:10px">Market</label>
 
       <select id="market">
@@ -1581,8 +1583,16 @@ async function loadMarkets(){
     }
   }
 
+  // Keep the real BTC perp available for chart research even when live
+  // metadata is missing. Candles must still be fetched from Hyperliquid;
+  // no prices, confirmations or signals are synthesized here.
+  if(!found.has('BTC')){
+    add('BTC',{kind:'perp',coin:'BTC',asset:'BTC',
+      label:'BTC · CHART / ANALYSIS ONLY',dex:'',
+      price:NaN,change:null,notional:null,openInterest:null,funding:null});
+  }
   marketInfo=found;
-  markets=[...found.keys()].sort((a,b)=>a.localeCompare(b));
+  markets=[...found.keys()].sort((a,b)=>a==='BTC'?-1:b==='BTC'?1:a.localeCompare(b));
 
   marketRows=[...found.entries()]
     .filter(([,item])=>
@@ -4829,6 +4839,15 @@ $('search')
 
   }
 );
+
+document.getElementById('showBtcChart')?.addEventListener('click',()=>{
+  if(!marketInfo.has('BTC'))return;
+  document.getElementById('search').value='';
+  updateMarkets();
+  document.getElementById('market').value='BTC';
+  analyze();
+  document.getElementById('liveChart')?.scrollIntoView({behavior:'smooth'});
+});
 
 $('market')
 .addEventListener(
