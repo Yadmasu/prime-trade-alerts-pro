@@ -588,10 +588,11 @@ button:active{transform:translateY(1px)}
 .sr-left-tag.r{color:#f39aa0;border-color:rgba(243,154,160,.55)}
 .cross-up-symbol{color:#21d6a5;font-size:11px}
 .cross-down-symbol{color:#ff637c;font-size:11px}
-.chart-share-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:11px 0 5px}
-.chart-share-actions button{font-size:12px;font-weight:800;border-radius:9px;border:1px solid #47627d;color:#dceafe;background:#13263d;min-height:43px;padding:8px}
-.chart-share-actions button:last-child{border-color:#7b9a58;color:#dafa4b}
-@media(max-width:560px){.chart-share-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-share-actions button:last-child{grid-column:span 2}.chart-quickbar button{min-width:0;font-size:12px;padding:8px 3px}}
+.chart-share-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:11px 0 5px}
+.chart-share-actions button,.chart-share-actions a{display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:800;border-radius:9px;border:1px solid #47627d;color:#dceafe;background:#13263d;min-height:43px;padding:8px;text-decoration:none}
+.chart-share-actions #openChartHyperliquid{border-color:#7b9a58;color:#dafa4b}
+.chart-share-actions #openChartPhantom{border-color:#8271c4;color:#c6b6ff}
+@media(max-width:560px){.chart-quickbar button{min-width:0;font-size:12px;padding:8px 3px}}
 #chartLegend{
   position:absolute;
   left:12px;
@@ -1225,6 +1226,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     <button type="button" id="shareChartTelegram">Share Telegram Image</button>
     <button type="button" id="shareChartWhatsapp">Share WhatsApp Image</button>
     <button type="button" id="openChartHyperliquid">Open Hyperliquid</button>
+    <a id="openChartPhantom" href="https://phantom.com/" target="_blank" rel="noopener noreferrer" aria-label="Open Phantom wallet official website">Open Phantom</a>
   </div>
   <p id="chartShareStatus" class="muted mini" role="status" aria-live="polite"></p>
   <div class="chart-oscillators"><details class="osc-panel" id="rsiPanel"><summary class="osc-label"><span>RSI 14</span><span><b id="rsiValue">—</b> <span class="osc-chevron">⌄</span></span></summary><canvas id="rsiPlot"></canvas></details><details class="osc-panel" id="macdPanel"><summary class="osc-label"><span>MACD 12 / 26 / 9</span><span><b id="macdValue">—</b> <span class="osc-chevron">⌄</span></span></summary><canvas id="macdPlot"></canvas></details></div>
