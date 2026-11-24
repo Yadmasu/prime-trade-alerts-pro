@@ -1541,7 +1541,7 @@ async function loadMarkets(){
       for(let index=0;index<universe.length;index++){
         const asset=universe[index];
 
-        if(asset.isDelisted||asset.name==='BTC')continue;
+        if(asset.isDelisted)continue;
 
         const id=
           dex&&!asset.name.includes(':')
@@ -1563,7 +1563,7 @@ async function loadMarkets(){
         add(id,{
           kind:'perp',
           coin:id,
-          label:id+' · PERP',
+          label:id+(id==='BTC'?' · CHART / ANALYSIS ONLY':' · PERP'),
           dex:dex||'',
           asset:asset.name,
           price,
@@ -1680,7 +1680,7 @@ async function scanCrosses(force=false){
   const token=++crossToken;
   crossScanBusy=true;crossScanDone=false;crossResults=[];
   crossScanned=0;crossFailed=0;
-  const eligible=marketRows.filter(item=>Number.isFinite(item.price)&&item.price>0);
+  const eligible=marketRows.filter(item=>item.id!=='BTC'&&Number.isFinite(item.price)&&item.price>0);
   crossExpected=eligible.length;
   renderCryptoMarket();
   let next=0;
@@ -2168,7 +2168,7 @@ function renderHistory(){
 
 function recordSignal(signal,id){
 
-  if(!signal?.confirmed){
+  if(id==='BTC'||!signal?.confirmed){
     return;
   }
 
@@ -4212,11 +4212,9 @@ async function analyze(){
 
     }
 
-    let confirmed =
-      confirmEntry(
-        candles15,
-        analysis
-      );
+    let confirmed = id==='BTC'
+      ? {confirmed:false,reason:'BTC is chart and analysis only; trade alerts are excluded.',checks:{}}
+      : confirmEntry(candles15,analysis);
 
     let livePriceValid = null;
 
@@ -4447,7 +4445,7 @@ async function checkAlert(){
         analysis
       );
 
-    if(!signal.confirmed){
+    if(id==='BTC'||!signal.confirmed){
       return;
     }
 
