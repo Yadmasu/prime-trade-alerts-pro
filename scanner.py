@@ -323,7 +323,6 @@ async def send_push(session: aiohttp.ClientSession, market: Market, signal: dict
         "idempotency_key": str(uuid.UUID(signal["chart_id"], version=4)),
         "headings": {"en": title},
         "contents": {"en": body},
-        "url": f"{APP_URL}confirmed.html?signal={signal['chart_id']}",
         "web_url": f"{APP_URL}confirmed.html?signal={signal['chart_id']}",
         "data": {"market": market.coin, **signal},
     }
