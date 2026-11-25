@@ -77,6 +77,8 @@ async def post(session: aiohttp.ClientSession, body: dict) -> object:
     for attempt in range(4):
         try:
             async with session.post(HL_API, json=body, timeout=20) as response:
+                if response.status == 429:
+                    print(f"Hyperliquid HTTP 429 request={body.get('type')} attempt={attempt + 1}", flush=True)
                 if response.status in (429, 500, 502, 503, 504):
                     if attempt == 3:
                         response.raise_for_status()
@@ -266,8 +268,12 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
 async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semaphore, market: Market):
     async with semaphore:
         try:
-            rows15, rows1h, rows4h = await asyncio.gather(
-                candles(session, market.coin, "15m", 13),
+            rows15 = await candles(session, market.coin, "15m", 13)
+            # These existing requirements depend only on the closed 15m bars.
+            # Avoid two history requests when this market already fails them.
+            if len(rows15) < 110 or not volume_ratio(rows15) >= MIN_VOLUME_RATIO:
+                return market, None
+            rows1h, rows4h = await asyncio.gather(
                 candles(session, market.coin, "1h", 17),
                 candles(session, market.coin, "4h", 45),
             )
@@ -284,7 +290,8 @@ async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semapho
                               history_hash=digest.hexdigest(),
                               chart_id=hashlib.sha256(f"{market.coin}/{signal['candle']}/{signal['side']}".encode()).hexdigest()[:32])
             return market, signal
-        except Exception:
+        except Exception as error:
+            print(f"Market scan failed market={market.coin} error={type(error).__name__}", flush=True)
             return market, None
 
 
