@@ -81,3 +81,9 @@ Authenticated Ubuntu shell inspected. Prime timer enabled and active. Last 24h j
 Bot 3 Telegram getMe succeeded as YoYoSmartWhaleProBot. getChat resolved HL_TEST_CHAT_ID to Yo-Yo WHALE ALERTS, TELEGRAM_CHAT_IDS to YO-YO MARKET ALERTS, and HL_WALLET_CHAT_ID returned 400. The enabled yoyo-whales daemon is the wallet watcher, NRestarts=0; its live source already backs off 30s exponentially and honors numeric Retry-After. 522 matching cooldown warnings over 24h. Separate chart sender found in ~/YOYO-NEW/smart-whale/main.py. Correct original chart destination needs confirmation prior to sending. Neither throttling resolution nor fresh photo receipt established.
 
 Bot 1 user timer yoyo-hyperliquid-scan.timer enabled, Linger=yes, last service result success in ~/YOYO-Hyperliquid-Aler with next quarter-hour invocation scheduled. No strategy edits or live alert claims.
+
+## November 25 verification checkpoint
+
+The owner specified YO-YO WHALE ALERTS as Bot 3's original destination. The preceding authenticated getChat check mapped HL_TEST_CHAT_ID to that channel. Bot posting permissions, the active scheduler for ~/YOYO-NEW/smart-whale/main.py, a matching automatic photo receipt, and improvement in the 429 rate still require live verification. The yoyo-whales wallet watcher is a separate process.
+
+This session reached the Vultr account sign-in page. No current journals were available. Bot 1's last verified service result remains success. For Bot 2, the owner-confirmed iPhone test stands. The current repository scanner compiled and its OneSignal payload passed static checks for a single web URL and an idempotency key. Genuine post-fix signal receipt on the iPhone is pending. No production edits, workflow runs or outbound notifications this session.
