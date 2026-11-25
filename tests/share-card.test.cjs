@@ -44,15 +44,15 @@ test('rendering creates a complete landscape PNG layout without depending on scr
   fillRect:(...args)=>drawn.push(['rect',...args]),
   strokeRect:()=>{},beginPath:()=>{},moveTo:()=>{},lineTo:()=>{},
   stroke:()=>{},fillText:(...args)=>drawn.push(['text',...args]),
-  setLineDash:()=>{}
+  setLineDash:()=>{},scale:()=>{}
  };
  const oldDocument=global.document;
  global.document={createElement:tag=>{assert.equal(tag,'canvas');return {
    width:0,height:0,getContext:()=>ctx};}};
  try{
   const canvas=card.drawShareCard(snapshot(),null,{supportResistance:()=>({support:.91,resistance:.96})});
-  assert.equal(canvas.width,1400);
-  assert.equal(canvas.height,900);
+  assert.equal(canvas.width,1280);
+  assert.equal(canvas.height,823);
   assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1]).includes('WAIT')));
   assert.ok(drawn.some(x=>x[0]==='text'&&x[1]==='No financial advice.'));
   assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1])==='SUPPORT'));
