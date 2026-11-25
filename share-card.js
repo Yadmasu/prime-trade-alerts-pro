@@ -87,7 +87,7 @@ function drawShareCard(snapshot,source,extras){
   const m=drawingModel(snapshot,extras);
   if(typeof document==='undefined')throw Error('Canvas rendering needs a browser');
   const cv=document.createElement('canvas');
-  cv.width=1080;cv.height=1440;
+  cv.width=1400;cv.height=900;
   const g=cv.getContext('2d');
   if(!g)throw Error('PNG renderer unavailable');
   const rect=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(x,y,w,h);};
@@ -96,17 +96,17 @@ function drawShareCard(snapshot,source,extras){
     g.textAlign=align;g.fillStyle=color;g.fillText(String(value),x,y);
     g.textAlign='left';
   };
-  rect(0,0,1080,1440,COLOR.bg);
-  rect(24,24,1032,1392,COLOR.panel);
-  g.strokeStyle='#2c4359';g.lineWidth=2;g.strokeRect(24,24,1032,1392);
+  rect(0,0,1400,900,COLOR.bg);
+  rect(24,24,1352,852,COLOR.panel);
+  g.strokeStyle='#2c4359';g.lineWidth=2;g.strokeRect(24,24,1352,852);
   rect(50,48,7,47,COLOR.support);
   text('PRIME',76,82,34,COLOR.white,'800');
   text('TRADE ALERTS PRO',205,82,34,COLOR.support,'800');
   text('HYPERLIQUID  •  MARKET CHART',52,120,16,COLOR.muted,'600');
   text(m.id+'  ·  '+m.tf,52,167,30,COLOR.white,'800');
-  text(m.headline,1028,165,21,m.confirmed?
+  text(m.headline,1342,165,21,m.confirmed?
     (m.direction==='BULLISH'?COLOR.up:COLOR.down):COLOR.gold,'800','right');
-  const frame={x:52,y:194,w:976,h:760},plot={x:72,y:220,w:830,h:610};
+  const frame={x:52,y:194,w:1008,h:574},plot={x:72,y:220,w:870,h:451};
   rect(frame.x,frame.y,frame.w,frame.h,'#0a1929');
   g.strokeStyle='#334860';g.strokeRect(frame.x,frame.y,frame.w,frame.h);
   const x=i=>plot.x+(i+.5)*plot.w/m.data.length;
@@ -115,7 +115,7 @@ function drawShareCard(snapshot,source,extras){
   for(let i=0;i<=5;i++){
     const py=plot.y+(plot.h*i/5);
     g.beginPath();g.moveTo(plot.x,py);g.lineTo(plot.x+plot.w,py);g.stroke();
-    text(formatPrice(m.high-(m.high-m.low)*i/5),plot.x+plot.w+11,py+4,21,COLOR.muted,'500');
+    text(formatPrice(m.high-(m.high-m.low)*i/5),plot.x+plot.w+11,py+4,14,COLOR.muted,'500');
   }
   for(let i=0;i<5;i++){
     const px=plot.x+plot.w*i/4;
@@ -143,41 +143,63 @@ function drawShareCard(snapshot,source,extras){
     g.beginPath();g.moveTo(plot.x,y(l.price));g.lineTo(plot.x+plot.w,y(l.price));g.stroke();
     g.setLineDash([]);
   }
-  rect(plot.x,850,plot.w,70,'#0c1a29');
+  rect(plot.x,689,plot.w,50,'#0c1a29');
   const peak=Math.max(1,...m.data.map(b=>b.v));
   m.data.forEach((b,i)=>{
-    rect(x(i)-barw/2,918-65*b.v/peak,barw,65*b.v/peak,
+    rect(x(i)-barw/2,738-45*b.v/peak,barw,45*b.v/peak,
       b.c>=b.o?'#2b8779':'#8e4b5a');
   });
   // Avoid extrapolating a real-time market price from the last candle close.
-  text('EMA 9',plot.x,944,22,COLOR.blue,'700');
-  text('EMA 21',plot.x+135,944,22,COLOR.orange,'700');
-  text('VOLUME',plot.x+285,944,22,COLOR.muted,'700');
-  rect(52,978,976,322,'#142439');
-  const metric=(label,value,x,y,color)=> {
-    text(label,x,y,20,COLOR.muted,'700');
-    text(value,x,y+42,33,color,'800');
-  };
-  metric('LAST CHART PRICE',formatPrice(m.price),76,1016,COLOR.white);
-  metric('TREND',m.direction,560,1016,m.direction==='BULLISH'?COLOR.up:m.direction==='BEARISH'?COLOR.down:COLOR.gold);
-  metric('SUPPORT',formatPrice(m.sr.support),76,1110,COLOR.support);
-  metric('RESISTANCE',formatPrice(m.sr.resistance),560,1110,COLOR.resistance);
+  text('EMA 9',plot.x,756,14,COLOR.blue,'700');
+  text('EMA 21',plot.x+85,756,14,COLOR.orange,'700');
+  text('VOLUME',plot.x+195,756,14,COLOR.muted,'700');
+  rect(1076,194,272,574,'#142439');
+  const divider=q=>{g.strokeStyle='#30465e';g.beginPath();
+    g.moveTo(1098,q);g.lineTo(1326,q);g.stroke();};
+  text('LAST CHART PRICE',1098,235,15,COLOR.muted,'700');
+  text(formatPrice(m.price),1098,279,34,COLOR.white,'800');divider(300);
+  text('TREND',1098,340,15,COLOR.muted,'700');
+  text(m.direction,1098,378,23,m.direction==='BULLISH'?COLOR.up:
+    m.direction==='BEARISH'?COLOR.down:COLOR.gold,'800');divider(400);
+  text('SUPPORT',1098,441,15,COLOR.muted,'700');
+  text(formatPrice(m.sr.support),1098,478,27,COLOR.support,'800');divider(500);
+  text('RESISTANCE',1098,541,15,COLOR.muted,'700');
+  text(formatPrice(m.sr.resistance),1098,578,27,COLOR.resistance,'800');divider(600);
   if(m.confirmed){
-    const trades=[['ENTRY','entry',COLOR.gold],['SL','stop',COLOR.down],['TP1','tp1',COLOR.up],['TP2','tp2',COLOR.up],['TP3','tp3',COLOR.up]];
-    trades.forEach(([label,key,color],i)=>{
-      const px=76+i*190;
-      text(label,px,1210,21,color,'800');
-      text(formatPrice(Number(m.levels[key])),px,1250,25,COLOR.white,'800');
-    });
+    text('ENTRY',1098,635,14,COLOR.muted);
+    text(formatPrice(Number(m.levels.entry)),1098,663,21,COLOR.gold,'800');
+    text('SL  '+formatPrice(Number(m.levels.stop)),1098,693,16,COLOR.down);
+    text('TP1  '+formatPrice(Number(m.levels.tp1)),1098,717,16,COLOR.up);
+    text('TP2  '+formatPrice(Number(m.levels.tp2))+'  |  TP3  '+formatPrice(Number(m.levels.tp3)),1098,744,13,COLOR.muted);
   }else{
-    text('RESEARCH ONLY — NOT AN ENTRY SIGNAL',76,1248,25,COLOR.gold,'800');
+    text('RESEARCH ONLY',1098,670,20,COLOR.gold,'800');
+    text('NOT AN ENTRY SIGNAL',1098,705,13,COLOR.white);
+  }
+  // Centered confirmed levels in exported Telegram/WhatsApp PNG only.
+  if(m.confirmed){
+    const trades=[
+      ['ENTRY',Number(m.levels.entry),COLOR.gold],
+      ['SL',Number(m.levels.stop),COLOR.down],
+      ['TP1',Number(m.levels.tp1),COLOR.up],
+      ['TP2',Number(m.levels.tp2),COLOR.up],
+      ['TP3',Number(m.levels.tp3),COLOR.up]
+    ];
+    const box={x:222,y:236,w:568,h:138};
+    g.save();g.globalAlpha=.94;rect(box.x,box.y,box.w,box.h,'#081321');g.restore();
+    g.strokeStyle='#3e5970';g.lineWidth=2;g.strokeRect(box.x,box.y,box.w,box.h);
+    const slots=[[95,27],[284,27],[473,27],[190,95],[378,95]];
+    trades.forEach(([label,price,color],i)=>{
+      const [dx,dy]=slots[i],px=box.x+dx,py=box.y+dy;
+      text(label,px,py,17,color,'800','center');
+      text(formatPrice(price),px,py+28,23,COLOR.white,'800','center');
+    });
   }
   const stamp=new Date(m.candleTime);
   if(!Number.isFinite(stamp.getTime()))throw Error('Invalid candle time');
   text('CANDLE TIME  '+stamp.toISOString().slice(0,16).replace('T',' ')+' UTC',
-    52,1342,22,COLOR.white,'600');
-  text('S/R = confirmed swing pivots  •  Price is latest chart candle',52,1376,18,COLOR.muted);
-  text('No financial advice.',1028,1400,16,COLOR.muted,'500','right');
+    52,814,17,COLOR.white,'600');
+  text('S/R = confirmed swing pivots  •  Price is latest chart candle',52,844,14,COLOR.muted);
+  text('No financial advice.',1342,842,12,COLOR.muted,'500','right');
   return cv;
 }
 return {cardMeta,formatPrice,validatedCandles,drawingModel,drawShareCard};
