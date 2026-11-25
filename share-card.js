@@ -87,9 +87,11 @@ function drawShareCard(snapshot,source,extras){
   const m=drawingModel(snapshot,extras);
   if(typeof document==='undefined')throw Error('Canvas rendering needs a browser');
   const cv=document.createElement('canvas');
-  cv.width=1400;cv.height=900;
+  cv.width=1280;cv.height=823;
   const g=cv.getContext('2d');
   if(!g)throw Error('PNG renderer unavailable');
+  // Uniform scaling preserves the approved landscape chart without cropping or stretching.
+  g.scale(cv.width/1400,cv.width/1400);
   const rect=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(x,y,w,h);};
   const text=(value,x,y,size,color,weight='600',align='left')=>{
     g.font=weight+' '+size+'px system-ui,-apple-system,sans-serif';
