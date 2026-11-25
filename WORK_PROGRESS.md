@@ -93,3 +93,9 @@ Later in this session Vultr sign-in succeeded, the instance showed Running, and 
 Bot 3 only, Nov 25 follow-up: Reconnected the existing authenticated noVNC console. The shell remained at a continuation prompt after interrupt input. The workspace exposed no existing SSH session, configured identity or SSH agent. No new production edits, restarts, scanner tests or Telegram posts occurred. The chart worker schedule, rate-limit fix and genuine original-channel photo receipt remain unverified.
 
 Bot 3 handoff: Owner confirmed Ctrl+C restored the VPS prompt and `crontab -l` reported no crontab for linuxuser. This excludes only that user's crontab. The Work execution environment was unavailable and exposed no console connection during this follow-up. Systemd scheduling, current 429 rate and automatic Telegram photo delivery still need live verification. No deployment or test occurred.
+
+## Bot 3 — VPS chart quality checkpoint, November 25
+
+The live wallet watcher in ~/yoyo-whale-new was backed up, its Telegram text POST removed, and yoyo-whales restarted and verified active. The chart worker in ~/YOYO-NEW/smart-whale now reads only HL_TEST_CHAT_ID, previously resolved to YO-YO WHALE ALERTS. Its backed-up main.py compiled after adding a numeric 8–10 sender guard. Calling send_telegram directly with an unscored input raised before rendering or network I/O. The deployed threshold patch is recorded in Smart Whale commit baf48547. Wallet suppression is recorded in 8009cc9.
+
+Bot 2's scanner returns confirmation levels without a numeric quality field. Its app shows 11 individual verification states and computes a separate directional agreement percentage. No existing 0–10 quality formula was identified in the checked sources. No replacement formula was assumed. No chart service activated in this session. Automatic delivery, production duplicate suppression and a Telegram photo receipt remain unverified. No Bot 1 or Bot 2 runtime or strategy changes.
