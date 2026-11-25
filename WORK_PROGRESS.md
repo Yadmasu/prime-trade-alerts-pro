@@ -47,3 +47,11 @@ Production verification remains open. Vultr account sign-in succeeded. The YOYO-
 ## Authenticated VPS inspection
 
 The Ubuntu login succeeded. Prime's enabled, active timer runs /opt/yoyo-prime/scanner.py; consecutive successful scans each examined 68 markets and found zero candidates. The standalone file's Git blob was 278aa5c4888d8c80f9125819870481464d0b6fc1. Compared with GitHub 6f48174, the existing functions differing were discover_markets and send_push. No genuine signal receipt was established. Bot 3 yoyo-whales.service is active and enabled. It runs /home/linuxuser/yoyo-whale-new/hl_comparison_daemon.py at checkout 9eb64d3 with locally modified hl_comparison_test.py, which references sendMessage. The searched 12-hour journal showed 23 matches for 429 and no matching photo receipt. The sender of the previously received photo still requires attribution. Preserve local modifications.
+
+## November 24 remote investigation (GitHub-only)
+
+- Confirmed Bot 2 GitHub `.github/workflows/scanner.yml` has `workflow_dispatch` only; unattended production alerts depend on the VPS `yoyo-prime.timer`, not GitHub Actions.
+- Confirmed Bot 3 repository `Yadmasu/-yoyo-smart-whale-pro` workflow `.github/workflows/smart-whale.yml` is manual-only; its VPS daemon must be checked for 24/7 delivery.
+- Bot 2 repository scanner includes retry handling for HTTP 429 and transient errors; its deployed VPS source was previously observed to differ from GitHub. These code findings alone cannot establish current live behavior.
+- **Unverified:** exact last-24-hour scan counts, confirmed candidate count, 429 failures, service restarts, recent OneSignal receipts, and Telegram photo message IDs. No authenticated live VPS journal was available in this investigation. No production changes were made and Bot 1 was not touched.
+- **Next VPS action:** inspect `systemctl status yoyo-prime.timer yoyo-prime.service yoyo-whales.service` and `journalctl` over 24 hours; redact secrets, count scans/candidates/errors/restarts/deliveries; compare deployed scanner to tested repo and check both receipts before modifying service files. Back up first, fix only demonstrated defects, verify and commit.
