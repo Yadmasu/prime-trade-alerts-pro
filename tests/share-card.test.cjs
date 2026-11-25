@@ -38,7 +38,7 @@ test('drawing model computes prices and valid scale from actual candles',()=>{
  assert.equal(model.levels.length,2);
  assert.equal(model.levels[0].name,'S');
 });
-test('rendering creates a complete landscape PNG layout without depending on screenshots',()=>{
+test('rendering creates a complete portrait PNG layout without depending on screenshots',()=>{
  const drawn=[];
  const ctx={
   fillRect:(...args)=>drawn.push(['rect',...args]),
@@ -51,8 +51,8 @@ test('rendering creates a complete landscape PNG layout without depending on scr
    width:0,height:0,getContext:()=>ctx};}};
  try{
   const canvas=card.drawShareCard(snapshot(),null,{supportResistance:()=>({support:.91,resistance:.96})});
-  assert.equal(canvas.width,1400);
-  assert.equal(canvas.height,900);
+  assert.equal(canvas.width,1080);
+  assert.equal(canvas.height,1440);
   assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1]).includes('WAIT')));
   assert.ok(drawn.some(x=>x[0]==='text'&&x[1]==='No financial advice.'));
   assert.ok(drawn.some(x=>x[0]==='text'&&String(x[1])==='SUPPORT'));
