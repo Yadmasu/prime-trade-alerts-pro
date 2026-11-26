@@ -993,6 +993,12 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 .v5-sentiment #v5Timeframes{font-size:12px;line-height:1.6}
 .v5-sentiment p{margin:10px 0 0}
 @media(max-width:749px){.ai-mode-tabs button{font-size:14px;min-height:42px}.ai-time-grid button{min-height:44px}.v5-sentiment-grid strong{font-size:13px}}
+/* Compact chart: legend occupies its own row, never clips the time axis. */
+body #liveChart .chartwrap,body.pro-tabs-on #liveChart .chartwrap{height:auto!important;min-height:0!important;display:flex;flex-direction:column;overflow:hidden;background:#0b1422}
+body #liveChart #chartLegend{position:static;max-width:none;width:100%;box-sizing:border-box;box-shadow:none;padding:8px 10px;font-size:11px;line-height:1.5}
+body #liveChart #tvchart,body.pro-tabs-on #liveChart #tvchart{height:clamp(300px,43vh,440px);min-height:0;flex:none}
+body #liveChart.chart-expanded #tvchart,body.pro-tabs-on #liveChart.chart-expanded #tvchart{height:clamp(380px,65vh,680px)}
+#primeChartKey{display:flex;flex-wrap:wrap;gap:6px 14px;padding:6px 10px;color:#a7b9ce;font-size:10px;line-height:1.4}
 </style>
 </head>
 
@@ -1218,6 +1224,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
   <div class="chartwrap">
     <div id="chartLegend">Select a market; analysis loads automatically.</div>
 
+    <div id="primeChartKey" aria-label="Visible chart indicators"></div>
     <div id="tvchart">
       <div id="interactiveChart"></div>
       <canvas id="priceChart"></canvas>
@@ -3755,6 +3762,20 @@ function drawChart(
   const host = $('interactiveChart');
   const fallback = $('priceChart');
   renderPrimeStructurePanel(candleData,timeframe);
+  const key=document.getElementById('primeChartKey');
+  if(key){
+    key.replaceChildren();
+    const enabled=k=>document.querySelector('[data-indicator="'+k+'"]')?.checked;
+    const items=[];
+    if(enabled('ema'))items.push(['EMA '+chartEmaPeriods().join('/'),'#a7b9ce']);
+    if(enabled('volume'))items.push(['Volume','#a7b9ce']);
+    if(enabled('vwap'))items.push(['UTC VWAP','#a78bfa']);
+    if(enabled('nylevels')&&timeframe==='15m'){
+      const ny=Array.isArray(candleData)?openingRangeAndVwap(candleData):null;
+      items.push([ny?'NY AVWAP / ORH / ORL':'NY range unavailable','#eab308']);
+    }
+    for(const [label,color] of items){const item=document.createElement('span');item.textContent=label;item.style.color=color;key.appendChild(item);}
+  }
   updateChartStatus(analysis,confirmed,timeframe);
   renderSRInfo(candleData);
   const visible = key => document.querySelector('[data-indicator="'+key+'"]')?.checked !== false;
@@ -3813,14 +3834,16 @@ function drawChart(
         timeVisible:true,
         secondsVisible:false,
         rightOffset:5,
-        barSpacing:8,
+        barSpacing:7,
         minBarSpacing:3
       }
     }
   );
 
+  const precision=Math.max(2,Math.min(8,4-Math.floor(Math.log10(candleData.at(-1).c))));
   const candleSeries =
     liveChart.addCandlestickSeries({
+      priceFormat:{type:'price',precision,minMove:Math.pow(10,-precision)},
       upColor:'#21d6a5',
       downColor:'#ff637c',
       borderUpColor:'#21d6a5',
@@ -3852,7 +3875,7 @@ function drawChart(
   const fastSeries =
     liveChart.addLineSeries({
       color:'#58a6ff',
-      lineWidth:2,
+      lineWidth:1,
       priceLineVisible:false,
       lastValueVisible:false
     });
@@ -3860,7 +3883,7 @@ function drawChart(
   const slowSeries =
     liveChart.addLineSeries({
       color:'#f59e0b',
-      lineWidth:2,
+      lineWidth:1,
       priceLineVisible:false,
       lastValueVisible:false
     });
@@ -3937,8 +3960,8 @@ function drawChart(
   }
   if(visible("vwap") && vwapData.length > 1){
     const vwapSeries = liveChart.addLineSeries({
-      color:'#a78bfa',lineWidth:2,priceLineVisible:false,
-      lastValueVisible:true,title:'UTC VWAP'
+      color:'#a78bfa',lineWidth:1,priceLineVisible:false,
+      lastValueVisible:false,title:''
     });
     vwapSeries.setData(vwapData);
   }
@@ -3948,7 +3971,7 @@ function drawChart(
     const ny=openingRangeAndVwap(candleData);
     if(ny){
       for(const [title,price,color] of [['NY AVWAP',ny.vwap,'#c084fc'],['ORH',ny.orh,'#eab308'],['ORL',ny.orl,'#eab308']]){
-        if(Number.isFinite(price))candleSeries.createPriceLine({price,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title});
+        if(Number.isFinite(price))candleSeries.createPriceLine({price,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:false,title:''});
       }
     }
   }
@@ -4068,7 +4091,8 @@ function drawChart(
     });
   }
 
-  liveChart.timeScale().fitContent();
+  const visibleBars=Math.max(20,Math.min(85,Math.floor(host.clientWidth/6)));
+  liveChart.timeScale().setVisibleLogicalRange({from:Math.max(0,candleData.length-visibleBars),to:candleData.length+3});
   requestAnimationFrame(placeSRLabels);
   liveChart.timeScale().subscribeVisibleLogicalRangeChange(placeSRLabels);
 
@@ -4136,6 +4160,12 @@ function primePanelGeometry(bars){
       if(hi?point.price>previous.price:point.price<previous.price)swings[swings.length-1]=point;
     }else swings.push(point);
   }
+  const previousByType={};
+  for(const point of swings){
+    const prior=previousByType[point.type];
+    point.label=prior?(point.price>prior.price?'H':point.price<prior.price?'L':'E')+point.type:'';
+    previousByType[point.type]=point;
+  }
   const points=swings.slice(-7);
   const last=source.at(-1);
   if(last&&points.length)points.push({t:last.t,price:last.c,type:'C'});
@@ -4158,6 +4188,10 @@ function renderPrimeStructurePanel(bars,timeframe){
   const y=v=>96-78*(v-min)/Math.max(max-min,Math.abs(max)*1e-10,1e-12);
   const add=(tag,attrs,txt)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(txt)el.textContent=txt;plot.appendChild(el);};
   add('polyline',{points:points.map(p=>x(p.t)+','+y(p.price)).join(' '),fill:'none',stroke:color,'stroke-width':1.7,'stroke-linejoin':'round','stroke-linecap':'round'});
+  for(const type of ['H','L']){
+    const p=points.filter(p=>p.type===type&&p.label).at(-1);
+    if(p)add('text',{x:Math.max(16,Math.min(304,x(p.t))),y:Math.max(9,Math.min(109,y(p.price)+(type==='H'?-6:12))),fill:'#a7b9ce','font-size':9,'text-anchor':'middle'},p.label);
+  }
   if(event&&event.t>=points[0].t&&event.t<=points.at(-1).t&&event.price>=min&&event.price<=max){
     const ex=x(event.t),ey=y(event.price);
     add('line',{x1:Math.max(12,ex-40),x2:Math.min(308,ex+40),y1:ey,y2:ey,stroke:color,'stroke-width':1,'stroke-dasharray':'4 3'});
