@@ -3711,7 +3711,7 @@ function drawCanvasChart(
   $('chartLegend').innerHTML =
     esc(id)+' · '+esc(timeframe.toUpperCase())+
     ' · TREND '+esc(analysis.side==='LONG'?'BULLISH':analysis.side==='SHORT'?'BEARISH':'MIXED')+
-    (plan?' · CONFIRMED ENTRY':' · WAIT · NO ENTRY');
+    '';
 
 }
 
@@ -3804,13 +3804,14 @@ function drawChart(
     key.replaceChildren();
     const enabled=k=>document.querySelector('[data-indicator="'+k+'"]')?.checked;
     const items=[];
-    if(enabled('ema'))items.push(['EMA '+chartEmaPeriods().join('/'),'#a7b9ce']);
+    if(enabled('ema'))chartEmaPeriods().forEach((period,i)=>items.push(['EMA '+period,['#58a6ff','#f59e0b','#c084fc','#f472b6','#2dd4bf','#a7b9ce'][i]||'#a7b9ce']));
     if(enabled('volume'))items.push(['Vol + SMA20','#a7b9ce']);
     if(enabled('vwap'))items.push(['UTC VWAP','#a78bfa']);
     if(enabled('nylevels')&&timeframe==='15m'){
       const ny=Array.isArray(candleData)?openingRangeAndVwap(candleData):null;
       if(ny)items.push(['NY AVWAP / ORH / ORL','#eab308']);
     }
+    if(Array.isArray(candleData)&&Number.isFinite(candleData.at(-1)?.c))items.push(['Close '+fmt(candleData.at(-1).c),'#edf5ff']);
     items.push(['Time · UTC','#8292a5']);
     for(const [label,color] of items){const item=document.createElement('span');item.textContent=label;item.style.color=color;key.appendChild(item);}
   }
@@ -3897,7 +3898,7 @@ function drawChart(
       borderVisible:false,
       wickVisible:true,
       priceLineVisible:true,
-      lastValueVisible:true
+      lastValueVisible:false
     });
 
   candleSeries.setData(
@@ -4163,10 +4164,7 @@ function drawChart(
     ' · <span style="color:#aebfd0">TREND:</span> '+
     '<span style="color:'+(analysis.side==='SHORT'?'#ff637c':analysis.side==='LONG'?'#21d6a5':'#a7b9ce')+'">'+
     esc(analysis.side==='LONG'?'BULLISH':analysis.side==='SHORT'?'BEARISH':'MIXED')+'</span>'+
-    (visible("ema")&&emaPeriods.length?' · EMA'+emaPeriods.join('/'):'')+
-    (plan
-      ? ' · <span style="color:#21d6a5">CONFIRMED ENTRY</span>'
-      : ' · <span style="color:#f6c96b">WAIT · NO ENTRY</span>');
+    '';
 }
 
 
