@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass
+from collections import Counter
 from pathlib import Path
 
 import aiohttp
@@ -193,9 +194,13 @@ def opening_range_and_vwap(rows: list[dict]) -> tuple[float, float, float] | Non
     return max(row["h"] for row in opening), min(row["l"] for row in opening), vwap
 
 
-def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict]) -> dict | None:
-    if len(rows15) < 110 or len(rows1h) < 95 or len(rows4h) < 95:
+def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict], diagnostics=None) -> dict | None:
+    def reject(reason):
+        if diagnostics is not None:
+            diagnostics[reason] += 1
         return None
+    if len(rows15) < 110 or len(rows1h) < 95 or len(rows4h) < 95:
+        return reject('insufficient_history')
     close15 = [row["c"] for row in rows15]
     close1h = [row["c"] for row in rows1h]
     ema9_15, ema21_15 = ema(close15, 9), ema(close15, 21)
@@ -205,7 +210,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     last = rows15[-1]
     opening = opening_range_and_vwap(rows15)
     if opening is None:
-        return None
+        return reject('NY_opening_range_unavailable')
     orh, orl, anchored_vwap = opening
     long_aligned = (ema9_15[-1] > ema21_15[-1] and
                     rows1h[-1]["c"] > ema9_1h[-1] > ema21_1h[-1] and
@@ -220,15 +225,21 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     long_ready = long_aligned and cross_up and last["c"] > anchored_vwap and last["c"] > orh
     short_ready = short_aligned and cross_down and last["c"] < anchored_vwap and last["c"] < orl
     if not (long_ready or short_ready):
-        return None
+        if not (long_aligned or short_aligned):
+            return reject('trend_alignment')
+        if not ((long_aligned and cross_up) or (short_aligned and cross_down)):
+            return reject('EMA_cross')
+        if not ((long_aligned and last['c'] > anchored_vwap) or (short_aligned and last['c'] < anchored_vwap)):
+            return reject('anchored_VWAP')
+        return reject('opening_range_breakout')
     side = "LONG" if long_ready else "SHORT"
     average_range = atr(rows15)
     vr = volume_ratio(rows15)
     if not math.isfinite(average_range) or not math.isfinite(vr) or vr < MIN_VOLUME_RATIO:
-        return None
+        return reject('volume_or_ATR')
     age = time.time() * 1000 - (last["t"] + 900_000)
     if not 0 <= age <= MAX_SIGNAL_AGE * 1000:
-        return None
+        return reject('stale_candle')
 
     previous = rows15[-6:-1]
     breakout = (last["c"] > max(row["h"] for row in previous)
@@ -240,8 +251,10 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
         last["c"] < last["o"] and last["c"] < ema9_15[-1] and
         last["o"] - last["c"] >= average_range * .20
     )
-    if not (breakout and strong_close):
-        return None
+    if not breakout:
+        return reject('structure_break')
+    if not strong_close:
+        return reject('strong_close')
 
     entry = last["c"]
     structure = min(row["l"] for row in rows15[-6:]) if side == "LONG" else max(row["h"] for row in rows15[-6:])
@@ -252,7 +265,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     )
     risk = abs(entry - stop)
     if risk <= 0 or not .015 <= risk / entry <= .03:
-        return None
+        return reject('stop_risk')
     direction = 1 if side == "LONG" else -1
     return {
         "side": side,
@@ -268,19 +281,23 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     }
 
 
-async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semaphore, market: Market):
+async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semaphore, market: Market, diagnostics=None):
     async with semaphore:
         try:
             rows15 = await candles(session, market.coin, "15m", 13)
             # These existing requirements depend only on the closed 15m bars.
             # Avoid two history requests when this market already fails them.
-            if len(rows15) < 110 or not volume_ratio(rows15) >= MIN_VOLUME_RATIO:
+            if len(rows15) < 110:
+                if diagnostics is not None: diagnostics['insufficient_15m_history'] += 1
+                return market, None
+            if not volume_ratio(rows15) >= MIN_VOLUME_RATIO:
+                if diagnostics is not None: diagnostics['volume_prefilter'] += 1
                 return market, None
             rows1h, rows4h = await asyncio.gather(
                 candles(session, market.coin, "1h", 17),
                 candles(session, market.coin, "4h", 45),
             )
-            signal = confirmed_signal(rows15, rows1h, rows4h)
+            signal = confirmed_signal(rows15, rows1h, rows4h, diagnostics)
             if signal:
                 import hashlib
                 import struct
@@ -294,6 +311,7 @@ async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semapho
                               chart_id=hashlib.sha256(f"{market.coin}/{signal['candle']}/{signal['side']}".encode()).hexdigest()[:32])
             return market, signal
         except Exception as error:
+            if diagnostics is not None: diagnostics['market_data_error'] += 1
             print(f"Market scan failed market={market.coin} error={type(error).__name__}", flush=True)
             return market, None
 
@@ -397,7 +415,9 @@ async def run_cycle() -> None:
         markets = await discover_markets(session)
         print(f"Scanning {len(markets)} liquid perpetual markets", flush=True)
         semaphore = asyncio.Semaphore(SCAN_CONCURRENCY)
-        results = await asyncio.gather(*(scan_market(session, semaphore, market) for market in markets))
+        diagnostics = Counter()
+        results = await asyncio.gather(*(scan_market(session, semaphore, market, diagnostics) for market in markets))
+        print(f"Scan gate breakdown (first failed gate): {json.dumps(dict(diagnostics), sort_keys=True)}", flush=True)
         state = load_state()
         now = int(time.time())
         state = {key: value for key, value in state.items() if now - int(value) < 14 * 86_400}
