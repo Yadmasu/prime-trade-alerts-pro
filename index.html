@@ -3580,14 +3580,14 @@ function drawCanvasChart(
       color;
 
     context.lineWidth =
-      1.8;
+      0.8;
 
     context.stroke();
 
   }
 
-  if(shown('ema')&&periods.length>0)drawLine(fast,'#58a6ff');
-  if(shown('ema')&&periods.length>1)drawLine(slow,'#f59e0b');
+  if(shown('ema')&&periods.length>0)drawLine(fast,'rgba(88,166,255,0.78)');
+  if(shown('ema')&&periods.length>1)drawLine(slow,'rgba(245,158,11,0.78)');
   if(shown('ema'))periods.slice(2).forEach((period,i)=>drawLine(ema(closes,period),['#f59e0b','#c084fc','#f472b6','#2dd4bf'][i]));
   if(shown('sr')&&window.PrimeChartExtras){
     const levels=window.PrimeChartExtras.supportResistance(candleData);
@@ -3921,16 +3921,18 @@ function drawChart(
 
   const fastSeries =
     liveChart.addLineSeries({
-      color:'#58a6ff',
+      color:'rgba(88,166,255,0.78)',
       lineWidth:1,
+      crosshairMarkerVisible:false,
       priceLineVisible:false,
       lastValueVisible:false
     });
 
   const slowSeries =
     liveChart.addLineSeries({
-      color:'#f59e0b',
+      color:'rgba(245,158,11,0.78)',
       lineWidth:1,
+      crosshairMarkerVisible:false,
       priceLineVisible:false,
       lastValueVisible:false
     });
