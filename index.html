@@ -3770,12 +3770,13 @@ function drawChart(
     const enabled=k=>document.querySelector('[data-indicator="'+k+'"]')?.checked;
     const items=[];
     if(enabled('ema'))items.push(['EMA '+chartEmaPeriods().join('/'),'#a7b9ce']);
-    if(enabled('volume'))items.push(['Volume','#a7b9ce']);
+    if(enabled('volume'))items.push(['Vol + SMA20','#a7b9ce']);
     if(enabled('vwap'))items.push(['UTC VWAP','#a78bfa']);
     if(enabled('nylevels')&&timeframe==='15m'){
       const ny=Array.isArray(candleData)?openingRangeAndVwap(candleData):null;
-      items.push([ny?'NY AVWAP / ORH / ORL':'NY range unavailable','#eab308']);
+      if(ny)items.push(['NY AVWAP / ORH / ORL','#eab308']);
     }
+    items.push(['Time · UTC','#8292a5']);
     for(const [label,color] of items){const item=document.createElement('span');item.textContent=label;item.style.color=color;key.appendChild(item);}
   }
   updateChartStatus(analysis,confirmed,timeframe);
@@ -3812,11 +3813,14 @@ function drawChart(
 
   host.innerHTML = '';
 
+  const precision=Math.max(2,Math.min(8,4-Math.floor(Math.log10(candleData.at(-1).c))));
+  const priceFormatter=new Intl.NumberFormat('en-US',{minimumFractionDigits:precision,maximumFractionDigits:precision});
   liveChart = LightweightCharts.createChart(
     host,
     {
       width:host.clientWidth,
       height:host.clientHeight,
+      localization:{locale:'en-US',priceFormatter:price=>priceFormatter.format(price)},
       layout:{
         background:{color:'#131722'},
         textColor:'#b2b5be',
@@ -3846,10 +3850,9 @@ function drawChart(
     }
   );
 
-  const precision=Math.max(2,Math.min(8,4-Math.floor(Math.log10(candleData.at(-1).c))));
   const candleSeries =
     liveChart.addCandlestickSeries({
-      priceFormat:{type:'price',precision,minMove:Math.pow(10,-precision)},
+      priceFormat:{type:'custom',minMove:Math.pow(10,-precision),formatter:price=>priceFormatter.format(price)},
       upColor:'#26a69a',
       downColor:'#ef5350',
       borderUpColor:'#26a69a',
@@ -3947,7 +3950,7 @@ function drawChart(
   if(volumeAverage.length){
     const volumeMA=liveChart.addLineSeries({
       color:'#cbd5e1',lineWidth:1,priceScaleId:'',
-      priceLineVisible:false,lastValueVisible:false,title:'Vol SMA20'
+      priceLineVisible:false,lastValueVisible:false,title:''
     });
     volumeMA.priceScale().applyOptions({scaleMargins:{top:.80,bottom:0}});
     volumeMA.setData(volumeAverage);
@@ -4188,7 +4191,7 @@ function renderPrimeStructurePanel(bars,timeframe){
   const color=bias==='UP'?'#21d6a5':bias==='DOWN'?'#ff637c':'#a7b9ce';
   status.textContent=bias==='UP'?'BULLISH':bias==='DOWN'?'BEARISH':'—';
   status.style.color=color;
-  detail.textContent=event?(timeframe||'').toUpperCase()+' · '+event.kind+' '+event.side+' · '+Number(event.price.toPrecision(7))+' · '+new Date(event.t).toISOString().slice(0,16).replace('T',' ')+' UTC (bar open)': 'No confirmed swing break available.';
+  detail.textContent=event?(timeframe||'').toUpperCase()+' · '+event.kind+' '+event.side+' · '+Number(event.price.toPrecision(7)).toLocaleString('en-US',{maximumFractionDigits:10})+' · '+new Date(event.t).toISOString().slice(0,16).replace('T',' ')+' UTC (bar open)': 'No confirmed swing break available.';
   plot.style.display=points.length>=2?'block':'none';
   if(points.length<2)return;
   const min=Math.min(...points.map(p=>p.price)),max=Math.max(...points.map(p=>p.price));
@@ -4204,6 +4207,7 @@ function renderPrimeStructurePanel(bars,timeframe){
     const ex=x(event.t),ey=y(event.price);
     add('line',{x1:Math.max(12,ex-40),x2:Math.min(308,ex+40),y1:ey,y2:ey,stroke:color,'stroke-width':1,'stroke-dasharray':'4 3'});
     add('circle',{cx:ex,cy:ey,r:3,fill:'#101923',stroke:color,'stroke-width':1.5});
+    add('text',{x:Math.max(28,Math.min(292,ex)),y:Math.max(10,ey-8),fill:color,'font-size':9,'font-weight':600,'text-anchor':'middle',stroke:'#101923','stroke-width':3,'paint-order':'stroke'},event.kind+' '+(event.side==='UP'?'↑':'↓'));
   }
 }
 
