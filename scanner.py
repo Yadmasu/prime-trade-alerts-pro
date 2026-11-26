@@ -24,7 +24,23 @@ REST_KEY = os.getenv("ONESIGNAL_REST_API_KEY", "")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHATS = [c.strip() for c in os.getenv("TELEGRAM_CHAT_IDS", os.getenv("TELEGRAM_CHAT_ID", "")).split(",") if c.strip()]
 STATE_FILE = Path(os.getenv("STATE_FILE", "signal_state.json"))
-SCAN_CONCURRENCY = int(os.getenv("SCAN_CONCURRENCY", "16"))
+SCAN_CONCURRENCY = max(1, min(4, int(os.getenv("SCAN_CONCURRENCY", "4"))))
+REQUEST_SPACING = max(0.75, float(os.getenv("HL_REQUEST_SPACING", "0.75")))
+_next_request = 0.0
+_request_lock = asyncio.Lock()
+
+
+async def pace_request():
+    global _next_request
+    async with _request_lock:
+        await asyncio.sleep(max(0.0, _next_request - time.monotonic()))
+        _next_request = time.monotonic() + REQUEST_SPACING
+
+
+async def extend_cooldown(seconds):
+    global _next_request
+    async with _request_lock:
+        _next_request = max(_next_request, time.monotonic() + seconds)
 MIN_VOLUME_RATIO = max(1.5, float(os.getenv("MIN_VOLUME_RATIO", "1.5")))
 MIN_24H_NOTIONAL = float(os.getenv("MIN_24H_NOTIONAL", "1000000"))
 MAX_SIGNAL_AGE = int(os.getenv("MAX_SIGNAL_AGE_SECONDS", "1800"))
@@ -83,6 +99,7 @@ async def post(session: aiohttp.ClientSession, body: dict) -> object:
 
     for attempt in range(4):
         try:
+            await pace_request()
             async with session.post(HL_API, json=body, timeout=20) as response:
                 if response.status == 429:
                     print(f"Hyperliquid HTTP 429 request={body.get('type')} attempt={attempt + 1}", flush=True)
@@ -97,7 +114,12 @@ async def post(session: aiohttp.ClientSession, body: dict) -> object:
                             wait = (parsedate_to_datetime(header) - datetime.now(timezone.utc)).total_seconds()
                         except (ValueError, TypeError, OverflowError):
                             wait = min(60.0, 2 ** (attempt + 1)) + random.uniform(0, 1)
-                    await asyncio.sleep(max(0.0, min(120.0, wait)))
+                    if not math.isfinite(wait):
+                        wait = 30.0
+                    if response.status == 429:
+                        wait = max(30.0, wait)
+                        await extend_cooldown(wait)
+                    await asyncio.sleep(max(0.0, wait))
                     continue
                 response.raise_for_status()
                 return await response.json()
