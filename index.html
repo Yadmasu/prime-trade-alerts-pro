@@ -1034,6 +1034,7 @@ body.pro-tabs-on main>section,.panel,#liveChart,.chartwrap,#tvchart{min-width:0;
  #liveChart .chart-share-actions>*{width:100%;min-width:0;max-width:100%;overflow-wrap:anywhere}
  #liveChart .chartwrap,#liveChart #tvchart{width:100%;max-width:100%;min-width:0}
 }
+.sr-left-tag{font-size:9px;font-weight:650;padding:2px 4px;border-radius:3px;background:#131722;opacity:.94}
 </style>
 </head>
 
@@ -3759,7 +3760,8 @@ function renderSRInfo(candles){
   const el=document.getElementById('chartSRInfo');
   if(!el||!window.PrimeChartExtras)return;
   const enabled=document.querySelector('[data-indicator="sr"]')?.checked!==false;
-  if(!enabled){el.textContent='Support / Resistance hidden';return;}
+  el.hidden=!enabled;
+  if(!enabled){el.textContent='';return;}
   const sr=window.PrimeChartExtras.supportResistance(candles);
   const format=value=>Number.isFinite(value)?fmt(value):'—';
   el.innerHTML='<span class="s">SUPPORT '+format(sr.support)+'</span>'+
@@ -4062,6 +4064,7 @@ function drawChart(
       const label=document.createElement('div');
       label.className='sr-left-tag '+level.kind;
       label.textContent=level.name;
+      label.title=(level.kind==='s'?'Support ':'Resistance ')+fmt(level.price);
       label.style.top=level.y+'px';
       host.appendChild(label);
       lastY=level.y;
@@ -5271,7 +5274,7 @@ setInterval(()=>{
   };
   if(cleanButton){
     cleanButton.setAttribute('aria-pressed','false');
-    cleanButton.title='Clean chart: candles, EMA9/21, volume, support and resistance; tap again to restore';
+    cleanButton.title='Clean chart: candles, EMA9/21 and volume; tap again to restore';
     cleanButton.onclick=()=>{
       const inputs=[...document.querySelectorAll('[data-indicator]')];
       const preset=document.getElementById('chartEmaPreset');
@@ -5282,7 +5285,7 @@ setInterval(()=>{
           preset:preset?.value,
           custom:custom?.dataset.applied||null
         };
-        inputs.forEach(x=>{x.checked=['ema','volume','sr'].includes(x.dataset.indicator);});
+        inputs.forEach(x=>{x.checked=['ema','volume'].includes(x.dataset.indicator);});
         if(preset)preset.value='9,21';
         if(custom)delete custom.dataset.applied;
         const details=document.querySelector('#liveChart .indicator-settings');
