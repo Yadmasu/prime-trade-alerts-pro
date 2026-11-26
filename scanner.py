@@ -63,7 +63,9 @@ def atr(rows: list[dict], period: int = 14) -> float:
 
 
 def volume_ratio(rows: list[dict]) -> float:
-    prior = [row["v"] for row in rows[-22:-1]]
+    if len(rows) < 21:
+        return math.nan
+    prior = [row["v"] for row in rows[-21:-1]]
     average = sum(prior) / len(prior) if prior else 0
     return rows[-1]["v"] / average if average > 0 else math.nan
 
@@ -224,7 +226,8 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict])
     vr = volume_ratio(rows15)
     if not math.isfinite(average_range) or not math.isfinite(vr) or vr < MIN_VOLUME_RATIO:
         return None
-    if time.time() * 1000 - (last["t"] + 900_000) > MAX_SIGNAL_AGE * 1000:
+    age = time.time() * 1000 - (last["t"] + 900_000)
+    if not 0 <= age <= MAX_SIGNAL_AGE * 1000:
         return None
 
     previous = rows15[-6:-1]
@@ -359,6 +362,35 @@ def save_state(state: dict) -> None:
     temp.replace(STATE_FILE)
 
 
+async def verify_fresh_signal(session: aiohttp.ClientSession, market: Market, signal: dict) -> bool:
+    """Fail closed on stale or unverifiable prices immediately before sending."""
+    try:
+        dex = market.coin.split(":", 1)[0] if ":" in market.coin else ""
+        request = {"type": "metaAndAssetCtxs"}
+        if dex:
+            request["dex"] = dex
+        data = await post(session, request)
+        universe = data[0]["universe"]
+        index = next(i for i, asset in enumerate(universe)
+                     if (f"{dex}:{asset['name']}" if dex and ":" not in asset["name"] else asset["name"]) == market.coin
+                     and not asset.get("isDelisted"))
+        context = data[1][index]
+        current = float(context.get("midPx") or context.get("markPx") or 0)
+        notional = float(context.get("dayNtlVlm") or 0)
+        age = time.time() * 1000 - (signal["candle"] + 900_000)
+        return (
+            0 <= age <= MAX_SIGNAL_AGE * 1000
+            and math.isfinite(current) and current > 0
+            and math.isfinite(notional) and notional >= MIN_24H_NOTIONAL
+            and math.isfinite(signal["max_drift"]) and signal["max_drift"] >= 0
+            and abs(current - signal["entry"]) <= signal["max_drift"]
+            and (current > signal["stop"] if signal["side"] == "LONG" else current < signal["stop"])
+        )
+    except Exception as error:
+        print(f"Pre-send validation unavailable market={market.coin} error={type(error).__name__}", flush=True)
+        return False
+
+
 async def run_cycle() -> None:
     connector = aiohttp.TCPConnector(limit=SCAN_CONCURRENCY)
     async with aiohttp.ClientSession(connector=connector, trust_env=True) as session:
@@ -376,9 +408,6 @@ async def run_cycle() -> None:
             key = f"{market.coin}:{signal['side']}:{signal['candle']}"
             if key in state:
                 continue
-            if abs(market.mid - signal["entry"]) > signal["max_drift"]:
-                print(f"Skip stale price {market.coin}", flush=True)
-                continue
             candidates.append((market, signal, key))
 
         candidates.sort(
@@ -386,10 +415,17 @@ async def run_cycle() -> None:
             reverse=True,
         )
         print(f"Confirmed fresh signal candidates: {len(candidates)}", flush=True)
-        for market, signal, key in candidates[:MAX_ALERTS_PER_RUN]:
+        sent = 0
+        for market, signal, key in candidates:
+            if sent >= MAX_ALERTS_PER_RUN:
+                break
+            if not await verify_fresh_signal(session, market, signal):
+                print(f"Skip unverifiable or stale pre-send signal {market.coin}", flush=True)
+                continue
             if not REST_KEY and not DRY_RUN:
                 raise RuntimeError("No notification channel configured")
             await send_push(session, market, signal)
+            sent += 1
             if not DRY_RUN:
                 state[key] = now
                 save_state(state)
