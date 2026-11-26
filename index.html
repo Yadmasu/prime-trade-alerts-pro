@@ -2883,42 +2883,38 @@ function openingRangeAndVwap(candles15){
     vwap:session.reduce((a,c)=>a+((c.h+c.l+c.c)/3)*c.v,0)/volume};
 }
 
-function confirmEntry(candles15,analysis){
-  if(analysis.error) return {reason:analysis.error,checks:{}};
-  if(!analysis.aligned || analysis.side!==analysis.shortTf)
-    return {reason:analysis.reason,checks:{trend:false}};
-  if(!Number.isFinite(analysis.riskPct) || analysis.riskPct<0.015 || analysis.riskPct>0.03)
-    return {reason:'Stop-loss risk must be 1.5%–3%',checks:{trend:true,risk:false}};
-  if(analysis.vr<1.5)
-    return {reason:'Volume below 1.5×',checks:{trend:true,risk:true,volume:false}};
-  const age=Date.now()-analysis.time;
-  if(age<0 || age>30*MIN)
-    return {reason:'Completed 15m candle is stale',checks:{trend:true,risk:true,volume:true,fresh:false}};
-  const opening=openingRangeAndVwap(candles15);
-  if(!opening)
-    return {reason:'Waiting for completed session opening range and VWAP',checks:{trend:true,risk:true,volume:true,fresh:true,opening:false}};
-  const isLong=analysis.side==='LONG', last=analysis.last;
-  const close=candles15.map(c=>c.c), fast=ema(close,9),slow=ema(close,21);
-  const cross=Array.from({length:Math.min(8,close.length-1)},(_,i)=>close.length-1-i)
-    .some(i=>isLong
-      ? fast[i-1]<=slow[i-1] && fast[i]>slow[i]
-      : fast[i-1]>=slow[i-1] && fast[i]<slow[i]);
-  const vwapOK=isLong ? last.c>opening.vwap : last.c<opening.vwap;
-  const rangeOK=isLong ? last.c>opening.orh : last.c<opening.orl;
+function confirmEntry(candles15,analysis,candles1h,candles4h){
+  if(candles15?.length<110||!candles1h||candles1h.length<95||!candles4h||candles4h.length<95)
+    return {confirmed:false,reason:'Insufficient completed 15m/1H/4H candles',checks:{}};
+  const last=candles15.at(-1), close=candles15.map(c=>c.c),fast=ema(close,9),slow=ema(close,21);
+  const higher=rows=>{const v=rows.map(c=>c.c),f=ema(v,9).at(-1),s=ema(v,21).at(-1),p=v.at(-1);return p>f&&f>s?'LONG':p<f&&f<s?'SHORT':'MIXED';};
+  const side=fast.at(-1)>slow.at(-1)?'LONG':fast.at(-1)<slow.at(-1)?'SHORT':'MIXED';
+  const isLong=side==='LONG', directional=side!=='MIXED',a=atr(candles15),vr=volumeRatio(candles15),entry=last.c;
+  const structure=isLong?Math.min(...candles15.slice(-6).map(c=>c.l)):Math.max(...candles15.slice(-6).map(c=>c.h));
+  const stop=isLong?Math.min(structure-a*.15,entry-a*1.35):Math.max(structure+a*.15,entry+a*1.35);
+  const risk=Math.abs(entry-stop),riskPct=risk/entry,age=Date.now()-(last.t+900000),opening=openingRangeAndVwap(candles15);
   const previous=candles15.slice(-6,-1);
-  const breakout=isLong ? last.c>Math.max(...previous.map(c=>c.h)) : last.c<Math.min(...previous.map(c=>c.l));
-  const candleOK=isLong ? last.c>last.o && last.c>fast.at(-1) && last.c-last.o>=analysis.a*.20
-                         : last.c<last.o && last.c<fast.at(-1) && last.o-last.c>=analysis.a*.20;
-  const checks={trend:true,risk:true,volume:true,fresh:true,opening:rangeOK,vwap:vwapOK,cross,breakout,candle:candleOK};
-  if(!cross||!vwapOK||!rangeOK||!breakout||!candleOK)
-    return {reason:'Waiting for EMA9/21 cross + Anchored VWAP + Opening Range confirmation',checks};
-  return {...analysis,...opening,confirmed:true,reason:'CONFIRMED',checks};
+  const checks={
+    trend:directional&&higher(candles1h)===side&&higher(candles4h)===side,
+    volume:Number.isFinite(vr)&&vr>=1.5,
+    cross:directional&&Array.from({length:8},(_,i)=>close.length-1-i).some(i=>isLong?fast[i-1]<=slow[i-1]&&fast[i]>slow[i]:fast[i-1]>=slow[i-1]&&fast[i]<slow[i]),
+    vwap:opening&&directional?(isLong?entry>opening.vwap:entry<opening.vwap):null,
+    opening:opening&&directional?(isLong?entry>opening.orh:entry<opening.orl):null,
+    breakout:directional&&(isLong?entry>Math.max(...previous.map(c=>c.h)):entry<Math.min(...previous.map(c=>c.l))),
+    candle:directional&&Number.isFinite(a)&&a>0&&(isLong?entry>last.o&&entry>fast.at(-1)&&entry-last.o>=a*.20:entry<last.o&&entry<fast.at(-1)&&last.o-entry>=a*.20),
+    risk:directional&&Number.isFinite(riskPct)&&riskPct>=.015&&riskPct<=.03,
+    fresh:age>=0&&age<=1800000
+  };
+  const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
+  if(failed.length)return {confirmed:false,reason:'Waiting: '+failed.join(', '),checks};
+  const direction=isLong?1:-1;
+  return {...analysis,...opening,side,entry,stop,tp1:entry+direction*2*risk,tp2:entry+direction*3*risk,tp3:entry+direction*4*risk,vr,a,riskPct,time:last.t+900000,candle:last.t,last,confirmed:true,reason:'CONFIRMED',checks};
 }
 
 function renderSignalQuality(signal={},info=null,liveValid=null){
   const checks=signal.checks||{};
   const rows=[
-    ['15m + 1H trend',checks.trend],
+    ['15m + 1H + 4H trend',checks.trend],
     ['Volume ≥ 1.5×',checks.volume],
     ['EMA9/21 cross',checks.cross],['Above/below anchored VWAP',checks.vwap],['Opening range breakout',checks.opening],
     ['Structure break',checks.breakout],
@@ -2929,7 +2925,9 @@ function renderSignalQuality(signal={},info=null,liveValid=null){
     ['Live price verified',liveValid]
   ];
 
-  $('signalQuality').innerHTML=rows.map(([label,value])=>{
+  const passed=rows.filter(([,v])=>v===true).length;
+  const score=(passed/rows.length*10).toFixed(1);
+  $('signalQuality').innerHTML='<div class="quality-item"><span>Quality score · '+passed+'/11 checks</span><b>'+score+'/10</b></div>'+rows.map(([label,value])=>{
     const state=value===true?'pass':value===false?'fail':'';
     const text=value===true?'PASS':value===false?'WAIT':'PENDING';
     return `<div class="quality-item ${state}"><span>${esc(label)}</span><b>${text}</b></div>`;
@@ -4333,6 +4331,7 @@ async function analyze(){
       new Set([
         '15m',
         '1h',
+        '4h',
         display,
         ...(mode==='multi' && selected.has('4h') ? ['4h'] : []),
         ...(mode==='multi' && selected.has('1d') ? ['1d'] : [])
@@ -4398,13 +4397,13 @@ async function analyze(){
 
     let confirmed = id==='BTC'
       ? {confirmed:false,reason:'BTC is chart and analysis only; trade alerts are excluded.',checks:{}}
-      : confirmEntry(candles15,analysis);
+      : confirmEntry(candles15,analysis,candles1h,data.get('4h'));
 
     let livePriceValid = null;
 
     if(
       confirmed.confirmed &&
-      Number(info.notional) < MIN_24H_NOTIONAL
+      !(Number(info.notional) >= MIN_24H_NOTIONAL)
     ){
       confirmed = {
         ...confirmed,
