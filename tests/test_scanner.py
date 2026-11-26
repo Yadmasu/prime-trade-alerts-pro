@@ -54,5 +54,51 @@ class ScannerTests(unittest.TestCase):
         self.assertGreaterEqual(scanner.MIN_VOLUME_RATIO, 1.5)
 
 
+
+class SessionAndParityTests(unittest.TestCase):
+    def test_ema_sma_seed(self):
+        import math
+        result = scanner.ema([1, 2, 3, 4, 5], 3)
+        self.assertTrue(math.isnan(result[0]))
+        self.assertEqual(result[2:], [2.0, 3.0, 4.0])
+
+    def test_weekend_midnight_and_dst(self):
+        from datetime import timezone
+        cases = [
+            ("2026-11-28T05:00:00+00:00", "2026-11-28T00:00:00+00:00"),
+            ("2026-11-28T08:15:00+00:00", "2026-11-28T00:00:00+00:00"),
+            ("2026-11-28T08:30:00+00:00", "2026-11-28T08:00:00+00:00"),
+            ("2026-11-29T15:00:00+00:00", "2026-11-29T14:30:00+00:00"),
+            ("2026-07-12T07:30:00+00:00", "2026-07-12T07:00:00+00:00"),
+        ]
+        for stamp, expected in cases:
+            with self.subTest(stamp=stamp):
+                end = int(datetime.fromisoformat(stamp).timestamp()*1000)
+                anchor = int(datetime.fromisoformat(expected).timestamp()*1000)
+                self.assertEqual(scanner.session_anchor(end), anchor)
+                rows = [{"t": t, "o": 100, "h": 101, "l": 99, "c": 100, "v": 10}
+                        for t in range(anchor, end+1, 900000)]
+                self.assertEqual(scanner.opening_range_and_vwap(rows), (101,99,100))
+                self.assertIsNone(scanner.opening_range_and_vwap(rows[1:]))
+
+    def test_volume_uses_previous_twenty(self):
+        rows = [{"v": 10000}] + [{"v": 100}]*20 + [{"v": 150}]
+        self.assertEqual(scanner.volume_ratio(rows), 1.5)
+
+
+class FreshPriceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_fresh_price_and_rejections(self):
+        market = scanner.Market("TEST", 2000000, 100, 2)
+        signal = {"side":"LONG","entry":100,"stop":98,"max_drift":0.5,"candle":1000000}
+        for px, notional, now, expected in [
+            (100,2000000,1901,True), (101,2000000,1901,False),
+            (100,500000,1901,False), (100,2000000,1800,False),
+            (100,2000000,4000,False),
+        ]:
+            data = [{"universe":[{"name":"TEST"}]},[{"midPx":str(px),"dayNtlVlm":str(notional)}]]
+            with patch("scanner.post",return_value=data), patch("scanner.time.time",return_value=now):
+                self.assertEqual(await scanner.verify_fresh_signal(None,market,signal),expected)
+
+
 if __name__ == "__main__":
     unittest.main()
