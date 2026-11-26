@@ -996,8 +996,10 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 /* Compact chart: legend occupies its own row, never clips the time axis. */
 body #liveChart .chartwrap,body.pro-tabs-on #liveChart .chartwrap{height:auto!important;min-height:0!important;display:flex;flex-direction:column;overflow:hidden;background:#0b1422}
 body #liveChart #chartLegend{position:static;max-width:none;width:100%;box-sizing:border-box;box-shadow:none;padding:8px 10px;font-size:11px;line-height:1.5}
-body #liveChart #tvchart,body.pro-tabs-on #liveChart #tvchart{height:clamp(300px,43vh,440px);min-height:0;flex:none}
-body #liveChart.chart-expanded #tvchart,body.pro-tabs-on #liveChart.chart-expanded #tvchart{height:clamp(380px,65vh,680px)}
+body #liveChart #tvchart,body.pro-tabs-on #liveChart #tvchart{height:clamp(290px,40vh,420px)!important;min-height:0!important;flex:none;width:100%;box-sizing:border-box}
+body #liveChart #interactiveChart,body #liveChart #priceChart{height:100%!important;min-height:0!important;width:100%!important}
+body #liveChart .chartwrap{min-width:0;box-sizing:border-box}
+body #liveChart.chart-expanded #tvchart,body.pro-tabs-on #liveChart.chart-expanded #tvchart{height:clamp(380px,65vh,680px)!important}
 #primeChartKey{display:flex;flex-wrap:wrap;gap:6px 14px;padding:6px 10px;color:#a7b9ce;font-size:10px;line-height:1.4}
 </style>
 </head>
@@ -3816,26 +3818,30 @@ function drawChart(
       width:host.clientWidth,
       height:host.clientHeight,
       layout:{
-        background:{color:'#0b1422'},
-        textColor:'#a7b9ce',
+        background:{color:'#131722'},
+        textColor:'#b2b5be',
+        fontSize:11,
+        fontFamily:'system-ui, sans-serif',
         attributionLogo:true
       },
       grid:{
-        vertLines:{color:'rgba(48,68,94,.16)'},
-        horzLines:{color:'rgba(48,68,94,.24)'}
+        vertLines:{color:'rgba(42,46,57,.55)'},
+        horzLines:{color:'rgba(42,46,57,.55)'}
       },
       crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
       rightPriceScale:{
         borderColor:'#30445e',
-        scaleMargins:{top:.08,bottom:.25}
+        scaleMargins:{top:.08,bottom:.22}
       },
       timeScale:{
         borderColor:'#30445e',
         timeVisible:true,
         secondsVisible:false,
-        rightOffset:5,
-        barSpacing:7,
-        minBarSpacing:3
+        rightOffset:3,
+        barSpacing:10,
+        minBarSpacing:4,
+        borderVisible:true,
+        visible:true
       }
     }
   );
@@ -3844,12 +3850,14 @@ function drawChart(
   const candleSeries =
     liveChart.addCandlestickSeries({
       priceFormat:{type:'price',precision,minMove:Math.pow(10,-precision)},
-      upColor:'#21d6a5',
-      downColor:'#ff637c',
-      borderUpColor:'#21d6a5',
-      borderDownColor:'#ff637c',
-      wickUpColor:'#21d6a5',
-      wickDownColor:'#ff637c',
+      upColor:'#26a69a',
+      downColor:'#ef5350',
+      borderUpColor:'#26a69a',
+      borderDownColor:'#ef5350',
+      wickUpColor:'#26a69a',
+      wickDownColor:'#ef5350',
+      borderVisible:false,
+      wickVisible:true,
       priceLineVisible:true,
       lastValueVisible:true
     });
@@ -3925,8 +3933,8 @@ function drawChart(
       time:Math.floor(item.t/1000),
       value:item.v,
       color:item.c>=item.o
-        ? 'rgba(33,214,165,.42)'
-        : 'rgba(255,99,124,.42)'
+        ? 'rgba(38,166,154,.65)'
+        : 'rgba(239,83,80,.65)'
     }))
   );
 
@@ -4091,8 +4099,8 @@ function drawChart(
     });
   }
 
-  const visibleBars=Math.max(20,Math.min(85,Math.floor(host.clientWidth/6)));
-  liveChart.timeScale().setVisibleLogicalRange({from:Math.max(0,candleData.length-visibleBars),to:candleData.length+3});
+  const visibleBars=Math.max(18,Math.min(85,Math.floor((host.clientWidth-65)/9)));
+  liveChart.timeScale().setVisibleLogicalRange({from:Math.max(0,candleData.length-1-visibleBars),to:candleData.length+2});
   requestAnimationFrame(placeSRLabels);
   liveChart.timeScale().subscribeVisibleLogicalRangeChange(placeSRLabels);
 
