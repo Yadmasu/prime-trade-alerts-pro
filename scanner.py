@@ -43,12 +43,16 @@ class Market:
 
 
 def ema(values: list[float], period: int) -> list[float]:
+    """SMA seed, identical to the app EMA calculation."""
+    out = [math.nan] * len(values)
+    if period < 1 or len(values) < period:
+        return out
+    current = sum(values[:period]) / period
+    out[period - 1] = current
     alpha = 2 / (period + 1)
-    out: list[float] = []
-    current = values[0]
-    for value in values:
-        current = value * alpha + current * (1 - alpha)
-        out.append(current)
+    for i in range(period, len(values)):
+        current = values[i] * alpha + current * (1 - alpha)
+        out[i] = current
     return out
 
 
