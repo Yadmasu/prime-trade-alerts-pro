@@ -1021,6 +1021,19 @@ body.pro-tabs-on main>section,.panel,#liveChart,.chartwrap,#tvchart{min-width:0;
  #liveChart .chart-share-actions button,#liveChart .chart-share-actions a{font-size:clamp(10px,3vw,12px);padding:8px 5px}
  .pro-workspace-nav button{min-width:0;max-width:25%}
 }
+/* Prevent horizontal document overflow on narrow iPhone viewports. */
+@media(max-width:749px){
+ html,body{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+ header,main,.pro-workspace-nav,.pro-view-hint{box-sizing:border-box;width:100%;max-width:100vw;min-width:0}
+ header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+ header .brand{font-size:clamp(11px,3.3vw,16px);white-space:normal}
+ header #notificationPill{max-width:38vw;min-width:0;width:auto;padding:6px 7px;font-size:9px}
+ header #notificationPillText{white-space:normal;overflow-wrap:normal}
+ main>.panel{width:100%;max-width:100%;min-width:0}
+ #liveChart .chart-share-actions{width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ #liveChart .chart-share-actions>*{width:100%;min-width:0;max-width:100%;overflow-wrap:anywhere}
+ #liveChart .chartwrap,#liveChart #tvchart{width:100%;max-width:100%;min-width:0}
+}
 </style>
 </head>
 
