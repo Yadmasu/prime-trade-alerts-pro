@@ -2864,34 +2864,23 @@ function evaluate(candles15,candles1h,strategy){
 }
 
 function openingRangeAndVwap(candles15){
-  // New York 09:30-10:00 ET opening range; volume-weighted price from 09:30.
-  if(!candles15.length) return null;
-  const formatter = new Intl.DateTimeFormat('en-US',{
-    timeZone:'America/New_York',weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',
-    hour:'2-digit',minute:'2-digit',hourCycle:'h23'
-  });
-  const parts = timestamp => Object.fromEntries(
-    formatter.formatToParts(new Date(timestamp)).map(x=>[x.type,x.value])
-  );
-  const latest = parts(candles15.at(-1).t);
-  if(latest.weekday==='Sat'||latest.weekday==='Sun') return null;
-  const date = latest.year+'-'+latest.month+'-'+latest.day;
-  const session=[], opening=[];
-  for(const candle of candles15){
-    const d=parts(candle.t);
-    if(d.year+'-'+d.month+'-'+d.day!==date) continue;
-    const minute=Number(d.hour)*60+Number(d.minute);
-    if(minute>=570) session.push(candle);
-    if(minute>=570 && minute<600) opening.push(candle);
+  if(!Array.isArray(candles15)||!candles15.length)return null;
+  const formatter=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+  const last=candles15.at(-1).t;
+  // Search real UTC instants for the latest scheduled ET anchor; DST-safe.
+  let anchor=null,sessionName=null;
+  for(let t=last-1800000;t>=last-36*3600000;t-=900000){
+    const local=formatter.format(new Date(t));
+    const names={'03:00':'London','09:30':'New York','19:00':'Asia'};
+    if(names[local]){anchor=t;sessionName=names[local];break;}
   }
-  if(opening.length!==2 || session.length<3) return null;
-  const volume=session.reduce((a,c)=>a+c.v,0);
-  if(!(volume>0)) return null;
-  return {
-    orh:Math.max(...opening.map(c=>c.h)),
-    orl:Math.min(...opening.map(c=>c.l)),
-    vwap:session.reduce((a,c)=>a+((c.h+c.l+c.c)/3)*c.v,0)/volume
-  };
+  if(anchor===null)return null;
+  const session=candles15.filter(c=>c.t>=anchor&&c.t<=last);
+  if(session.length<3||session.some((c,i)=>c.t!==anchor+i*900000))return null;
+  const opening=session.slice(0,2),volume=session.reduce((a,c)=>a+c.v,0);
+  if(!Number.isFinite(volume)||volume<=0)return null;
+  return {anchor,sessionName,orh:Math.max(...opening.map(c=>c.h)),orl:Math.min(...opening.map(c=>c.l)),
+    vwap:session.reduce((a,c)=>a+((c.h+c.l+c.c)/3)*c.v,0)/volume};
 }
 
 function confirmEntry(candles15,analysis){
@@ -2907,7 +2896,7 @@ function confirmEntry(candles15,analysis){
     return {reason:'Completed 15m candle is stale',checks:{trend:true,risk:true,volume:true,fresh:false}};
   const opening=openingRangeAndVwap(candles15);
   if(!opening)
-    return {reason:'Waiting for completed NY opening range and VWAP',checks:{trend:true,risk:true,volume:true,fresh:true,opening:false}};
+    return {reason:'Waiting for completed session opening range and VWAP',checks:{trend:true,risk:true,volume:true,fresh:true,opening:false}};
   const isLong=analysis.side==='LONG', last=analysis.last;
   const close=candles15.map(c=>c.c), fast=ema(close,9),slow=ema(close,21);
   const cross=Array.from({length:Math.min(8,close.length-1)},(_,i)=>close.length-1-i)
@@ -3809,7 +3798,7 @@ function drawChart(
     if(enabled('vwap'))items.push(['UTC VWAP','#a78bfa']);
     if(enabled('nylevels')&&timeframe==='15m'){
       const ny=Array.isArray(candleData)?openingRangeAndVwap(candleData):null;
-      if(ny)items.push(['NY AVWAP / ORH / ORL','#eab308']);
+      if(ny)items.push([ny.sessionName+' AVWAP / ORH / ORL','#eab308']);
     }
     if(Array.isArray(candleData)&&Number.isFinite(candleData.at(-1)?.c))items.push(['Close '+fmt(candleData.at(-1).c),'#edf5ff']);
     items.push(['Time · UTC','#8292a5']);
@@ -4019,7 +4008,7 @@ function drawChart(
   if(timeframe==='15m' && visible("nylevels")){
     const ny=openingRangeAndVwap(candleData);
     if(ny){
-      for(const [title,price,color] of [['NY AVWAP',ny.vwap,'#c084fc'],['ORH',ny.orh,'#eab308'],['ORL',ny.orl,'#eab308']]){
+      for(const [title,price,color] of [[ny.sessionName+' AVWAP',ny.vwap,'#c084fc'],['ORH',ny.orh,'#eab308'],['ORL',ny.orl,'#eab308']]){
         if(Number.isFinite(price))candleSeries.createPriceLine({price,color,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:false,title:''});
       }
     }
