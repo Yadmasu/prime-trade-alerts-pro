@@ -1224,6 +1224,12 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
     </div>
   </div>
 
+  <section id="primeStructurePanel" hidden style="margin:12px 0;padding:12px;border:1px solid #26364a;border-radius:12px;background:#101923;min-width:0" aria-label="Market structure research">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700"><span>MARKET STRUCTURE</span><span id="primeStructureBias">—</span></div>
+    <svg id="primeStructurePlot" viewBox="0 0 320 112" width="100%" style="display:block;margin:8px 0" role="img" aria-label="Confirmed swing structure"></svg>
+    <div id="primeStructureDetail" style="font-size:12px;color:#a7b9ce;overflow-wrap:anywhere">Waiting for completed candles.</div>
+    <p class="muted mini" style="margin:6px 0 0">Research only · not an entry alert</p>
+  </section>
   <div class="chart-share-actions" aria-label="Chart actions">
     <button type="button" id="shareChartTelegram">Share Telegram Image</button>
     <button type="button" id="shareChartWhatsapp">Share WhatsApp Image</button>
@@ -2001,6 +2007,7 @@ function syncButtons(){
 }
 
 function clearChart(){
+  renderPrimeStructurePanel([],null);
 
   const canvas =
     $('priceChart');
@@ -3747,6 +3754,7 @@ function drawChart(
 
   const host = $('interactiveChart');
   const fallback = $('priceChart');
+  renderPrimeStructurePanel(candleData,timeframe);
   updateChartStatus(analysis,confirmed,timeframe);
   renderSRInfo(candleData);
   const visible = key => document.querySelector('[data-indicator="'+key+'"]')?.checked !== false;
@@ -3833,14 +3841,6 @@ function drawChart(
     }))
   );
 
-  if(visible('structure')){
-    const events=primeSwingStructure(candleData).events.slice(-6);
-    if(typeof candleSeries.setMarkers==='function')candleSeries.setMarkers(events.map(e=>({
-      time:Math.floor(e.t/1000),position:e.side==='UP'?'belowBar':'aboveBar',
-      color:e.side==='UP'?'#21d6a5':'#ff637c',
-      shape:e.side==='UP'?'arrowUp':'arrowDown',text:e.kind
-    })));
-  }
   lastChartCandleSeries=candleSeries;
   // Cross discoveries stay in the Markets tab; no overlapping text/arrows on price candles.
   const closes = candleData.map(item=>item.c);
@@ -4120,6 +4120,49 @@ function primeSwingStructure(bars,wing=2){
     }
   }
   return {bias,events};
+}
+
+function primePanelGeometry(bars){
+  const source=Array.isArray(bars)?bars:[];
+  const {bias,events}=primeSwingStructure(source);
+  const swings=[];
+  for(let j=2;j<source.length-2;j++){
+    const p=source[j],near=source.slice(j-2,j+3).filter((_,k)=>k!==2);
+    const hi=near.every(b=>p.h>b.h),lo=near.every(b=>p.l<b.l);
+    if(hi===lo)continue;
+    const point={t:p.t,price:hi?p.h:p.l,type:hi?'H':'L'};
+    const previous=swings.at(-1);
+    if(previous?.type===point.type){
+      if(hi?point.price>previous.price:point.price<previous.price)swings[swings.length-1]=point;
+    }else swings.push(point);
+  }
+  const points=swings.slice(-7);
+  const last=source.at(-1);
+  if(last&&points.length)points.push({t:last.t,price:last.c,type:'C'});
+  return {bias,event:events.at(-1),points};
+}
+function renderPrimeStructurePanel(bars,timeframe){
+  const panel=document.getElementById('primeStructurePanel'),plot=document.getElementById('primeStructurePlot'),status=document.getElementById('primeStructureBias'),detail=document.getElementById('primeStructureDetail');
+  if(!panel||!plot||!status||!detail)return;
+  panel.hidden=!document.querySelector('[data-indicator="structure"]')?.checked;
+  plot.replaceChildren();
+  const {bias,event,points}=primePanelGeometry(bars);
+  const color=bias==='UP'?'#21d6a5':bias==='DOWN'?'#ff637c':'#a7b9ce';
+  status.textContent=bias==='UP'?'BULLISH':bias==='DOWN'?'BEARISH':'—';
+  status.style.color=color;
+  detail.textContent=event?(timeframe||'').toUpperCase()+' · '+event.kind+' '+event.side+' · '+Number(event.price.toPrecision(7))+' · '+new Date(event.t).toISOString().slice(0,16).replace('T',' ')+' UTC (bar open)': 'No confirmed swing break available.';
+  plot.style.display=points.length>=2?'block':'none';
+  if(points.length<2)return;
+  const min=Math.min(...points.map(p=>p.price)),max=Math.max(...points.map(p=>p.price));
+  const x=t=>12+296*(t-points[0].t)/Math.max(1,points.at(-1).t-points[0].t);
+  const y=v=>96-78*(v-min)/Math.max(max-min,Math.abs(max)*1e-10,1e-12);
+  const add=(tag,attrs,txt)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(txt)el.textContent=txt;plot.appendChild(el);};
+  add('polyline',{points:points.map(p=>x(p.t)+','+y(p.price)).join(' '),fill:'none',stroke:color,'stroke-width':1.7,'stroke-linejoin':'round','stroke-linecap':'round'});
+  if(event&&event.t>=points[0].t&&event.t<=points.at(-1).t&&event.price>=min&&event.price<=max){
+    const ex=x(event.t),ey=y(event.price);
+    add('line',{x1:Math.max(12,ex-40),x2:Math.min(308,ex+40),y1:ey,y2:ey,stroke:color,'stroke-width':1,'stroke-dasharray':'4 3'});
+    add('circle',{cx:ex,cy:ey,r:3,fill:'#101923',stroke:color,'stroke-width':1.5});
+  }
 }
 
 function updateV5Sentiment(analysis,data){
