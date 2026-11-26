@@ -4601,7 +4601,8 @@ async function checkAlert(){
 
     const[
       candles15,
-      candles1h
+      candles1h,
+      candles4h
     ]=await Promise.all([
       candles(
         info.coin,
@@ -4612,7 +4613,8 @@ async function checkAlert(){
         info.coin,
         '1h',
         17
-      )
+      ),
+      candles(info.coin,'4h',45)
     ]);
 
     const analysis =
@@ -4625,10 +4627,12 @@ async function checkAlert(){
     const signal =
       confirmEntry(
         candles15,
-        analysis
+        analysis,
+        candles1h,
+        candles4h
       );
 
-    if(id==='BTC'||!signal.confirmed){
+    if(id==='BTC'||!signal.confirmed||!(Number(info.notional)>=MIN_24H_NOTIONAL)){
       return;
     }
 
@@ -4651,7 +4655,6 @@ async function checkAlert(){
     const key =
       'yoyo-v41:'+
       id+':'+
-      $('strategy').value+':'+
       signal.side+':'+
       signal.candle;
 
