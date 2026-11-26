@@ -168,27 +168,30 @@ async def candles(session: aiohttp.ClientSession, coin: str, interval: str, days
 
 NY = ZoneInfo("America/New_York")
 
+def session_anchor(timestamp: int) -> int:
+    """Latest scheduled completed 30-minute range, every day, in ET."""
+    from datetime import timedelta
+    local = datetime.fromtimestamp(timestamp / 1000, NY)
+    candidates = []
+    for day in (local.date() - timedelta(days=1), local.date()):
+        for hour, minute in ((3, 0), (9, 30), (19, 0)):
+            anchor = datetime(day.year, day.month, day.day, hour, minute, tzinfo=NY)
+            ms = int(anchor.timestamp() * 1000)
+            if ms + 1800000 <= timestamp:
+                candidates.append(ms)
+    return max(candidates)
+
+
 def opening_range_and_vwap(rows: list[dict]) -> tuple[float, float, float] | None:
-    """NY 09:30-10:00 ET range; VWAP anchored to 09:30, completed candles only."""
     if not rows:
         return None
-    latest = datetime.fromtimestamp(rows[-1]["t"] / 1000, timezone.utc).astimezone(NY)
-    if latest.weekday() >= 5 or (latest.hour, latest.minute) < (10, 0):
+    anchor = session_anchor(rows[-1]["t"])
+    session = [row for row in rows if anchor <= row["t"] <= rows[-1]["t"]]
+    if len(session) < 3 or any(row["t"] != anchor + i * 900000 for i, row in enumerate(session)):
         return None
-    session = []
-    opening = []
-    for row in rows:
-        dt = datetime.fromtimestamp(row["t"] / 1000, timezone.utc).astimezone(NY)
-        if dt.date() != latest.date():
-            continue
-        if (dt.hour, dt.minute) >= (9, 30):
-            session.append(row)
-        if (9, 30) <= (dt.hour, dt.minute) < (10, 0):
-            opening.append(row)
-    if len(opening) != 2 or len(session) < 3:
-        return None
+    opening = session[:2]
     volume = sum(row["v"] for row in session)
-    if volume <= 0:
+    if not math.isfinite(volume) or volume <= 0:
         return None
     vwap = sum((row["h"] + row["l"] + row["c"]) / 3 * row["v"] for row in session) / volume
     return max(row["h"] for row in opening), min(row["l"] for row in opening), vwap
@@ -210,7 +213,7 @@ def confirmed_signal(rows15: list[dict], rows1h: list[dict], rows4h: list[dict],
     last = rows15[-1]
     opening = opening_range_and_vwap(rows15)
     if opening is None:
-        return reject('NY_opening_range_unavailable')
+        return reject('session_opening_range_unavailable')
     orh, orl, anchored_vwap = opening
     long_aligned = (ema9_15[-1] > ema21_15[-1] and
                     rows1h[-1]["c"] > ema9_1h[-1] > ema21_1h[-1] and
@@ -301,12 +304,11 @@ async def scan_market(session: aiohttp.ClientSession, semaphore: asyncio.Semapho
             if signal:
                 import hashlib
                 import struct
-                stamp = datetime.fromtimestamp(signal["candle"]/1000, NY)
-                anchor = stamp.replace(hour=9, minute=30, second=0, microsecond=0)
+                anchor = session_anchor(signal["candle"])
                 digest = hashlib.sha256()
                 for row in rows15:
                     digest.update(struct.pack(">6d", *(row[k] for k in ("t","o","h","l","c","v"))))
-                signal.update(size_decimals=market.size_decimals, first=rows15[0]["t"], anchor=int(anchor.timestamp()*1000),
+                signal.update(size_decimals=market.size_decimals, first=rows15[0]["t"], anchor=anchor,
                               history_hash=digest.hexdigest(),
                               chart_id=hashlib.sha256(f"{market.coin}/{signal['candle']}/{signal['side']}".encode()).hexdigest()[:32])
             return market, signal
