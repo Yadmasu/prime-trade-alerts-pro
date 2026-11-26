@@ -1170,7 +1170,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
   </div>
 
   <details class="v5-indicator-panel"><summary>Indicators · 5 selected for research</summary><div class="v5-indicator-grid"><label><input type="checkbox" checked disabled> EMA9 / EMA21</label><label><input type="checkbox" checked disabled> RSI</label><label><input type="checkbox" checked disabled> MACD</label><label><input type="checkbox" checked disabled> Volume</label><label><input type="checkbox" checked disabled> Bollinger Bands</label></div><p class="muted mini">Research indicators are computed from live candles. Chart overlays can be changed in Chart → Tools.</p></details>
-  <div class="v5-sentiment" aria-live="polite"><div class="v5-sentiment-heading">MARKET SENTIMENT <span>Research only · not an entry alert</span></div><div class="v5-sentiment-grid"><div><small>Direction</small><strong id="v5Direction">—</strong></div><div><small>Trend agreement</small><strong id="v5Agreement">—</strong></div><div><small>15m / 1H / 4H / 1D</small><strong id="v5Timeframes">—</strong></div></div><div class="v5-sentiment-grid" id="primeResearchMetrics" aria-label="Research metrics"><div><small>15m RVOL · prior 20 bars</small><strong id="primeRvol">—</strong></div><div><small>15m ATR(14) · simple mean TR</small><strong id="primeAtr">—</strong></div><div><small>NY opening range · 09:30–10:00 ET</small><strong id="primeOR">—</strong></div><div><small>NY anchored VWAP · 09:30 ET</small><strong id="primeAvwap">—</strong></div><div><small>15m structure · prior 6-bar close break</small><strong id="primeStructure">—</strong></div></div><p id="v5SentimentNote" class="muted mini">Tap Analyze Now for a fresh analysis.</p></div>
+  <div class="v5-sentiment" aria-live="polite"><div class="v5-sentiment-heading">MARKET SENTIMENT <span>Research only · not an entry alert</span></div><div class="v5-sentiment-grid"><div><small>Direction</small><strong id="v5Direction">—</strong></div><div><small>Trend agreement</small><strong id="v5Agreement">—</strong></div><div><small>15m / 1H / 4H / 1D</small><strong id="v5Timeframes">—</strong></div></div><div class="v5-sentiment-grid" id="primeResearchMetrics" aria-label="Research metrics"><div><small>15m RVOL · prior 20 bars</small><strong id="primeRvol">—</strong></div><div><small>15m ATR(14) · simple mean TR</small><strong id="primeAtr">—</strong></div><div><small>NY opening range · 09:30–10:00 ET</small><strong id="primeOR">—</strong></div><div><small>NY anchored VWAP · 09:30 ET</small><strong id="primeAvwap">—</strong></div><div><small>15m swing structure · BOS / CHOCH</small><strong id="primeStructure">—</strong></div></div><p id="v5SentimentNote" class="muted mini">Tap Analyze Now for a fresh analysis.</p></div>
   <div class="status" id="status">Connecting...</div>
 
   <div class="notice" id="connectionHelp">
@@ -1207,7 +1207,7 @@ main>.panel{background:#111720;border:1px solid #27313e;border-radius:12px;box-s
 <section class="panel" id="liveChart">
   <div class="pro-section-kicker">Chart workspace · Hyperliquid feed</div><h2>Live Price Chart</h2>
 
-  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="sr" checked> Support / Resistance</label><label><input type="checkbox" data-indicator="vwap"> UTC Session VWAP</label><label><input type="checkbox" data-indicator="fib"> Fibonacci (clean 0.382 / 0.5 / 0.618)</label><label><input type="checkbox" data-indicator="rsi"> RSI Panel</label><label><input type="checkbox" data-indicator="macd"> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="9,21" selected>EMA 9 / 21</option><option value="21,89">EMA 21 / 89</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
+  <details class="indicator-settings"><summary>Indicators &amp; Fibonacci settings</summary><div class="indicator-switches"><label><input type="checkbox" data-indicator="ema" checked> EMA9 / EMA21</label><label><input type="checkbox" data-indicator="volume" checked> Volume + SMA20</label><label><input type="checkbox" data-indicator="sr" checked> Support / Resistance</label><label><input type="checkbox" data-indicator="vwap"> UTC Session VWAP</label><label><input type="checkbox" data-indicator="nylevels"> NY AVWAP + ORH/ORL</label><label><input type="checkbox" data-indicator="structure"> BOS / CHOCH</label><label><input type="checkbox" data-indicator="fib"> Fibonacci (clean 0.382 / 0.5 / 0.618)</label><label><input type="checkbox" data-indicator="rsi"> RSI Panel</label><label><input type="checkbox" data-indicator="macd"> MACD Panel</label><label><input type="checkbox" data-indicator="bb"> Bollinger Bands</label></div><label class="mini" for="chartEmaPreset">Chart EMA preset (display only)</label><select id="chartEmaPreset"><option value="9,21" selected>EMA 9 / 21</option><option value="21,89">EMA 21 / 89</option><option value="13,89">EMA 13 / 89</option><option value="20,89">EMA 20 / 89</option><option value="21">EMA 21 only</option><option value="none">Hide EMA</option></select><label class="mini" for="customEmaPeriods">Custom EMA numbers (e.g. 9, 21, 50, 200)</label><input id="customEmaPeriods" type="text" inputmode="numeric" placeholder="9, 21, 50, 200" maxlength="50" aria-label="Custom EMA periods"><button type="button" id="applyCustomEma">Apply EMA</button><button type="button" id="resetCustomEma">Reset EMA</button><p id="emaInputStatus" class="muted mini" aria-live="polite">Enter 1–6 EMA periods between 2 and 500. Display only.</p><p class="muted mini">Display settings only · Confirmed entry still uses EMA9/21 and 15m + 1H.</p></details>
   <div class="chart-quickbar"><button type="button" id="chartToolsButton">⚙ Tools</button><button type="button" id="chartCleanButton">◉ Clean</button><button type="button" id="chartProButton" aria-pressed="false">◈ Pro</button><button type="button" id="chartExpandButton">⛶ Expand</button></div>
   <div class="chart-status-strip" aria-live="polite">
     <span id="chartSignalStatus" class="chart-state">WAIT · NO ENTRY</span>
@@ -2024,6 +2024,7 @@ function resetOutputs(
   lastSnapshot = null;
   const d=document.getElementById('v5Direction'),a=document.getElementById('v5Agreement'),t=document.getElementById('v5Timeframes'),n=document.getElementById('v5SentimentNote');
   if(d)d.textContent='—';if(a)a.textContent='—';if(t)t.textContent='—';if(n)n.textContent='Waiting for fresh data.';
+  document.querySelectorAll('#primeResearchMetrics strong').forEach(el=>el.textContent='—');
 
   $('manualResult').innerHTML = `
 
@@ -3832,6 +3833,14 @@ function drawChart(
     }))
   );
 
+  if(visible('structure')){
+    const events=primeSwingStructure(candleData).events.slice(-6);
+    if(typeof candleSeries.setMarkers==='function')candleSeries.setMarkers(events.map(e=>({
+      time:Math.floor(e.t/1000),position:e.side==='UP'?'belowBar':'aboveBar',
+      color:e.side==='UP'?'#21d6a5':'#ff637c',
+      shape:e.side==='UP'?'arrowUp':'arrowDown',text:e.kind
+    })));
+  }
   lastChartCandleSeries=candleSeries;
   // Cross discoveries stay in the Markets tab; no overlapping text/arrows on price candles.
   const closes = candleData.map(item=>item.c);
@@ -3935,7 +3944,7 @@ function drawChart(
   }
 
   // Research-only session levels, using the same 15m session helper as entry verification.
-  if(timeframe==='15m' && visible("vwap")){
+  if(timeframe==='15m' && visible("nylevels")){
     const ny=openingRangeAndVwap(candleData);
     if(ny){
       for(const [title,price,color] of [['NY AVWAP',ny.vwap,'#c084fc'],['ORH',ny.orh,'#eab308'],['ORL',ny.orl,'#eab308']]){
@@ -4090,6 +4099,29 @@ function drawChart(
 }
 
 
+function primeSwingStructure(bars,wing=2){
+  let high=null,low=null,bias=null;
+  const events=[];
+  if(!Array.isArray(bars))return {bias,events};
+  for(let i=2*wing;i<bars.length;i++){
+    const j=i-wing,p=bars[j],around=bars.slice(j-wing,j+wing+1).filter((_,k)=>k!==wing);
+    if(around.every(b=>p.h>b.h))high={price:p.h,broken:false};
+    if(around.every(b=>p.l<b.l))low={price:p.l,broken:false};
+    const b=bars[i];
+    const up=high&&!high.broken&&b.c>high.price;
+    const down=low&&!low.broken&&b.c<low.price;
+    if(up===true&&down===true)continue;
+    if(up||down){
+      const side=up?'UP':'DOWN',level=up?high:low;
+      level.broken=true;
+      const kind=bias===null?'BREAK':bias===side?'BOS':'CHOCH';
+      events.push({t:b.t,side,kind,price:level.price});
+      bias=side;
+    }
+  }
+  return {bias,events};
+}
+
 function updateV5Sentiment(analysis,data){
   const direction=document.getElementById('v5Direction');
   const agreement=document.getElementById('v5Agreement');
@@ -4125,12 +4157,8 @@ function updateV5Sentiment(analysis,data){
   put('primeAtr',fmt(ar));
   put('primeOR',session?fmt(session.orh)+' / '+fmt(session.orl):'UNAVAILABLE');
   put('primeAvwap',session?fmt(session.vwap):'UNAVAILABLE');
-  let structure='UNAVAILABLE';
-  if(bars.length>=7){
-    const prior=bars.slice(-7,-1),close=bars.at(-1).c;
-    structure=close>Math.max(...prior.map(b=>b.h))?'UP BREAK':close<Math.min(...prior.map(b=>b.l))?'DOWN BREAK':'NO BREAK';
-  }
-  put('primeStructure',structure);
+  const structure=primeSwingStructure(bars),event=structure.events.at(-1);
+  put('primeStructure',event?event.kind+' '+event.side+' · '+fmt(event.price)+' · '+new Date(event.t+900000).toISOString().slice(11,16)+' UTC close':bars.length>=5?'NO CONFIRMED SWING BREAK':'UNAVAILABLE');
   agreement.textContent=Number.isFinite(analysis.agreement)?analysis.agreement+'% (15m/1H)':'—';
   note.textContent=four==='—'?'4H research unavailable. 15m/1H entry logic is unchanged.':'Trend agreement is not win probability. Entry requires separate confirmation and live-price verification.';
 }
@@ -5165,7 +5193,7 @@ setInterval(()=>{
     if(!savedProSettings){
       savedProSettings=Object.fromEntries(inputs.map(x=>[x.dataset.indicator,x.checked]));
       inputs.forEach(x=>{
-        x.checked=['ema','volume','sr','vwap','rsi'].includes(x.dataset.indicator);
+        x.checked=['ema','volume','sr','vwap','rsi','nylevels','structure'].includes(x.dataset.indicator);
       });
       proButton.textContent='◈ Pro ON';
       proButton.setAttribute('aria-pressed','true');
