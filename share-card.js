@@ -108,21 +108,26 @@ function drawShareCard(snapshot,source,extras){
   text(m.id+'  ·  '+m.tf,52,167,30,COLOR.white,'800');
   text(m.headline,1342,165,21,m.confirmed?
     (m.direction==='BULLISH'?COLOR.up:COLOR.down):COLOR.gold,'800','right');
-  const frame={x:52,y:194,w:1008,h:574},plot={x:72,y:220,w:870,h:451};
+  const frame={x:52,y:194,w:1008,h:574},plot={x:72,y:220,w:870,h:407};
   rect(frame.x,frame.y,frame.w,frame.h,'#0a1929');
   g.strokeStyle='#334860';g.strokeRect(frame.x,frame.y,frame.w,frame.h);
-  const x=i=>plot.x+(i+.5)*plot.w/m.data.length;
+  const step=plot.w/(m.data.length+4);
+  const x=i=>plot.x+(i+.5)*step;
+  const priceY=plot.y+(m.high-m.price)/(m.high-m.low)*plot.h;
   const y=p=>plot.y+(m.high-p)/(m.high-m.low)*plot.h;
   g.lineWidth=1;g.strokeStyle=COLOR.grid;
   for(let i=0;i<=5;i++){
     const py=plot.y+(plot.h*i/5);
     g.beginPath();g.moveTo(plot.x,py);g.lineTo(plot.x+plot.w,py);g.stroke();
-    text(formatPrice(m.high-(m.high-m.low)*i/5),plot.x+plot.w+11,py+4,14,COLOR.muted,'500');
+    if(Math.abs(py-priceY)>19)text(formatPrice(m.high-(m.high-m.low)*i/5),plot.x+plot.w+11,py+4,14,COLOR.muted,'500');
   }
   for(let i=0;i<5;i++){
-    const px=plot.x+plot.w*i/4;
+    const index=Math.round((m.data.length-1)*i/4),px=x(index);
     g.beginPath();g.moveTo(px,plot.y);g.lineTo(px,plot.y+plot.h);g.stroke();
+    const stamp=new Date(m.data[index].t).toISOString();
+    text(m.tf==='1D'?stamp.slice(5,10):stamp.slice(11,16),px,727,13,COLOR.muted,'500',i===0?'left':'center');
   }
+  text('UTC',plot.x+plot.w+11,727,12,COLOR.muted,'500');
   const barw=Math.max(3,Math.min(10,plot.w/m.data.length*.68));
   m.data.forEach((b,i)=>{
     const color=b.c>=b.o?COLOR.up:COLOR.down;
@@ -132,29 +137,42 @@ function drawShareCard(snapshot,source,extras){
     g.fillRect(x(i)-barw/2,top,barw,Math.max(1,bot-top));
   });
   const drawEma=(array,color)=>{
-    g.strokeStyle=color;g.lineWidth=2.5;g.beginPath();let first=true;
+    g.strokeStyle=color;g.lineWidth=1.1;g.beginPath();let first=true;
     array.forEach((v,i)=>{if(!Number.isFinite(v))return;
       if(first){g.moveTo(x(i),y(v));first=false;}else g.lineTo(x(i),y(v));
     });if(!first)g.stroke();
   };
-  drawEma(m.ema9,COLOR.blue);drawEma(m.ema21,COLOR.orange);
+  drawEma(m.ema9,'rgba(88,166,255,.85)');drawEma(m.ema21,'rgba(246,162,58,.85)');
   // Pivot lines are intentionally thin; numeric tags live in the dedicated sidebar.
-  for(const l of m.levels){
+  let lastTagY=-999;
+  for(const l of [...m.levels].sort((a,b)=>b.price-a.price)){
     if(l.price<m.low||l.price>m.high)continue;
     g.lineWidth=1;g.strokeStyle=l.color;g.setLineDash([6,7]);
     g.beginPath();g.moveTo(plot.x,y(l.price));g.lineTo(plot.x+plot.w,y(l.price));g.stroke();
     g.setLineDash([]);
+    const tagY=Math.max(y(l.price),lastTagY+19);
+    if(tagY<plot.y+plot.h-8){
+      rect(plot.x+3,tagY-9,l.name.length>1?48:22,17,COLOR.bg);
+      text(l.name,plot.x+7,tagY+4,12,l.color,'700');lastTagY=tagY;
+    }
   }
-  rect(plot.x,689,plot.w,50,'#0c1a29');
-  const peak=Math.max(1,...m.data.map(b=>b.v));
+  g.lineWidth=1;g.strokeStyle=COLOR.muted;g.setLineDash([2,5]);
+  g.beginPath();g.moveTo(plot.x,priceY);g.lineTo(plot.x+plot.w,priceY);g.stroke();g.setLineDash([]);
+  rect(plot.x+plot.w+3,priceY-10,105,21,COLOR.panel);
+  text(formatPrice(m.price),plot.x+plot.w+9,priceY+5,14,COLOR.white,'700');
+  rect(plot.x,637,plot.w,71,'#0c1a29');
+  const sma=m.data.map((_,i)=>{const end=m.all.length-m.data.length+i+1;return end>=20?m.all.slice(end-20,end).reduce((sum,b)=>sum+b.v,0)/20:null;});
+  const peak=Math.max(1,...m.data.map(b=>b.v),...sma.filter(Number.isFinite));
   m.data.forEach((b,i)=>{
-    rect(x(i)-barw/2,738-45*b.v/peak,barw,45*b.v/peak,
+    rect(x(i)-barw/2,706-65*b.v/peak,barw,65*b.v/peak,
       b.c>=b.o?'#2b8779':'#8e4b5a');
   });
+  g.strokeStyle=COLOR.muted;g.lineWidth=1;g.beginPath();let started=false;
+  sma.forEach((v,i)=>{if(!Number.isFinite(v))return;const py=706-65*v/peak;if(started)g.lineTo(x(i),py);else{g.moveTo(x(i),py);started=true;}});if(started)g.stroke();
   // Avoid extrapolating a real-time market price from the last candle close.
   text('EMA 9',plot.x,756,14,COLOR.blue,'700');
   text('EMA 21',plot.x+85,756,14,COLOR.orange,'700');
-  text('VOLUME',plot.x+195,756,14,COLOR.muted,'700');
+  text('VOLUME · SMA20',plot.x+195,756,14,COLOR.muted,'700');
   rect(1076,194,272,574,'#142439');
   const divider=q=>{g.strokeStyle='#30465e';g.beginPath();
     g.moveTo(1098,q);g.lineTo(1326,q);g.stroke();};
